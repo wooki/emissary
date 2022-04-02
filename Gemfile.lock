@@ -1,0 +1,18 @@
+GIT
+  remote: https://github.com/wooki/fantasynamegenerator.git
+  revision: 2b89269001f72df8188ad2da640dae4b08273029
+  specs:
+    fantasynamegenerator (0.0.3)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  fantasynamegenerator!
+
+BUNDLED WITH
+   1.17.2
