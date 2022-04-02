@@ -656,7 +656,7 @@ mg = Wraithdale::MapGenerator.new seeded
 map = mg.generate options[:size]
 
 if options[:file] and options[:format] == "json"
-   puts "SEED: #{mg.seed}"
+   $stdout.print "#{mg.seed}"
    File.open(options[:file], 'w') do | file |
       file.print map.to_json
    end
@@ -673,4 +673,5 @@ else
    # puts data
 end
 
-
+# pipe seed from json gen to svg so we get same map twice
+# bundle exec ruby map_generator.rb -f map.json -F json -S 100 -h 16 | xargs -I % sh -c 'bundle exec ruby map_generator.rb -f map.svg -S 100 -h 16 --seed=%'

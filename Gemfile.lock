@@ -9,10 +9,10 @@ GEM
   specs:
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
   fantasynamegenerator!
 
 BUNDLED WITH
-   1.17.2
+   2.3.10
