@@ -589,6 +589,8 @@ class MapGenerator
          elsif terrain == "ocean" && hex[:trade]
             io.print "<use href=\"#trade\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"black\" style=\"opacity:0.8\" />"
          end
+
+         # io.print "<text font-size=\"11px\" x=\"#{x}\" y=\"#{pos[:y]}\" fill=\"white\">#{hex[:x]},#{hex[:y]}</text>"
       }
 
       # town and city labels
