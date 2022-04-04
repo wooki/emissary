@@ -198,32 +198,41 @@ class MapUtils
    
 
    # recursively look at adjacent hexs until match condition met
-   def self.breadth_search(start, size, path=[], exclude=[])
+   def self.breadth_search(coord, size, can_be_traversed, is_found, path=[], exclude=[])
 
       # check if coord is outside map
+      return nil if !MapUtils::mapcontains(size, {x: coord[:x], y: coord[:y]})
 
-      # check if excluded - checked already
+      # check if excluded
+      return nil if exclude.include? "#{coord[:x]},#{coord[:y]}"
+
+      # add to exclude
+      exclude.push "#{coord[:x]},#{coord[:y]}"
 
       # check if this hex should be blocked
-      # can_be_traversed?
+      return nil if !can_be_traversed.call(coord, path)
 
-      # check if this search complete
-      # is_found?
-
-      # return path when found
-
+      # check if this search complete and return path      
+      return path if is_found.call(coord, path)         
+         
       # check all adjacents
       transforms = self.adjacent_transforms
       transforms.each { | transform |
 
-         # append path when returned
-      }
+         # recursively search
+         nextcoord = MapUtils::transform_coord(coord, transform)
+         next_path = Array.new
+         next_path.replace(path).push(nextcoord)
+         search_path = self.breadth_search(nextcoord, size, can_be_traversed, is_found, next_path, exclude);         
+         return search_path if search_path
+      }      
 
+      nil
    end
 
    # when we are searching for a path to a know coord then we can do better
    # with A* which estimates min distance and prioritises direct route
-   def self.astar_search()
+   def self.a_star_search()
    end
   
 end

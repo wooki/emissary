@@ -46,6 +46,8 @@ class MapGenerator
       @edge_ocean_chances = [100, 80, 50, 20]
       @city_away_from_edge = 10
       @town_away_from_edge = 3
+      @trade_node_min_size = 10
+      @trade_node_sample_size = 10
 
       # store the map as we build it
       @map = Hash.new
@@ -69,6 +71,10 @@ class MapGenerator
       @deserts = @deserts * areafactor
       @forests = @forests * areafactor
       @extra_plains = @extra_plains * areafactor
+      @trade_node_min_size = @trade_node_min_size * areafactor
+      @trade_node_sample_size = 20 - (@trade_node_sample_size * areafactor).round
+      @trade_node_sample_size = 1 if @trade_node_sample_size < 1      
+
 
       # adjust for a more land-based map
       # @mountain_chance = 300
@@ -92,7 +98,7 @@ class MapGenerator
       mountain_ranges_to_gen = (@mountain_ranges * size).round
       (1..mountain_ranges_to_gen).each { | x |
 
-         # get a coord within range of the centre
+         # get a coord within range of the center
          allowed_distance_edge = (size/2).round - ((size/2).round * @ocean_edge)
          allowed_distance_middle = ((size/2).round * @ocean_middle)
          summit = nil
@@ -247,6 +253,25 @@ class MapGenerator
          settlement[:name] = n
       }
 
+      # create trade nodes in large bodies of water
+      trade_nodes = possible_trade_nodes(size)
+      
+      # add trade node to map and find closest town/city for name
+      colors = ["deeppink", "indigo", "lightskyblue", "darkorange", "chartreuse", "orchid", "tomato", "thistle"]
+      trade_nodes.each { | hex |
+         hex = getHex(hex[:x], hex[:y])
+         hex[:tradenode] = colors.pop
+      }
+
+      # assign each town/city to closest trade node via ocean
+      
+
+      
+
+      
+
+
+
       # rivers would be great for map making but not so practival for game making
       # maybe leave for now!
 
@@ -264,7 +289,122 @@ class MapGenerator
       # find all ocean and set coast edges of adjacent not ocean
       # TODO
 
+      # Trade nodes need to allow river travel if the above is added
+
       @map
+   end
+
+   def getHex(x, y)
+      @map["#{x},#{y}"]
+   end
+
+   # finds all ocean hexs that are surrounded by ocean in all directions by at
+   # least @trade_node_min_size
+   def possible_trade_nodes(size)
+
+      # only ever check a certain distance
+      max_range = 3 * @trade_node_min_size
+
+      # get all water that is completely surrounded by water
+      # then reduce list as much as possible for speed
+      possible_nodes = get_terrain('ocean').filter { | hex |            
+         adj = count_terrain(MapUtils::adjacent(hex, size))                  
+         adj['ocean'] == 6
+      }   
+      
+      # any near edge will be found anyway - so safe to remove a lot
+      possible_nodes.filter! { | hex |            
+         dist_from_middle = MapUtils::distance(hex, {:x => (size/2).round, :y => (size/2).round})
+         dist_from_middle < (size/2).round-4
+      }
+
+      # just remove 1 in X nodes in the list - will be found anyway
+      possible_nodes = possible_nodes.shuffle.each_slice(@trade_node_sample_size).map(&:first)      
+      
+      # find all possible trade nodes (blocks of ocean)
+      possible_nodes = possible_nodes.map { | hex |
+         possible_trade_node(hex, size, max_range)
+      }      
+      possible_nodes.compact!
+      
+      # order by size
+      possible_nodes.sort! { | a, b |
+         a[:hexes].length <=> b[:hexes].length
+      }
+      possible_nodes.reverse!
+      
+      # remove any subsequent nodes that appear in an earlier block
+      possible_nodes.filter! { | node |
+         found = false
+
+         node_index = possible_nodes.index { | n | n[:x] == node[:x] and n[:y] == node[:y] }
+
+         better_nodes = possible_nodes.slice(node_index + 1, possible_nodes.length)
+
+         if better_nodes.length > 0            
+            better_nodes.each { | better_node |
+               
+               if better_node[:x] == node[:x] and better_node[:y] == node[:y]
+                  found = true
+               elsif better_node[:hexes].index { | n | n[:x] == node[:x] and n[:y] == node[:y] }
+                  found = true
+               end
+            }
+         end
+         
+         !found
+      }         
+   end
+
+   # find the ocean area around a hex and check if center is ocean
+   def possible_trade_node(start, size, max_range)
+
+      # search continues up to a reasonable max
+      is_found = lambda do | coord, path |          
+         false # never found in this use
+      end
+
+      # remember all hexs
+      searched_hexes = Array.new
+      can_be_traversed = lambda do | coord, path | 
+         # exclude once we hit a max range from start
+         distance = MapUtils::distance(coord, {:x => start[:x], :y => start[:y]})
+         return false if distance > max_range
+
+         # check terrain
+         mapcoord = @map["#{coord[:x]},#{coord[:y]}"]         
+         can_traverse = mapcoord[:terrain] == 'ocean'
+         searched_hexes.push(mapcoord) if can_traverse
+
+         can_traverse
+      end
+      
+      # we won't have a parh because we aren't going anywhere specific
+      MapUtils::breadth_search({:x => start[:x], :y => start[:y]}, size, can_be_traversed, is_found)
+      
+      # check center
+      max_x = searched_hexes.reduce(0) do | sum, hex |
+         sum + hex[:x]
+      end
+      max_y = searched_hexes.reduce(0) do | sum, hex |
+         sum + hex[:y]
+      end
+      center_x = (max_x.to_f / searched_hexes.length.to_f).round
+      center_y = (max_y.to_f / searched_hexes.length.to_f).round
+
+      # not allowed if not ocean and surrounded by ocean
+      center_hex = getHex(center_x, center_y)
+      return nil if center_hex[:terrain] != 'ocean'
+      adj = count_terrain(MapUtils::adjacent(center_hex, size))
+      return nil if adj['ocean'] != 6
+
+      # return center point and hexes that it contains
+      return {
+         :x => center_x, 
+         :y => center_y,
+         :hexes => searched_hexes
+      };
+
    end
 
    # check if this area is suitable for a town
@@ -553,7 +693,11 @@ class MapGenerator
             # terrain = "silver"
             terrain_color = "dimgray"
          elsif terrain == "ocean"
-            terrain_color = "#3D59AB"
+            if hex[:tradenode]
+               terrain_color = hex[:tradenode]
+            else
+               terrain_color = "#3D59AB"
+            end
          elsif terrain == "mountain"
             terrain_color = "slategray"
          elsif terrain == "plains"
@@ -586,11 +730,11 @@ class MapGenerator
             io.print "<use href=\"#town\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"white\" style=\"opacity:1.0\" />"
          elsif terrain == "city"
             io.print "<use href=\"#city\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"white\" style=\"opacity:1.0\" />"
-         elsif terrain == "ocean" && hex[:trade]
-            io.print "<use href=\"#trade\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"black\" style=\"opacity:0.8\" />"
+         elsif terrain == "ocean" && hex[:tradenode]
+            io.print "<use href=\"#trade\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"white\" style=\"opacity:0.8\" />"
          end
 
-         # io.print "<text font-size=\"11px\" x=\"#{x}\" y=\"#{pos[:y]}\" fill=\"white\">#{hex[:x]},#{hex[:y]}</text>"
+         # io.print "<text font-size=\"8px\" x=\"#{x}\" y=\"#{pos[:y]}\" fill=\"white\">#{hex[:x]},#{hex[:y]}</text>"
       }
 
       # town and city labels
@@ -613,6 +757,51 @@ class MapGenerator
 
          end
       }
+
+      # debug searched path
+      if @searched_hexes
+         @searched_hexes.each { | hex |
+            
+            pos = MapUtils::hex_pos(hex[:x], hex[:y], hexsize, xoffset, yoffset)
+            hexsizes = MapUtils::hexsizes(hexsize)
+            hex_points = MapUtils::hex_points(pos[:x], pos[:y], hexsize)
+
+            io.print "<polygon points=\""
+            hex_points.each { | hex_point |
+               io.print "#{hex_point[:x].round(2)},#{hex_point[:y].round(2)} "
+            }
+            io.print "\" fill=\"magenta\" fill-opacity=\"0.3\" />"
+         }
+      end
+      
+      if @searched_path
+         @searched_path.each { | hex |
+            
+            pos = MapUtils::hex_pos(hex[:x], hex[:y], hexsize, xoffset, yoffset)
+            hexsizes = MapUtils::hexsizes(hexsize)
+            hex_points = MapUtils::hex_points(pos[:x], pos[:y], hexsize)
+
+            io.print "<polygon points=\""
+            hex_points.each { | hex_point |
+               io.print "#{hex_point[:x].round(2)},#{hex_point[:y].round(2)} "
+            }
+            io.print "\" fill=\"black\" fill-opacity=\"0.3\" />"
+         }
+      end
+
+      if @searched_center
+            
+         pos = MapUtils::hex_pos(@searched_center[:x], @searched_center[:y], hexsize, xoffset, yoffset)
+         hexsizes = MapUtils::hexsizes(hexsize)
+         hex_points = MapUtils::hex_points(pos[:x], pos[:y], hexsize)
+
+         io.print "<polygon points=\""
+         hex_points.each { | hex_point |
+            io.print "#{hex_point[:x].round(2)},#{hex_point[:y].round(2)} "
+         }
+         io.print "\" fill=\"white\" fill-opacity=\"0.7\" />"
+      
+      end
 
       io.print "</svg>"
    end
