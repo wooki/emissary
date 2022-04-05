@@ -117,7 +117,7 @@ class MapUtils
    
     # return transforms needed to move to each adjacent area
     # for hex there are no diagonals to worry about excluding
-    def self.adjacent_transforms(diagonals=true)
+    def self.adjacent_transforms
         [
             {:x => 1, :y => 1},
             {:x => 0, :y => 1},
@@ -197,35 +197,57 @@ class MapUtils
    end
    
 
-   # recursively look at adjacent hexs until match condition met
-   def self.breadth_search(coord, size, can_be_traversed, is_found, path=[], exclude=[])
+   # look at adjacent hexs until match condition met, returning the path taken to that point
+   def self.breadth_search(startcoord, size, can_be_traversed, is_found)
 
-      # check if coord is outside map
-      return nil if !MapUtils::mapcontains(size, {x: coord[:x], y: coord[:y]})
+      # keep track of excluded
+      checked = Array.new
 
-      # check if excluded
-      return nil if exclude.include? "#{coord[:x]},#{coord[:y]}"
+      # add coord to the queue and then process the queue
+      queue = Queue.new
+      queue.push({
+         :coord => startcoord,
+         :path => Array.new
+      })
 
-      # add to exclude
-      exclude.push "#{coord[:x]},#{coord[:y]}"
+      while queue.length > 0 do
 
-      # check if this hex should be blocked
-      return nil if !can_be_traversed.call(coord, path)
+         # get coord to process
+         step = queue.pop
+         coord = step[:coord]
+         path = step[:path]
 
-      # check if this search complete and return path      
-      return path if is_found.call(coord, path)         
-         
-      # check all adjacents
-      transforms = self.adjacent_transforms
-      transforms.each { | transform |
+         # check if coord is inside map and not excluded
+         if MapUtils::mapcontains(size, {x: coord[:x], y: coord[:y]}) and
+            !checked.include? "#{coord[:x]},#{coord[:y]}"
 
-         # recursively search
-         nextcoord = MapUtils::transform_coord(coord, transform)
-         next_path = Array.new
-         next_path.replace(path).push(nextcoord)
-         search_path = self.breadth_search(nextcoord, size, can_be_traversed, is_found, next_path, exclude);         
-         return search_path if search_path
-      }      
+            # add to checked
+            checked.push "#{coord[:x]},#{coord[:y]}"
+
+            # check if this hex should be blocked
+            if can_be_traversed.call(coord, path)
+
+               # check if this search complete and return path
+               if is_found.call(coord, path)
+                  return path.push(coord)
+               else
+
+                  # add all adjacents to the queue
+                  transforms = self.adjacent_transforms
+                  transforms.each { | transform |
+
+                     # add to queue
+                     nextcoord = MapUtils::transform_coord(coord, transform)
+                     queue.push({
+                        :coord => nextcoord,
+                        :path => Array.new.replace(path).push(nextcoord)
+                     })
+                  }
+               end # found
+
+            end # dont traverse
+         end # not in map or excluded
+      end # more to process
 
       nil
    end
