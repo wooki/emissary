@@ -277,7 +277,10 @@ class MapGenerator
          # we won't have a path because we aren't going anywhere specific
          path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
          closest = getHex(path_to_closest.last[:x], path_to_closest.last[:y])
-         hex[:tradenode] = "#{closest[:name]} Trade Node"
+         hex[:trade] = {
+            :name => "#{closest[:name]} Trade Node",
+            :is_node => true
+         }
       }
 
       # assign each town/city to closest trade node via ocean
@@ -286,9 +289,11 @@ class MapGenerator
          tradenode = nil
 
          tradenode_found = lambda do | coord, path |
-            mapcoord = getHex(coord[:x], coord[:y])
-            tradenode = mapcoord
-            mapcoord[:tradenode]
+            if is_trade_node?(coord)
+               tradenode = getHex(coord[:x], coord[:y])
+            else
+               false
+            end
          end
 
          can_be_traversed = lambda do | coord, path, is_first |
@@ -302,8 +307,12 @@ class MapGenerator
 
          path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
          if path_to_closest
-            hex[:trade] = tradenode[:tradenode]
-            hex[:tradedistance] = path_to_closest.length
+            hex[:trade] = {
+               :x => tradenode[:x],
+               :y => tradenode[:y],
+               :name => tradenode[:trade][:name],
+               :distance => path_to_closest.length
+            }
          end
       }
 
@@ -315,9 +324,11 @@ class MapGenerator
             tradenode = nil
 
             tradenode_found = lambda do | coord, path |
-               mapcoord = getHex(coord[:x], coord[:y])
-               tradenode = mapcoord
-               mapcoord[:tradenode]
+               if is_trade_node?(coord)
+                  tradenode = getHex(coord[:x], coord[:y])
+               else
+                  false
+               end
             end
 
             can_be_traversed = lambda do | coord, path, is_first |
@@ -327,8 +338,12 @@ class MapGenerator
 
             path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
             if path_to_closest
-               hex[:trade] = tradenode[:tradenode]
-               hex[:tradedistance] = path_to_closest.length * @trade_node_land_multiplier
+               hex[:trade] = {
+                  :x => tradenode[:x],
+                  :y => tradenode[:y],
+                  :name => tradenode[:trade][:name],
+                  :distance => path_to_closest.length * @trade_node_land_multiplier
+               }
             end
          end
       }
@@ -338,23 +353,43 @@ class MapGenerator
          hex = getHex(hex[:x], hex[:y])
 
          closest = nil
+         path_to_closest = nil
          second_closest = nil
+         path_to_second_closest = nil
 
          tradenode_found = lambda do | coord, path |
             mapcoord = getHex(coord[:x], coord[:y])
-            if mapcoord[:tradenode] and mapcoord != hex
+
+            if is_trade_node?(coord) and mapcoord != hex
+
                if !closest.nil? and second_closest.nil?
+                  path_to_second_closest = path
                   second_closest = mapcoord
-                  second_closest[:tradeconnections] = Array.new if !second_closest[:tradeconnections]
-                  second_closest[:tradeconnections].push hex[:tradenode]
-                  second_closest[:tradeconnections].uniq!
+                  second_closest[:trade][:connected] = Array.new if !second_closest[:trade][:connected]
+                  second_closest[:trade][:connected].push({
+                     :name => hex[:trade][:name],
+                     :x => hex[:x],
+                     :y => hex[:y],
+                     :distance => path.length
+                  })
+                  second_closest[:trade][:connected].uniq!
                elsif closest.nil?
+                  path_to_closest = path
                   closest = mapcoord
-                  closest[:tradeconnections] = Array.new if !closest[:tradeconnections]
-                  closest[:tradeconnections].push hex[:tradenode]
-                  closest[:tradeconnections].uniq!
+                  closest[:trade][:connected] = Array.new if !closest[:trade][:connected]
+                  closest[:trade][:connected].push({
+                     :name => hex[:trade][:name],
+                     :x => hex[:x],
+                     :y => hex[:y],
+                     :distance => path.length
+                  })
+                  closest[:trade][:connected].uniq!
                end
+
+            else
+               false
             end
+
             (!closest.nil? and !second_closest.nil?)
          end
 
@@ -363,13 +398,25 @@ class MapGenerator
             ["city", "town", "ocean"].include? mapcoord[:terrain]
          end
 
-         path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
+         MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
 
          if closest
-            hex[:tradeconnections] = Array.new if !hex[:tradeconnections]
-            hex[:tradeconnections].push closest[:tradenode]
-            hex[:tradeconnections].push second_closest[:tradenode] if second_closest
-            hex[:tradeconnections].uniq!
+            hex[:trade][:connected] = Array.new if !hex[:trade][:connected]
+            hex[:trade][:connected].push({
+               :name => closest[:trade][:name],
+               :x => closest[:x],
+               :y => closest[:y],
+               :distance => path_to_closest.length
+            })
+            if second_closest
+               hex[:trade][:connected].push({
+                  :name => second_closest[:trade][:name],
+                  :x => second_closest[:x],
+                  :y => second_closest[:y],
+                  :distance => path_to_second_closest.length
+               })
+            end
+            hex[:trade][:connected].uniq!
          end
 
          puts hex.inspect
@@ -400,6 +447,20 @@ class MapGenerator
 
    def getHex(x, y)
       @map["#{x},#{y}"]
+   end
+
+   def is_trade_node?(coords)
+      hex = getHex(coords[:x], coords[:y])
+      hex[:trade] and hex[:trade][:is_node]
+   end
+
+   def getTradeNode(coords)
+      hex = getHex(coords[:x], coords[:y])
+      if hex[:trade] and trade[:x] and trade[:y]
+         getHex trade[:x], trade[:y]
+      else
+         nil
+      end
    end
 
 
@@ -795,7 +856,7 @@ class MapGenerator
             # terrain = "silver"
             terrain_color = "dimgray"
          elsif terrain == "ocean"
-            if hex[:tradenode]
+            if is_trade_node? hex
                # terrain_color = hex[:tradenode]
                terrain_color = "blueviolet"
             else
@@ -833,7 +894,7 @@ class MapGenerator
             io.print "<use href=\"#town\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"white\" style=\"opacity:1.0\" />"
          elsif terrain == "city"
             io.print "<use href=\"#city\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"white\" style=\"opacity:1.0\" />"
-         elsif terrain == "ocean" && hex[:tradenode]
+         elsif terrain == "ocean" and is_trade_node? hex
             io.print "<use href=\"#trade\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"black\" style=\"opacity:0.8\" />"
          end
 
@@ -843,7 +904,8 @@ class MapGenerator
       # town and city labels
       @map.each { | key, hex |
 
-         if hex[:terrain] == "city" or hex[:terrain] == "town"
+         if hex[:terrain] == "city" or hex[:terrain] == "town" or
+            (hex[:terrain] == "ocean" and is_trade_node? hex)
 
             pos = MapUtils::hex_pos(hex[:x], hex[:y], hexsize, xoffset, yoffset)
             hexsizes = MapUtils::hexsizes(hexsize)
@@ -856,7 +918,9 @@ class MapGenerator
             font_size = '20px'
             font_size = '14px' if hex[:terrain] == "town"
 
-            io.print "<text font-size=\"#{font_size}\" x=\"#{x}\" y=\"#{y}\" fill=\"#{color}\">#{hex[:name]}</text>"
+            text = hex[:name]
+            text = hex[:trade][:name] if text.nil?
+            io.print "<text font-size=\"#{font_size}\" x=\"#{x}\" y=\"#{y}\" fill=\"#{color}\">#{text}</text>"
 
          end
       }
