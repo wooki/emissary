@@ -48,7 +48,7 @@ class MapGenerator
       @town_away_from_edge = 3
       @trade_node_min_size = 14
       @trade_node_sample_size = 14
-      # @trade_node_sample_size = 0
+      @trade_node_land_multiplier = 3
 
       # store the map as we build it
       @map = Hash.new
@@ -260,8 +260,6 @@ class MapGenerator
       # create trade nodes in large bodies of water
       trade_nodes = possible_trade_nodes(size)
       
-      @debug_hexes = Array.new
-
       # add trade node to map and find closest town/city for name
       trade_nodes.each { | hex |
          hex = getHex(hex[:x], hex[:y])
@@ -279,7 +277,7 @@ class MapGenerator
          # we won't have a path because we aren't going anywhere specific
          path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
          closest = getHex(path_to_closest.last[:x], path_to_closest.last[:y])
-         hex[:tradenode] = closest[:name]
+         hex[:tradenode] = "#{closest[:name]} Trade Node"
       }
 
       # assign each town/city to closest trade node via ocean
@@ -302,18 +300,80 @@ class MapGenerator
             end
          end
 
-         # we won't have a part because we aren't going anywhere specific
          path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
          if path_to_closest
-            @debug_hexes.concat path_to_closest
-            hex[:trade] = tradenode[:name]
+            hex[:trade] = tradenode[:tradenode]
+            hex[:tradedistance] = path_to_closest.length
          end
       }
 
-      
+      # assign each town/city that isn't attached via ocean to the closest attached
+      get_terrain(['city', 'town']).each { | hex |
 
-      
+         if hex[:trade].nil?
 
+            tradenode = nil
+
+            tradenode_found = lambda do | coord, path |
+               mapcoord = getHex(coord[:x], coord[:y])
+               tradenode = mapcoord
+               mapcoord[:tradenode]
+            end
+
+            can_be_traversed = lambda do | coord, path, is_first |
+               mapcoord = getHex(coord[:x], coord[:y])
+               !(["peek", "mountain"].include? mapcoord[:terrain])
+            end
+
+            path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
+            if path_to_closest
+               hex[:trade] = tradenode[:tradenode]
+               hex[:tradedistance] = path_to_closest.length * @trade_node_land_multiplier
+            end
+         end
+      }
+
+      # connect every trade node to closest two it connects to via ocean
+      trade_nodes.each { | hex |
+         hex = getHex(hex[:x], hex[:y])
+
+         closest = nil
+         second_closest = nil
+
+         tradenode_found = lambda do | coord, path |
+            mapcoord = getHex(coord[:x], coord[:y])
+            if mapcoord[:tradenode] and mapcoord != hex
+               if !closest.nil? and second_closest.nil?
+                  second_closest = mapcoord
+                  second_closest[:tradeconnections] = Array.new if !second_closest[:tradeconnections]
+                  second_closest[:tradeconnections].push hex[:tradenode]
+                  second_closest[:tradeconnections].uniq!
+               elsif closest.nil?
+                  closest = mapcoord
+                  closest[:tradeconnections] = Array.new if !closest[:tradeconnections]
+                  closest[:tradeconnections].push hex[:tradenode]
+                  closest[:tradeconnections].uniq!
+               end
+            end
+            (!closest.nil? and !second_closest.nil?)
+         end
+
+         can_be_traversed = lambda do | coord, path, is_first |
+            mapcoord = getHex(coord[:x], coord[:y])
+            ["city", "town", "ocean"].include? mapcoord[:terrain]
+         end
+
+         path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
+
+         if closest
+            hex[:tradeconnections] = Array.new if !hex[:tradeconnections]
+            hex[:tradeconnections].push closest[:tradenode]
+            hex[:tradeconnections].push second_closest[:tradenode] if second_closest
+            hex[:tradeconnections].uniq!
+         end
+
+         puts hex.inspect
+      }
 
 
       # rivers would be great for map making but not so practival for game making
@@ -384,10 +444,6 @@ class MapGenerator
       }
       possible_nodes.reverse!
 
-      # @debug_hexes = possible_nodes.map { | nodes |
-      #    { :x => nodes[:x], :y => nodes[:y] }
-      # }
-      
       # remove any subsequent nodes that appear in an earlier block
       possible_nodes.filter! { | node |
          found = false
