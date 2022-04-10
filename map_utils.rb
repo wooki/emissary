@@ -198,10 +198,7 @@ class MapUtils
    
 
    # look at adjacent hexs until match condition met, returning the path taken to that point
-   def self.breadth_search(startcoord, size, can_be_traversed, is_found)
-
-      # keep track of excluded
-      checked = Array.new
+   def self.breadth_search(startcoord, size, can_be_traversed, is_found, checked=Array.new)
 
       # add coord to the queue and then process the queue
       queue = Queue.new
@@ -209,6 +206,8 @@ class MapUtils
          :coord => startcoord,
          :path => Array.new
       })
+
+      startnode = true
 
       while queue.length > 0 do
 
@@ -225,7 +224,9 @@ class MapUtils
             checked.push "#{coord[:x]},#{coord[:y]}"
 
             # check if this hex should be blocked
-            if can_be_traversed.call(coord, path)
+            if can_be_traversed.nil? or can_be_traversed.call(coord, path, startnode)
+
+               startnode = false
 
                # check if this search complete and return path
                if is_found.call(coord, path)

@@ -203,7 +203,8 @@ class MapGenerator
 
          # find the closest edge and move in that direction 70% of the time
          # but go sideways 30% - until you reach ocean!
-         river_direction = closest_terrain_direction(river, 'ocean', size, @existing_rivers)
+         # river_direction = closest_terrain_direction(river, 'ocean', size)
+         river_direction = closest_ocean_direction(river, size)
          make_river(river, size, river_direction)
 
       }
@@ -238,7 +239,9 @@ class MapGenerator
       # name settlements
       all_names = Hash.new
       settlements.each { | settlement |
-         distance = closest_terrain(settlement, 'desert', size, Array.new)
+
+         path = find_closest_terrain(settlement, 'desert', size)
+         distance = path.length
          n = nil
 
          while n == nil do
@@ -260,32 +263,52 @@ class MapGenerator
       @debug_hexes = Array.new
 
       # add trade node to map and find closest town/city for name
-      colors = ["deeppink", "indigo", "lightskyblue", "darkorange", "mediumslateblue", "orchid", "tomato", "thistle"]
       trade_nodes.each { | hex |
          hex = getHex(hex[:x], hex[:y])
-         hex[:tradenode] = colors.shuffle.pop
 
          settlement_found = lambda do | coord, path |
             mapcoord = getHex(coord[:x], coord[:y])
             ["city", "town"].include? mapcoord[:terrain] and mapcoord[:trade].nil?
          end
 
-         can_be_traversed = lambda do | coord, path |
+         can_be_traversed = lambda do | coord, path, is_first |
             mapcoord = getHex(coord[:x], coord[:y])
             ["city", "town", "ocean"].include? mapcoord[:terrain]
          end
 
-         # we won't have a parh because we aren't going anywhere specific
+         # we won't have a path because we aren't going anywhere specific
          path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
          closest = getHex(path_to_closest.last[:x], path_to_closest.last[:y])
-         puts "closest: #{closest}"
-
-         # @debug_hexes.concat(path_to_closest)
-         @debug_hexes.push closest
+         hex[:tradenode] = closest[:name]
       }
 
       # assign each town/city to closest trade node via ocean
-      
+      get_terrain(['city', 'town']).each { | hex |
+
+         tradenode = nil
+
+         tradenode_found = lambda do | coord, path |
+            mapcoord = getHex(coord[:x], coord[:y])
+            tradenode = mapcoord
+            mapcoord[:tradenode]
+         end
+
+         can_be_traversed = lambda do | coord, path, is_first |
+            mapcoord = getHex(coord[:x], coord[:y])
+            if is_first
+               ["city", "town", "ocean"].include? mapcoord[:terrain]
+            else
+               ["ocean"].include? mapcoord[:terrain]
+            end
+         end
+
+         # we won't have a part because we aren't going anywhere specific
+         path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
+         if path_to_closest
+            @debug_hexes.concat path_to_closest
+            hex[:trade] = tradenode[:name]
+         end
+      }
 
       
 
@@ -398,7 +421,7 @@ class MapGenerator
 
       # remember all hexs
       searched_hexes = Array.new
-      can_be_traversed = lambda do | coord, path | 
+      can_be_traversed = lambda do | coord, path, is_first |
          # exclude once we hit a max range from start
          distance = MapUtils::distance(coord, {:x => start[:x], :y => start[:y]})
          return false if distance > max_range
@@ -621,72 +644,63 @@ class MapGenerator
 
    # find the direction of closest terrain of certain type
    # and return as a transform
-   def closest_terrain_direction(coord, terrain, size, exclude=[])
+   # def closest_terrain_direction(coord, terrain, size, exclude=[])
 
-      transforms = MapUtils::adjacent_transforms
-      closest_transform = nil
-      closest_distance = 0
-      transforms.each { | transform |
+   #    path = find_closest_terrain(coord, terrain, size, exclude)
 
-         distance = find_terrain_by_transform(coord, transform, terrain, size, exclude)
-         distance = size if distance == nil
+   #    # get transform of first step if there is one
+   #    if path and path.length > 0
 
-         if closest_transform == nil or
-            distance <= closest_distance
-            closest_transform = transform
-            closest_distance = distance
-         end
-      }
-      closest_transform
-   end
+   #       first = path.first
+   #       {
+   #          :x => (first[:x] - coord[:x]),
+   #          :y => (first[:y] - coord[:y])
+   #       }
 
-   # find the distance of closest terrain of certain type
-   # and return as a transform
-   def closest_terrain(coord, terrain, size, exclude=[])
+   #    else
+   #       nil
+   #    end
+   # end
 
-      transforms = MapUtils::adjacent_transforms
-      closest_transform = nil
-      closest_distance = 0
-      transforms.each { | transform |
+   # find the direction of closest ocean surrounded by ocean (i.e. skip rivers!)
+   def closest_ocean_direction(start, size, exclude=[])
 
-         distance = find_terrain_by_transform(coord, transform, terrain, size, exclude)
-         distance = size if distance == nil
+      terrain_found = lambda do | coord, path |
+         mapcoord = getHex(coord[:x], coord[:y])
+         if mapcoord[:terrain] == 'ocean'
 
-         if closest_transform == nil or
-            distance <= closest_distance
-            closest_transform = transform
-            closest_distance = distance
-         end
-      }
-      closest_distance
-   end
+            adj = count_terrain(MapUtils::adjacent(coord, size))
+            adj['ocean'] == 6
 
-   # keep transforming coord until terrain type found and return
-   # the distance
-   def find_terrain_by_transform(start, transform, terrain, size, exclude=[])
-
-      # move one coord
-      nextcoord = MapUtils::transform_coord(start, transform)
-
-      return nil if !nextcoord
-      if exclude.include? "#{nextcoord[:x]},#{nextcoord[:y]}"
-         return nil
-      end
-
-      # check for desired terrain
-      return nil if !MapUtils::mapcontains(size, {x: nextcoord[:x], y: nextcoord[:y]})
-
-      if @map["#{nextcoord[:x]},#{nextcoord[:y]}"][:terrain] == terrain
-         return 1
-      else
-         rest_of_search = find_terrain_by_transform(nextcoord, transform, terrain, size)
-         if rest_of_search == nil
-            return nil
          else
-            return 1+rest_of_search
+            false
          end
       end
 
+      path = MapUtils::breadth_search({:x => start[:x], :y => start[:y]}, size, nil, terrain_found, exclude)
+
+      # get transform of first step if there is one
+      if path and path.length > 0
+
+         first = path.first
+         {
+            :x => (first[:x] - start[:x]),
+            :y => (first[:y] - start[:y])
+         }
+
+      else
+         nil
+      end
+   end
+
+   def find_closest_terrain(start, terrain, size, exclude=[])
+
+      terrain_found = lambda do | coord, path |
+         mapcoord = getHex(coord[:x], coord[:y])
+         mapcoord[:terrain] == terrain
+      end
+
+      return MapUtils::breadth_search({:x => start[:x], :y => start[:y]}, size, nil, terrain_found, exclude)
    end
 
    # output as svg
@@ -726,7 +740,8 @@ class MapGenerator
             terrain_color = "dimgray"
          elsif terrain == "ocean"
             if hex[:tradenode]
-               terrain_color = hex[:tradenode]
+               # terrain_color = hex[:tradenode]
+               terrain_color = "blueviolet"
             else
                terrain_color = "#3D59AB"
             end
@@ -792,17 +807,22 @@ class MapGenerator
 
       # debug searched path
       if @debug_hexes
-         @debug_hexes.each { | hex |
-            
-            pos = MapUtils::hex_pos(hex[:x], hex[:y], hexsize, xoffset, yoffset)
-            hexsizes = MapUtils::hexsizes(hexsize)
-            hex_points = MapUtils::hex_points(pos[:x], pos[:y], hexsize)
 
-            io.print "<polygon points=\""
-            hex_points.each { | hex_point |
-               io.print "#{hex_point[:x].round(2)},#{hex_point[:y].round(2)} "
-            }
-            io.print "\" fill=\"magenta\" fill-opacity=\"0.3\" />"
+         @debug_hexes.uniq!
+
+         @debug_hexes.each { | hex |
+
+            if hex[:tradenode].nil? && hex[:trade].nil?
+               pos = MapUtils::hex_pos(hex[:x], hex[:y], hexsize, xoffset, yoffset)
+               hexsizes = MapUtils::hexsizes(hexsize)
+               hex_points = MapUtils::hex_points(pos[:x], pos[:y], hexsize)
+
+               io.print "<polygon points=\""
+               hex_points.each { | hex_point |
+                  io.print "#{hex_point[:x].round(2)},#{hex_point[:y].round(2)} "
+               }
+               io.print "\" fill=\"magenta\" fill-opacity=\"0.2\" />"
+            end
          }
       end
 
