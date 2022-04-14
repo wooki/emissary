@@ -259,7 +259,7 @@ class MapGenerator
 
       # create trade nodes in large bodies of water
       trade_nodes = possible_trade_nodes(size)
-      
+
       # add trade node to map and find closest town/city for name
       trade_nodes.each { | hex |
          hex = getHex(hex[:x], hex[:y])
@@ -443,6 +443,19 @@ class MapGenerator
       # Trade nodes need to allow river travel if the above is added
 
 
+      # set population and production
+      # population = 20k for city, 10k for town
+      # adjacent terrain gives bonus
+
+      # other terrain all have a base level
+      # adjacent to city/town, 2 away from city/town
+
+      # production is skewed towards food/goods
+
+      # production of each boosted by adjacent terrain
+
+
+
       # remove some side-effect keys e.g. :z and :required_distance
 
       @map
@@ -476,26 +489,26 @@ class MapGenerator
 
       # get all water that is completely surrounded by water
       # then reduce list as much as possible for speed
-      possible_nodes = get_terrain('ocean').filter { | hex |            
-         adj = count_terrain(MapUtils::adjacent(hex, size))                  
+      possible_nodes = get_terrain('ocean').filter { | hex |
+         adj = count_terrain(MapUtils::adjacent(hex, size))
          adj['ocean'] == 6
-      }   
-      
+      }
+
       # any near edge will be found anyway - so safe to remove a lot
-      possible_nodes.filter! { | hex |            
+      possible_nodes.filter! { | hex |
          dist_from_middle = MapUtils::distance(hex, {:x => (size/2).round, :y => (size/2).round})
          dist_from_middle < (size/2).round-4
       }
 
       # just remove 1 in X nodes in the list - will be found anyway
-      possible_nodes = possible_nodes.shuffle.each_slice(@trade_node_sample_size).map(&:first)      
-      
+      possible_nodes = possible_nodes.shuffle.each_slice(@trade_node_sample_size).map(&:first)
+
       # find all possible trade nodes (blocks of ocean)
       possible_nodes = possible_nodes.map { | hex |
          possible_trade_node(hex, size, max_range)
-      }      
+      }
       possible_nodes.compact!
-      
+
       # order by number of times that center hex appears and then by size
       possible_nodes.sort! { | a, b |
          count_a = possible_nodes.filter { | x | x[:x] == a[:x] and x[:y] == a[:y] }.length
@@ -518,7 +531,7 @@ class MapGenerator
 
          if better_nodes.length > 0
             better_nodes.each { | better_node |
-               
+
                if better_node[:x] == node[:x] and better_node[:y] == node[:y]
                   found = true
                elsif better_node[:hexes].index { | n | n[:x] == node[:x] and n[:y] == node[:y] }
@@ -526,7 +539,7 @@ class MapGenerator
                end
             }
          end
-         
+
          !found
       }
    end
@@ -535,7 +548,7 @@ class MapGenerator
    def possible_trade_node(start, size, max_range)
 
       # search continues up to a reasonable max
-      is_found = lambda do | coord, path |          
+      is_found = lambda do | coord, path |
          false # never found in this use
       end
 
@@ -547,16 +560,16 @@ class MapGenerator
          return false if distance > max_range
 
          # check terrain
-         mapcoord = @map["#{coord[:x]},#{coord[:y]}"]         
+         mapcoord = @map["#{coord[:x]},#{coord[:y]}"]
          can_traverse = mapcoord[:terrain] == 'ocean'
          searched_hexes.push(mapcoord) if can_traverse
 
          can_traverse
       end
-      
+
       # we won't have a parh because we aren't going anywhere specific
       MapUtils::breadth_search({:x => start[:x], :y => start[:y]}, size, can_be_traversed, is_found)
-      
+
       # check center
       max_x = searched_hexes.reduce(0) do | sum, hex |
          sum + hex[:x]
@@ -575,7 +588,7 @@ class MapGenerator
 
       # return center point and hexes that it contains
       return {
-         :x => center_x, 
+         :x => center_x,
          :y => center_y,
          :hexes => searched_hexes
       };
@@ -695,6 +708,11 @@ class MapGenerator
 
       map_area = @map["#{coord[:x]},#{coord[:y]}"]
       return if !map_area
+
+      # don't allow peeks to be converted
+      if map_area[:terrain] == 'peek'
+         return false
+      end
 
       # handle meeting ocean is tricky. If we hit another river then stop.
       # If we hit 2+ ocean in a row stop otherwise carry one.
@@ -853,7 +871,7 @@ class MapGenerator
       io.print '</symbol>'
 
       # assign each trade node a color
-      colors = ['deeppink', 'purple', 'darkviolet', 'darkslateblue', 'lightpink', 'yellow', 'aqua', 'mediumseagreen', 'plum'].shuffle
+      colors = ['mediumvioletred', 'indigo', 'darkviolet', 'midnightblue', 'saddlebrown', 'chocolate', 'maroon', 'deeppink'].shuffle
       trade_node_colors = Hash.new
       @map.each { | key, hex |
          if is_trade_node? hex
@@ -902,8 +920,9 @@ class MapGenerator
          stroke = "black"
          stroke_width= 0.1
          if !is_trade_node?(hex) and hex[:trade]
-            stroke = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]
-            stroke_width = 2.0
+            # stroke = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]
+            # stroke_width = 2.0
+            terrain_color = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]
          end
          io.print "\" fill=\"#{terrain_color}\" stroke=\"#{stroke}\" stroke-width=\"#{stroke_width}\" />"
 
