@@ -46,8 +46,8 @@ class MapGenerator
       @edge_ocean_chances = [100, 80, 50, 20]
       @city_away_from_edge = 10
       @town_away_from_edge = 3
-      @trade_node_min_size = 14
-      @trade_node_sample_size = 14
+      @trade_node_min_size = 13
+      @trade_node_sample_size = 15
       @trade_node_land_multiplier = 3
 
       # store the map as we build it
@@ -419,7 +419,7 @@ class MapGenerator
             hex[:trade][:connected].uniq!
          end
 
-         puts hex.inspect
+         # puts hex.inspect
       }
 
 
@@ -441,6 +441,9 @@ class MapGenerator
       # TODO
 
       # Trade nodes need to allow river travel if the above is added
+
+
+      # remove some side-effect keys e.g. :z and :required_distance
 
       @map
    end
@@ -849,6 +852,15 @@ class MapGenerator
       io.print '<path xmlns="http://www.w3.org/2000/svg" d="M255.95 27.11L180.6 107.614l150.7 1.168-75.35-81.674h-.003zM25 109.895v68.01l19.412 25.99h71.06l19.528-26v-68h-14v15.995h-18v-15.994H89v15.995H71v-15.994H57v15.995H39v-15.994H25zm352 0v68l19.527 26h71.06L487 177.906v-68.01h-14v15.995h-18v-15.994h-14v15.995h-18v-15.994h-14v15.995h-18v-15.994h-14zm-176 15.877V260.89h110V126.63l-110-.857zm55 20.118c8 0 16 4 16 12v32h-32v-32c0-8 8-12 16-12zM41 221.897V484.89h78V221.897H41zm352 0V484.89h78V221.897h-78zM56 241.89c4 0 8 4 8 12v32H48v-32c0-8 4-12 8-12zm400 0c4 0 8 4 8 12v32h-16v-32c0-8 4-12 8-12zm-303 37v23h-16v183h87v-55c0-24 16-36 32-36s32 12 32 36v55h87v-183h-16v-23h-14v23h-18v-23h-14v23h-18v-23h-14v23h-18v-23h-14v23h-18v-23h-14v23h-18v-23h-14v23h-18v-23h-14zm-49 43c4 0 8 4 8 12v32H96v-32c0-8 4-12 8-12zm72 0c8 0 16 4 16 12v32h-32v-32c0-8 8-12 16-12zm80 0c8 0 16 4 16 12v32h-32v-32c0-8 8-12 16-12zm80 0c8 0 16 4 16 12v32h-32v-32c0-8 8-12 16-12zm72 0c4 0 8 4 8 12v32h-16v-32c0-8 4-12 8-12zm-352 64c4 0 8 4 8 12v32H48v-32c0-8 4-12 8-12zm400 0c4 0 8 4 8 12v32h-16v-32c0-8 4-12 8-12z"/>'
       io.print '</symbol>'
 
+      # assign each trade node a color
+      colors = ['deeppink', 'purple', 'darkviolet', 'darkslateblue', 'lightpink', 'yellow', 'aqua', 'mediumseagreen', 'plum'].shuffle
+      trade_node_colors = Hash.new
+      @map.each { | key, hex |
+         if is_trade_node? hex
+            trade_node_colors[key] = colors.pop
+         end
+      }
+
       @map.each { | key, hex |
 
          terrain = hex[:terrain]
@@ -858,7 +870,8 @@ class MapGenerator
          elsif terrain == "ocean"
             if is_trade_node? hex
                # terrain_color = hex[:tradenode]
-               terrain_color = "blueviolet"
+               # terrain_color = "blueviolet"
+               terrain_color = trade_node_colors[key]
             else
                terrain_color = "#3D59AB"
             end
@@ -886,7 +899,13 @@ class MapGenerator
          }
          # io.print "\" fill=\"#{terrain_color}\" stroke=\"#{terrain_color}\" />"
          # io.print "\" fill=\"#{terrain_color}\" stroke=\"black\" stroke-width=\"0.5\" />"
-         io.print "\" fill=\"#{terrain_color}\" stroke=\"black\" stroke-width=\"0.1\" />"
+         stroke = "black"
+         stroke_width= 0.1
+         if !is_trade_node?(hex) and hex[:trade]
+            stroke = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]
+            stroke_width = 2.0
+         end
+         io.print "\" fill=\"#{terrain_color}\" stroke=\"#{stroke}\" stroke-width=\"#{stroke_width}\" />"
 
          x = pos[:x].to_f - (hexsize.to_f/2).to_f
          y = pos[:y].to_f - (hexsize.to_f/2).to_f
@@ -962,6 +981,8 @@ options = {
 OptionParser.new do | opts |
    opts.banner = "Usage: map_generator.rb [options]"
 
+   # input json file
+
    opts.on("-fFILE", "--fileout=FILE", "File to write map to") do |n|
      options[:file] = n
    end
@@ -1008,3 +1029,5 @@ end
 
 # pipe seed from json gen to svg so we get same map twice
 # bundle exec ruby map_generator.rb -f map.json -F json -S 100 -h 16 | xargs -I % sh -c 'bundle exec ruby map_generator.rb -f map.svg -S 100 -h 16 --seed=%'
+
+
