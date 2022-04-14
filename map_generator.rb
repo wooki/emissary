@@ -24,7 +24,7 @@ class MapGenerator
       # some variables for generation, usually # per size
       @mountain_ranges = 0.2
       @mountain_chance = 150
-      @peek_chance = 40
+      @peak_chance = 40
       @plains_chance = 350
       @rivers = 0.35
       @river_bend = 50
@@ -121,12 +121,12 @@ class MapGenerator
          }
       }
 
-      # make mountains peeks if they are completely surrounded by mountains and 0-1 other peek
+      # make mountains peaks if they are completely surrounded by mountains and 0-1 other peak
       mountains = get_terrain('mountain')
       mountains.each { | mountain |
-         if can_be_peek(mountain, size)
-            if rand(0..100) <= @peek_chance
-               mountain[:terrain] = 'peek'
+         if can_be_peak(mountain, size)
+            if rand(0..100) <= @peak_chance
+               mountain[:terrain] = 'peak'
             end
          end
       }
@@ -198,7 +198,11 @@ class MapGenerator
       # create rivers from mountains to the sea
       rivers_to_gen = (@rivers * size).round
       @existing_rivers = Array.new
-      river_sources = get_terrain('mountain').sample(rivers_to_gen)
+      river_sources = get_terrain(['mountain', 'peak']).filter { | hex |
+         adj = count_terrain(MapUtils::adjacent(hex, size))
+         adj['ocean'] == 0
+      }.sample(rivers_to_gen)
+
       river_sources.each { | river |
 
          # find the closest edge and move in that direction 70% of the time
@@ -333,7 +337,7 @@ class MapGenerator
 
             can_be_traversed = lambda do | coord, path, is_first |
                mapcoord = getHex(coord[:x], coord[:y])
-               !(["peek", "mountain"].include? mapcoord[:terrain])
+               !(["peak", "mountain"].include? mapcoord[:terrain])
             end
 
             path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
@@ -656,15 +660,15 @@ class MapGenerator
       end
    end
 
-   # check if this area is suitable for a peek
-   # all mountain, optionally 1 peek adjacent
-   def can_be_peek(coord, size)
+   # check if this area is suitable for a peak
+   # all mountain, optionally 1 peak adjacent
+   def can_be_peak(coord, size)
 
       # check adjacent terrain
       adj = count_terrain(MapUtils::adjacent(coord, size))
       if adj['mountain'] == 6 or
          (adj['mountain'] == 5 and
-          adj['peek'] == 1)
+          adj['peak'] == 1)
 
          true
       else
@@ -677,7 +681,7 @@ class MapGenerator
 
       total = {'ocean' => 0, 'town' => 0, 'plains' => 0,
                'mountain' => 0, 'forest' => 0, 'desert' => 0,
-               'peek' => 0, 'city' => 0, 'river' => 0 }
+               'peak' => 0, 'city' => 0, 'river' => 0 }
 
       coords.each { | coord |
          mapcoord = @map["#{coord[:x]},#{coord[:y]}"]
@@ -709,11 +713,6 @@ class MapGenerator
       map_area = @map["#{coord[:x]},#{coord[:y]}"]
       return if !map_area
 
-      # don't allow peeks to be converted
-      if map_area[:terrain] == 'peek'
-         return false
-      end
-
       # handle meeting ocean is tricky. If we hit another river then stop.
       # If we hit 2+ ocean in a row stop otherwise carry one.
       if map_area[:terrain] == 'ocean'
@@ -727,13 +726,15 @@ class MapGenerator
       result = true
       if rand(0..100) <= @river_bend
          if rand(0..100) <= 49
-            result = make_river(MapUtils::transform_coord(coord, MapUtils::rotate_transform(transform)), size, transform, ocean_count)
+            next_coord = MapUtils::transform_coord(coord, MapUtils::rotate_transform(transform))
          else
-            result = make_river(MapUtils::transform_coord(coord, MapUtils::rotate_transform_by(transform, 5)), size, transform, ocean_count)
+            next_coord = MapUtils::transform_coord(coord, MapUtils::rotate_transform_by(transform, 5))
          end
       else
-         result = make_river(MapUtils::transform_coord(coord, transform), size, transform, ocean_count)
+         next_coord = MapUtils::transform_coord(coord, transform)
       end
+
+      make_river(next_coord, size, transform, ocean_count)
 
       if result
          map_area[:terrain] = 'ocean'
@@ -882,7 +883,7 @@ class MapGenerator
       @map.each { | key, hex |
 
          terrain = hex[:terrain]
-         if terrain == "peek"
+         if terrain == "peak"
             # terrain = "silver"
             terrain_color = "dimgray"
          elsif terrain == "ocean"
