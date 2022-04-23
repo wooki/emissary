@@ -1,4 +1,4 @@
-module Wraithdale
+module Emissary
 
 require 'json'
 require 'optparse'
@@ -1105,18 +1105,20 @@ end.parse!
 
 seeded = nil
 seeded = options[:seed]
-mg = Wraithdale::MapGenerator.new seeded
+mg = Emissary::MapGenerator.new seeded
 
 map = mg.generate options[:size]
 
 if options[:file] and options[:format] == "json"
    $stdout.print "#{mg.seed}"
    File.open(options[:file], 'w') do | file |
-      file.print map.to_json
+      # file.print map.to_json
+      file.print JSON.pretty_generate(map)
    end
 elsif options[:format] == "json"
 
-   print map.to_json
+   # print map.to_json
+   print JSON.pretty_generate(map)
 
 elsif options[:file]
    File.open(options[:file], 'w') do | file |
