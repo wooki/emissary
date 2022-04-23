@@ -25,7 +25,7 @@ class MapGenerator
       @mountain_ranges = 0.2
       @mountain_chance = 150
       @peak_chance = 40
-      @plains_chance = 350
+      @lowland_chance = 350
       @rivers = 0.35
       @river_bend = 50
       @deserts = 0.1
@@ -34,9 +34,9 @@ class MapGenerator
       @deserts_region_offset = 0.4
       @forests = 18
       @forests_chance = 50
-      @extra_plains = @forests*2
-      @extra_plains_region = 0.15
-      @extra_plains_chance = 35
+      @extra_lowland = @forests*2
+      @extra_lowland_region = 0.15
+      @extra_lowland_chance = 35
       @ocean_edge = 0.15
       @ocean_middle = 0.25
       @city_min_distance = 8
@@ -49,6 +49,33 @@ class MapGenerator
       @trade_node_min_size = 13
       @trade_node_sample_size = 15
       @trade_node_land_multiplier = 3
+
+      @population_settlement_required = 8
+      @population_nop_settlement = 0.1
+      @population = {
+         'city' => 30000,
+         'town' => 10000,
+         'lowland' => 1000,
+         'forest' => 500,
+         'mountain' => 500,
+         'desert' => 250
+      }
+      @food = {
+         'city' => 0,
+         'town' => 0,
+         'lowland' => 0.003,
+         'forest' => 0.0015,
+         'mountain' => 0.0007,
+         'desert' => 0.0002
+      }
+      @goods = {
+         'city' => 0,
+         'town' => 0,
+         'lowland' => 0.0004,
+         'forest' => 0.002,
+         'mountain' => 0.0015,
+         'desert' => 0.0001
+      }
 
       # store the map as we build it
       @map = Hash.new
@@ -71,20 +98,20 @@ class MapGenerator
       @rivers = @rivers * areafactor
       @deserts = @deserts * areafactor
       @forests = @forests * areafactor
-      @extra_plains = @extra_plains * areafactor
+      @extra_lowland = @extra_lowland * areafactor
       @trade_node_min_size = @trade_node_min_size * areafactor
       @trade_node_sample_size = 20 - (@trade_node_sample_size * areafactor).round
       @trade_node_sample_size = 1 if @trade_node_sample_size < 1
-
+      @population_settlement_required = @population_settlement_required * areafactor
 
       # adjust for a more land-based map
       # @mountain_chance = 300
-      # @plains_chance = 900
+      # @lowland_chance = 900
 
       # adjust for a more island based map
       # @mountain_ranges = 0.3
       # @mountain_chance = 70
-      # @plains_chance = 150
+      # @lowland_chance = 150
 
       # start by creating a ocean world
       MapUtils::mapcoords(size) { | x, y |
@@ -131,12 +158,12 @@ class MapGenerator
          end
       }
 
-      # raise plains around the mountain ranges
+      # raise lowland around the mountain ranges
       mountains = get_terrain('mountain')
       mountains.each { | mountain |
          coords = MapUtils::adjacent(mountain, size)
          coords.each { | coord |
-            make_terrain(coord, size, ['ocean'], 'plains', @plains_chance)
+            make_terrain(coord, size, ['ocean'], 'lowland', @lowland_chance)
          }
       }
 
@@ -155,9 +182,9 @@ class MapGenerator
 
       # raise forests randomly around
       forests_to_gen = (@forests * size).round
-      forests = get_terrain('plains').sample(forests_to_gen)
+      forests = get_terrain('lowland').sample(forests_to_gen)
       forests.each { | forest |
-         make_terrain(forest, size, ['plains'], 'forest', @forests_chance)
+         make_terrain(forest, size, ['lowland'], 'forest', @forests_chance)
       }
 
       # randomly add an area of desert
@@ -165,20 +192,20 @@ class MapGenerator
       from_y = ((size/2) - (size*@deserts_region)).round + (@deserts_region_offset*@size)
       to_y = ((size/2) + (size*@deserts_region)).round + (@deserts_region_offset*@size)
 
-      deserts = get_terrain_in_region(['plains', 'forest'], {:from => {:x => 0, :y => from_y}, :to => {:x => size, :y => to_y}}).sample(deserts_to_gen)
+      deserts = get_terrain_in_region(['lowland', 'forest'], {:from => {:x => 0, :y => from_y}, :to => {:x => size, :y => to_y}}).sample(deserts_to_gen)
       deserts.each { | desert |
-         make_terrain(desert, size, ['plains', 'forest'], 'desert', @deserts_chance)
+         make_terrain(desert, size, ['lowland', 'forest'], 'desert', @deserts_chance)
       }
 
 
-      # randomly add an area of plains within middle region to reduce forests
-      extra_plains_to_gen = (@extra_plains * size).round
-      from_y = ((size/2) - (size*@extra_plains_region)).round
-      to_y = ((size/2) + (size*@extra_plains_region)).round
+      # randomly add an area of lowland within middle region to reduce forests
+      extra_lowland_to_gen = (@extra_lowland * size).round
+      from_y = ((size/2) - (size*@extra_lowland_region)).round
+      to_y = ((size/2) + (size*@extra_lowland_region)).round
 
-      extra_plains = get_terrain_in_region(['forest'], {:from => {:x => 0, :y => from_y}, :to => {:x => size, :y => to_y}}).sample(extra_plains_to_gen)
-      extra_plains.each { | extra_plain |
-         make_terrain(extra_plain, size, ['plains', 'forest'], 'plains', @extra_plains_chance)
+      extra_lowland = get_terrain_in_region(['forest'], {:from => {:x => 0, :y => from_y}, :to => {:x => size, :y => to_y}}).sample(extra_lowland_to_gen)
+      extra_lowland.each { | extra_plain |
+         make_terrain(extra_plain, size, ['lowland', 'forest'], 'lowland', @extra_lowland_chance)
       }
 
       # make edges ocean
@@ -215,7 +242,7 @@ class MapGenerator
 
       # create cities on areas are suitable and
       # the required distance from any other city
-      allowed_settlement_terrain = get_terrain(['plains', 'forest', 'mountain', 'desert']).shuffle
+      allowed_settlement_terrain = get_terrain(['lowland', 'forest', 'mountain', 'desert']).shuffle
       settlements = Array.new
       allowed_settlement_terrain.each { | plain |
          if can_be_city(plain, size, settlements)
@@ -448,15 +475,65 @@ class MapGenerator
 
 
       # set population and production
-      # population = 20k for city, 10k for town
+      # population = 30k for city, 10k for town
       # adjacent terrain gives bonus
-
       # other terrain all have a base level
       # adjacent to city/town, 2 away from city/town
-
       # production is skewed towards food/goods
-
       # production of each boosted by adjacent terrain
+      @map.each { | key, hex |
+
+         base_population = @population[hex[:terrain]]
+         base_food = @food[hex[:terrain]]
+         base_goods = @goods[hex[:terrain]]
+
+         if !base_population.nil?
+
+            # always adjusted a bit for randomness
+            base_population = base_population + ((base_population.to_f / 100.0) * rand() * rand(-15..15).to_f).round.to_i
+
+            if ['city', 'town'].include? hex[:terrain]
+
+               # adjusted by adjacent hexes only
+               adj = count_terrain(MapUtils::adjacent({:x => hex[:x], :y => hex[:y]}, size))
+               adjustment = 1.0
+
+               adjustment = adjustment + (adj['desert'].to_f * 0.1) if adj['desert'] > 0
+               adjustment = adjustment + (adj['ocean'].to_f * 0.05) if adj['ocean'] > 0
+
+               base_population = (base_population.to_f * adjustment).round.to_i
+
+            else
+
+               # adjusted by adjacent oceans
+               adj = count_terrain(MapUtils::adjacent({:x => hex[:x], :y => hex[:y]}, size))
+               adjustment = 1.0
+               adjustment = adjustment + (adj['ocean'].to_f * 0.05) if adj['ocean'] > 0
+
+               # adjusted by distance to closest town/city
+               path = find_closest_terrain({:x => hex[:x], :y => hex[:y]}, ['town', 'city'], size)
+               if !path.nil? and path.length <= 3
+
+                  adjustment = adjustment + ((4 - path.length).to_f * 0.1)
+
+               elsif !path.nil? or path.length * 2 > @population_settlement_required
+
+                  adjustment = adjustment - 0.5
+
+               elsif path.nil? or path.length >= @population_settlement_required
+
+                  adjustment = @population_nop_settlement
+
+               end
+
+               base_population = (base_population.to_f * adjustment).round.to_i
+               puts "#{hex[:terrain]} = #{base_population} (#{adjustment})"
+            end
+         end
+      }
+
+
+
 
 
 
@@ -600,7 +677,7 @@ class MapGenerator
    end
 
    # check if this area is suitable for a town
-   # 1+ ocean and 2+ plains/forest
+   # 1+ ocean and 2+ lowland/forest
    def can_be_town(coord, size, existing_settlements)
 
       # check adjacent terrain
@@ -608,8 +685,8 @@ class MapGenerator
       if (adj['desert'] >= 3 and
           adj['ocean'] >= 1) or
          (adj['ocean'] >= 1 and
-          adj['plains'] >= 1 and
-          adj['plains']+adj['forest'] >= 3)
+          adj['lowland'] >= 1 and
+          adj['lowland']+adj['forest'] >= 3)
 
          # check if too close to edge
          if MapUtils::distance(coord, {:x => (size/2).round, :y => (size/2).round}) >= (size/2).round-@town_away_from_edge
@@ -630,7 +707,7 @@ class MapGenerator
    end
 
    # check if this area is suitable for a city
-   # 1+ ocean and 2+ plains/forest
+   # 1+ ocean and 2+ lowland/forest
    def can_be_city(coord, size, existing_settlements)
 
       # check adjacent terrain
@@ -638,9 +715,9 @@ class MapGenerator
       if (adj['desert'] >= 3 and
           adj['ocean'] >= 1) or
          (adj['ocean'] >= 1 and
-          adj['plains'] >= 1 and
+          adj['lowland'] >= 1 and
           adj['forest'] >= 1 and
-          adj['plains']+adj['forest'] >= 3)
+          adj['lowland']+adj['forest'] >= 3)
 
          # check if too close to edge
          if MapUtils::distance(coord, {:x => (size/2).round, :y => (size/2).round}) >= (size/2).round-@city_away_from_edge
@@ -679,7 +756,7 @@ class MapGenerator
    # util for counting terrain types
    def count_terrain(coords)
 
-      total = {'ocean' => 0, 'town' => 0, 'plains' => 0,
+      total = {'ocean' => 0, 'town' => 0, 'lowland' => 0,
                'mountain' => 0, 'forest' => 0, 'desert' => 0,
                'peak' => 0, 'city' => 0, 'river' => 0 }
 
@@ -834,9 +911,11 @@ class MapGenerator
 
    def find_closest_terrain(start, terrain, size, exclude=[])
 
+      terrain = [terrain] if !terrain.kind_of?(Array)
+
       terrain_found = lambda do | coord, path |
          mapcoord = getHex(coord[:x], coord[:y])
-         mapcoord[:terrain] == terrain
+         terrain.include? mapcoord[:terrain]
       end
 
       return MapUtils::breadth_search({:x => start[:x], :y => start[:y]}, size, nil, terrain_found, exclude)
@@ -896,7 +975,7 @@ class MapGenerator
             end
          elsif terrain == "mountain"
             terrain_color = "slategray"
-         elsif terrain == "plains"
+         elsif terrain == "lowland"
             terrain_color = "limegreen"
          elsif terrain == "forest"
             terrain_color = "forestgreen"
