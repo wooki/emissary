@@ -538,6 +538,10 @@ class MapGenerator
 
 
       # remove some side-effect keys e.g. :z and :required_distance
+      @map.each { | key, hex |
+         hex.delete(:z)
+         hex.delete(:required_distance)
+      }
 
       @map
    end
