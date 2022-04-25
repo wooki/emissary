@@ -50,7 +50,6 @@ class MapGenerator
       @trade_node_sample_size = 15
       @trade_node_land_multiplier = 3
 
-      @population_settlement_required = 8
       @population_nop_settlement = 0.1
       @population = {
          'city' => 30000,
@@ -76,6 +75,7 @@ class MapGenerator
          'mountain' => 0.0015,
          'desert' => 0.0001
       }
+      @population_settlement_boost = [4.0, 3.0, 2.0, 1.0, 1.0, 0.75, 0.5, 0.25, 0.2, 0.15];
 
       # store the map as we build it
       @map = Hash.new
@@ -102,7 +102,6 @@ class MapGenerator
       @trade_node_min_size = @trade_node_min_size * areafactor
       @trade_node_sample_size = 20 - (@trade_node_sample_size * areafactor).round
       @trade_node_sample_size = 1 if @trade_node_sample_size < 1
-      @population_settlement_required = @population_settlement_required * areafactor
 
       # adjust for a more land-based map
       # @mountain_chance = 300
@@ -291,6 +290,11 @@ class MapGenerator
       # create trade nodes in large bodies of water
       trade_nodes = possible_trade_nodes(size)
 
+      # turn into just coords
+      trade_nodes.map! { | hex |
+         {:x => hex[:x], :y => hex[:y]}
+      }
+
       # add trade node to map and find closest town/city for name
       trade_nodes.each { | hex |
          hex = getHex(hex[:x], hex[:y])
@@ -379,80 +383,79 @@ class MapGenerator
          end
       }
 
-      # connect every trade node to closest two it connects to via ocean
+      # util for checking if node exists etc
+      def connect_trade_node(addto_node, this_node, vector, path)
+
+         addto_node[:trade][:connected] = Hash.new if !addto_node[:trade][:connected]
+
+         key = "#{this_node[:x]},#{this_node[:y]}"
+
+         if addto_node[:trade][:connected].has_key? key
+            connection = addto_node[:trade][:connected][key]
+         else
+            connection = {
+               :name => this_node[:trade][:name],
+               :x => this_node[:x],
+               :y => this_node[:y],
+               :distance => path.length
+            }
+         end
+
+         # if !connection.has_key? :vectors
+         #    connection[:vectors] = Array.new
+         # end
+
+         # connection[:vectors].push({:x => vector[:x], :y => vector[:y]})
+
+         addto_node[:trade][:connected][key] = connection
+      end
+
+      # connect every trade node to closest three it connects to via ocean
+      @debug_hexes = Array.new
+      index = 0
       trade_nodes.each { | hex |
+
+         index = index + 1
          hex = getHex(hex[:x], hex[:y])
 
-         closest = nil
-         path_to_closest = nil
-         second_closest = nil
-         path_to_second_closest = nil
+         closest = Hash.new
+         path_to_closest = Hash.new
 
          tradenode_found = lambda do | coord, path |
             mapcoord = getHex(coord[:x], coord[:y])
 
             if is_trade_node?(coord) and mapcoord != hex
 
-               if !closest.nil? and second_closest.nil?
-                  path_to_second_closest = path
-                  second_closest = mapcoord
-                  second_closest[:trade][:connected] = Array.new if !second_closest[:trade][:connected]
-                  second_closest[:trade][:connected].push({
-                     :name => hex[:trade][:name],
-                     :x => hex[:x],
-                     :y => hex[:y],
-                     :distance => path.length
-                  })
-                  second_closest[:trade][:connected].uniq!
-               elsif closest.nil?
-                  path_to_closest = path
-                  closest = mapcoord
-                  closest[:trade][:connected] = Array.new if !closest[:trade][:connected]
-                  closest[:trade][:connected].push({
-                     :name => hex[:trade][:name],
-                     :x => hex[:x],
-                     :y => hex[:y],
-                     :distance => path.length
-                  })
-                  closest[:trade][:connected].uniq!
-               end
+               key = "#{mapcoord[:x]},#{mapcoord[:y]}"
+               if !closest.has_key?(key)
 
-            else
-               false
+                  closest[key] = mapcoord
+                  path_to_closest[key] = path
+
+                  connect_trade_node(mapcoord, hex, ({:x => path[-2][:x], :y => path[-2][:y]}), path)
+                  connect_trade_node(hex, mapcoord, ({:x => path[0][:x], :y => path[0][:y]}), path.reverse )
+               end
             end
 
-            (!closest.nil? and !second_closest.nil?)
+            closest.keys.length >= 3
          end
 
          can_be_traversed = lambda do | coord, path, is_first |
+            @debug_hexes.push coord if index == 4
+            return false if path.length > @size * 0.8
             mapcoord = getHex(coord[:x], coord[:y])
             ["city", "town", "ocean"].include? mapcoord[:terrain]
          end
 
          MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
-
-         if closest
-            hex[:trade][:connected] = Array.new if !hex[:trade][:connected]
-            hex[:trade][:connected].push({
-               :name => closest[:trade][:name],
-               :x => closest[:x],
-               :y => closest[:y],
-               :distance => path_to_closest.length
-            })
-            if second_closest
-               hex[:trade][:connected].push({
-                  :name => second_closest[:trade][:name],
-                  :x => second_closest[:x],
-                  :y => second_closest[:y],
-                  :distance => path_to_second_closest.length
-               })
-            end
-            hex[:trade][:connected].uniq!
-         end
-
-         # puts hex.inspect
       }
 
+      # get actual hex listfor trade nodes
+      trade_nodes = trade_nodes.map { | hex |
+         getHex(hex[:x], hex[:y])
+      }
+
+      puts JSON.pretty_generate(trade_nodes)
 
       # rivers would be great for map making but not so practival for game making
       # maybe leave for now!
@@ -479,7 +482,6 @@ class MapGenerator
       # adjacent terrain gives bonus
       # other terrain all have a base level
       # adjacent to city/town, 2 away from city/town
-      # production is skewed towards food/goods
       # production of each boosted by adjacent terrain
       @map.each { | key, hex |
 
@@ -502,7 +504,7 @@ class MapGenerator
                adjustment = adjustment + (adj['ocean'].to_f * 0.05) if adj['ocean'] > 0
 
                base_population = (base_population.to_f * adjustment).round.to_i
-
+               hex[:popupulation] = base_population
             else
 
                # adjusted by adjacent oceans
@@ -512,22 +514,27 @@ class MapGenerator
 
                # adjusted by distance to closest town/city
                path = find_closest_terrain({:x => hex[:x], :y => hex[:y]}, ['town', 'city'], size)
-               if !path.nil? and path.length <= 3
+               if !path.nil?
 
-                  adjustment = adjustment + ((4 - path.length).to_f * 0.1)
-
-               elsif !path.nil? or path.length * 2 > @population_settlement_required
-
-                  adjustment = adjustment - 0.5
-
-               elsif path.nil? or path.length >= @population_settlement_required
-
-                  adjustment = @population_nop_settlement
+                  if path.length > (@population_settlement_boost.length - 1)
+                     adjustment = adjustment * @population_nop_settlement
+                  else
+                     adjustment = adjustment * @population_settlement_boost[path.length]
+                  end
 
                end
+               # no path to a settlement - isolated islands stay x1
 
                base_population = (base_population.to_f * adjustment).round.to_i
-               puts "#{hex[:terrain]} = #{base_population} (#{adjustment})"
+               hex[:popupulation] = base_population
+
+               # extra food in lowland adjacent to desert and water
+               if hex[:terrain] == 'lowland' and adj['desert'] > 0 and adj['ocean'] > 0
+                  base_food = base_food + (adj['desert'].to_f * 0.0003)
+               end
+
+               hex[:food] = base_food
+               hex[:goods] = base_goods
             end
          end
       }
