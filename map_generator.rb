@@ -411,7 +411,7 @@ class MapGenerator
       end
 
       # connect every trade node to closest three it connects to via ocean
-      @debug_hexes = Array.new
+      # @debug_hexes = Array.new
       index = 0
       trade_nodes.each { | hex |
 
@@ -441,7 +441,7 @@ class MapGenerator
          end
 
          can_be_traversed = lambda do | coord, path, is_first |
-            @debug_hexes.push coord if index == 4
+            # @debug_hexes.push coord if index == 4
             return false if path.length > @size * 0.8
             mapcoord = getHex(coord[:x], coord[:y])
             ["city", "town", "ocean"].include? mapcoord[:terrain]
@@ -454,8 +454,6 @@ class MapGenerator
       trade_nodes = trade_nodes.map { | hex |
          getHex(hex[:x], hex[:y])
       }
-
-      puts JSON.pretty_generate(trade_nodes)
 
       # rivers would be great for map making but not so practival for game making
       # maybe leave for now!
@@ -1055,25 +1053,25 @@ class MapGenerator
       }
 
       # debug searched path
-      if @debug_hexes
+      # if @debug_hexes
 
-         @debug_hexes.uniq!
+      #    @debug_hexes.uniq!
 
-         @debug_hexes.each { | hex |
+      #    @debug_hexes.each { | hex |
 
-            if hex[:tradenode].nil? && hex[:trade].nil?
-               pos = MapUtils::hex_pos(hex[:x], hex[:y], hexsize, xoffset, yoffset)
-               hexsizes = MapUtils::hexsizes(hexsize)
-               hex_points = MapUtils::hex_points(pos[:x], pos[:y], hexsize)
+      #       if hex[:tradenode].nil? && hex[:trade].nil?
+      #          pos = MapUtils::hex_pos(hex[:x], hex[:y], hexsize, xoffset, yoffset)
+      #          hexsizes = MapUtils::hexsizes(hexsize)
+      #          hex_points = MapUtils::hex_points(pos[:x], pos[:y], hexsize)
 
-               io.print "<polygon points=\""
-               hex_points.each { | hex_point |
-                  io.print "#{hex_point[:x].round(2)},#{hex_point[:y].round(2)} "
-               }
-               io.print "\" fill=\"magenta\" fill-opacity=\"0.2\" />"
-            end
-         }
-      end
+      #          io.print "<polygon points=\""
+      #          hex_points.each { | hex_point |
+      #             io.print "#{hex_point[:x].round(2)},#{hex_point[:y].round(2)} "
+      #          }
+      #          io.print "\" fill=\"magenta\" fill-opacity=\"0.2\" />"
+      #       end
+      #    }
+      # end
 
       io.print "</svg>"
    end

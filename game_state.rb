@@ -6,6 +6,20 @@ class GameState
 
   attr_accessor :kingdoms, :map, :my_kingdom
 
+  def self.load(gamefile)
+    # load the gamestate
+    data = JSON.parse(File.read(mapfile))
+    self.from_json(data)
+  end
+
+  def self.from_json(json)
+    hash = JSON.parse(json)
+    state = GameState.new
+    state.map = hash[:map]
+    state.kingdoms = hash[:kingdoms]
+    state.my_kingdom = hash[:my_kingdom]
+    state
+  end
 
   ##################################
   # find a random empty village, update to
@@ -119,6 +133,12 @@ class GameState
         as_json(*options).to_json(*options)
     end
 
+    def save(gamefile)
+      # save the gamestate
+      File.open(gamefile, 'w') do | file |
+        file.print JSON.pretty_generate(@state)
+      end
+    end
 
 end
 
