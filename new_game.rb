@@ -18,9 +18,7 @@ class NewGame
     @state.map = JSON.parse(File.read(mapfile))
 
     # save the gamestate
-    File.open(gamefile, 'w') do | file |
-        file.print JSON.pretty_generate(@state)
-    end
+    @state.save gamefile
   end
 
 end

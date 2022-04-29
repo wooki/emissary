@@ -136,7 +136,7 @@ class GameState
     def save(gamefile)
       # save the gamestate
       File.open(gamefile, 'w') do | file |
-        file.print JSON.pretty_generate(@state)
+        file.print JSON.pretty_generate(self)
       end
     end
 
