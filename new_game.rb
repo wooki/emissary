@@ -1,5 +1,3 @@
-module Emissary
-
 require 'json'
 require 'optparse'
 require_relative 'game_state'
@@ -15,13 +13,11 @@ class NewGame
     @state = Emissary::GameState.new
 
     # load the map and add to gamestate
-    @state.map = JSON.parse(File.read(mapfile))
+    @state.map = JSON.parse(File.read(mapfile), {:symbolize_names => true})
 
     # save the gamestate
     @state.save gamefile
   end
-
-end
 
 end
 
@@ -39,4 +35,6 @@ OptionParser.new do | opts |
    end
 end.parse!
 
-ng = Emissary::NewGame.new options[:gamefile], options[:mapfile]
+ng = NewGame.new options[:gamefile], options[:mapfile]
+
+# bundle exec ruby new_game.rb -g game.json -m map.json

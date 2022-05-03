@@ -2,7 +2,7 @@ module Emissary
 
 class Kingdom
 
-  attr_accessor :belongs_to, :name, :capital, :capital_coord
+  attr_accessor :player, :name, :capital, :capital_coord
 
   ##################################
   # set-up initial state
@@ -10,7 +10,7 @@ class Kingdom
   def initialize
     super()
 
-    @belongs_to = nil # user_id
+    @player = nil
     @name = nil
     @capital = nil
     @capital_coord = {:x => nil, :y => nil}

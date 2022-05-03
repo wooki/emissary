@@ -4,21 +4,113 @@ require 'json'
 
 class GameState
 
-  attr_accessor :kingdoms, :map, :my_kingdom
+  attr_accessor :kingdoms, :map, :my_kingdom, :settlements
 
   def self.load(gamefile)
     # load the gamestate
-    data = JSON.parse(File.read(mapfile))
+    data = File.read(gamefile)
     self.from_json(data)
   end
 
   def self.from_json(json)
-    hash = JSON.parse(json)
+    hash = JSON.parse(json, {:symbolize_names => true})
     state = GameState.new
     state.map = hash[:map]
     state.kingdoms = hash[:kingdoms]
     state.my_kingdom = hash[:my_kingdom]
+    state.load_settlements
     state
+  end
+
+  # shortcut to settlements in the map hash based on unique
+  # short strings
+  def load_settlements
+
+    @settlements = Hash.new
+
+    # iterate settlements and assign shortcuts to each
+    @map.each { | key, hex |
+
+      if ['town', 'city'].include? hex[:terrain]
+
+        if hex[:shortcut]
+          code = hex[:shortcut]
+          shortcut_help = hex[:shortcut_help]
+
+        elsif hex[:name].include? " "
+          parts = hex[:name].downcase.split
+          code = parts.collect { | part | part[0, 1] }.join
+          shortcut_help = parts.collect { | part | part[0, 1].upcase + part[1, 99].downcase }.join(' ')
+
+          if @settlements.include? code
+            code = parts[0][0,1] + parts[1][0,2]
+            shortcut_help = parts[0][0,1].upcase + parts[0][1, 99].downcase + " " + parts[1][0,2].upcase + parts[1][2, 99].downcase
+          end
+
+          if @settlements.include? code
+            code = parts[0][0,2] + parts[1][0,1]
+            shortcut_help = parts[0][0,2].upcase + parts[0][2, 99].downcase + " " + parts[1][0,1].upcase + parts[1][1, 99].downcase
+          end
+
+          if @settlements.include? code
+            code = parts.collect { | part | part[0, 2] }.join
+            shortcut_help = parts.collect { | part | part[0, 2].upcase + part[2, 99].downcase }.join(' ')
+          end
+
+          if @settlements.include? code
+            code = parts[0][0,2] + parts[1][0,3]
+            shortcut_help = parts[0][0,2].upcase + parts[0][2, 99].downcase + " " + parts[1][0,3].upcase + parts[1][3, 99].downcase
+          end
+        else
+
+          code = hex[:name][0, 3].downcase
+          shortcut_help =  hex[:name][0, 3].upcase +  hex[:name][3, 99].downcase
+
+          if @settlements.include? code
+            code = hex[:name][0, 4].downcase
+            shortcut_help =  hex[:name][0, 4].upcase +  hex[:name][4, 99].downcase
+          end
+
+          if @settlements.include? code
+            code = hex[:name][0, 5].downcase
+            shortcut_help =  hex[:name][0, 5].upcase +  hex[:name][5, 99].downcase
+          end
+
+          if @settlements.include? code
+            code = hex[:name].downcase
+            shortcut_help =  hex[:name].upcase
+          end
+        end
+
+        hex[:shortcut] = code.to_sym
+        hex[:shortcut_help] = shortcut_help.to_sym
+        @settlements[code.to_sym] = key
+      end
+    }
+
+  end
+
+  # find a settlement with a short version of the name
+  def find_settlement(name_fragment)
+    coord = @settlements[name_fragment]
+    if coord
+      @map[coord]
+    else
+      nil
+    end
+  end
+
+  def kingdom_by_name(name)
+    @kingdoms.values.find { | kingdom | kingdom[:name] == name }
+  end
+
+  def kingdom_by_player(name)
+
+    @kingdoms[name]
+  end
+
+  def kingdom_by_capital(coord)
+    @kingdoms.values.find { | kingdom | kingdom[:x] == coord[:x] and kingdom[:y] == coord[:y] }
   end
 
   ##################################
@@ -99,25 +191,7 @@ class GameState
     maparray
   end
 
-  ##################################
-  # build the map based on 2d array of terrains
-  ##################################
-  def build_map(mapdata)
 
-    @map = Hash.new
-    mapdata.each { | key, value |
-
-      # create and add an area
-      area = Emissary::Area.new
-      area.x = value[:x]
-      area.y = value[:y]
-      area.terrain = value[:terrain]
-      area.name = "Unnamed #{area.terrain}" if area.terrain == 'village'
-      newkey = "#{area.x},#{area.y}"
-      @map[newkey] = area
-    }
-
-  end
 
   def as_json(options={})
   # :kingdoms, :map, :my_kingdom
