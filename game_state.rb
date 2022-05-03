@@ -22,6 +22,16 @@ class GameState
     state
   end
 
+  # work out the largest x/y dimension
+  def size
+    largest = 0
+    @map.each { | key, hex |
+      largest = hex[:x] if hex[:x] > largest
+      largest = hex[:y] if hex[:y] > largest
+    }
+    largest
+  end
+
   # shortcut to settlements in the map hash based on unique
   # short strings
   def load_settlements

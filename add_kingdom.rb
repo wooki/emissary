@@ -6,7 +6,7 @@ class AddKingdom
 
   attr_accessor :state
 
-  # load map.json and create game state, save game state
+  # load game state, save game state
   def initialize(gamefile, player, kingdom, capital)
 
     # create an empty gamestate
