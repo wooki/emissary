@@ -9,7 +9,6 @@ class AddKingdom
   # load game state, save game state
   def initialize(gamefile, player, kingdom, capital)
 
-    # create an empty gamestate
     @state = Emissary::GameState.load(gamefile)
 
     # check we have a unique player, kingdom
@@ -52,6 +51,9 @@ class AddKingdom
       :y => hex[:y],
       :capital => hex[:name]
     }
+
+    # set ownership
+    hex[:owner] = player
 
     # save the gamestate
     @state.save gamefile

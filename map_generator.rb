@@ -503,6 +503,7 @@ class MapGenerator
 
                base_population = (base_population.to_f * adjustment).round.to_i
                hex[:popupulation] = base_population
+
             else
 
                # adjusted by adjacent oceans
@@ -520,6 +521,13 @@ class MapGenerator
                      adjustment = adjustment * @population_settlement_boost[path.length]
                   end
 
+                  # also remember the settlement to which this area is attached
+                  hex[:closest_settlement] = {
+                     :name => path.last[:name],
+                     :x => path.last[:x],
+                     :y => path.last[:y],
+                     :distance => path.length
+                  }
                end
                # no path to a settlement - isolated islands stay x1
 

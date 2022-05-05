@@ -4,7 +4,19 @@ require 'json'
 
 class GameState
 
-  attr_accessor :kingdoms, :map, :my_kingdom, :settlements
+  attr_accessor :kingdoms, :map, :my_kingdom, :settlements, :turn
+
+  def initialize
+    super()
+
+    # keyed by user id
+    @kingdoms = Hash.new
+
+    # keyed by "x,y" (areas contain units)
+    @map = Hash.new
+
+    @turn = 1
+  end
 
   def self.load(gamefile)
     # load the gamestate
@@ -15,6 +27,7 @@ class GameState
   def self.from_json(json)
     hash = JSON.parse(json, {:symbolize_names => true})
     state = GameState.new
+    state.turn = hash[:map]
     state.map = hash[:map]
     state.kingdoms = hash[:kingdoms]
     state.my_kingdom = hash[:my_kingdom]
@@ -95,6 +108,7 @@ class GameState
         hex[:shortcut] = code.to_sym
         hex[:shortcut_help] = shortcut_help.to_sym
         @settlements[code.to_sym] = key
+
       end
     }
 
@@ -175,17 +189,43 @@ class GameState
     return true
   end
 
-  ##################################
-  # set-up initial state
-  ##################################
-  def initialize
-    super()
 
-    # keyed by user id
-    @kingdoms = Hash.new
 
-    # keyed by "x,y" (areas contain units)
-    @map = Hash.new
+  ##################################
+  # clears old data and increments
+  # turn
+  ##################################
+  def new_turn(randomseed)
+
+    # clear old data
+    puts "clearing old data"
+    @messages = Array.new
+
+  	# reset planets
+  	# self.each_planet { | planet |
+  	# 	planet.new_turn
+  	# }
+
+    # reset ships
+  	# self.each_ship { | ship |
+  	# 	ship.new_turn
+  	# }
+
+  	 # increment turn no
+    @turn = @turn.next
+    puts "moving to turn #{@turn}"
+
+    # ensure we can repeat rand calls by logging
+    # and allowing the reuse of a seed
+    if randomseed == nil or randomseed == ''
+  		randomseed = rand(1000000)
+  		puts "random seed generated: #{randomseed}"
+  		@randomseed = randomseed
+	 	else
+			puts "random seed set to: #{randomseed}"
+			@randomseed = randomseed
+	 	end
+	 	srand(@randomseed)
 
   end
 
@@ -207,7 +247,8 @@ class GameState
   # :kingdoms, :map, :my_kingdom
       data = {
         :kingdoms => @kingdoms,
-        :map => @map
+        :map => @map,
+        :turn => @turn
       }
       data[:my_kingdom] = @mykingdom if !@my_kingdom.nil?
       data

@@ -175,7 +175,7 @@ OptionParser.new do | opts |
   end
 end.parse!
 
-ng = DrawMap.new options[:gamefile], options[:mapfile]
+ng = DrawMap.new options[:gamefile], options[:mapfile], options[:hexsize]
 
 
 # bundle exec ruby draw_map.rb -g game.json -m world.svg -h 6
