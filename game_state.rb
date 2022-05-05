@@ -52,22 +52,22 @@ class GameState
           code = parts.collect { | part | part[0, 1] }.join
           shortcut_help = parts.collect { | part | part[0, 1].upcase + part[1, 99].downcase }.join(' ')
 
-          if @settlements.include? code
+          if @settlements.include? code.to_sym
             code = parts[0][0,1] + parts[1][0,2]
             shortcut_help = parts[0][0,1].upcase + parts[0][1, 99].downcase + " " + parts[1][0,2].upcase + parts[1][2, 99].downcase
           end
 
-          if @settlements.include? code
+          if @settlements.include? code.to_sym
             code = parts[0][0,2] + parts[1][0,1]
             shortcut_help = parts[0][0,2].upcase + parts[0][2, 99].downcase + " " + parts[1][0,1].upcase + parts[1][1, 99].downcase
           end
 
-          if @settlements.include? code
+          if @settlements.include? code.to_sym
             code = parts.collect { | part | part[0, 2] }.join
             shortcut_help = parts.collect { | part | part[0, 2].upcase + part[2, 99].downcase }.join(' ')
           end
 
-          if @settlements.include? code
+          if @settlements.include? code.to_sym
             code = parts[0][0,2] + parts[1][0,3]
             shortcut_help = parts[0][0,2].upcase + parts[0][2, 99].downcase + " " + parts[1][0,3].upcase + parts[1][3, 99].downcase
           end
@@ -76,17 +76,17 @@ class GameState
           code = hex[:name][0, 3].downcase
           shortcut_help =  hex[:name][0, 3].upcase +  hex[:name][3, 99].downcase
 
-          if @settlements.include? code
+          if @settlements.include? code.to_sym
             code = hex[:name][0, 4].downcase
             shortcut_help =  hex[:name][0, 4].upcase +  hex[:name][4, 99].downcase
           end
 
-          if @settlements.include? code
+          if @settlements.include? code.to_sym
             code = hex[:name][0, 5].downcase
             shortcut_help =  hex[:name][0, 5].upcase +  hex[:name][5, 99].downcase
           end
 
-          if @settlements.include? code
+          if @settlements.include? code.to_sym
             code = hex[:name].downcase
             shortcut_help =  hex[:name].upcase
           end

@@ -1,6 +1,6 @@
 require 'json'
 require 'optparse'
-require_relative 'game_state'
+require_relative '../game_state'
 
 class AddKingdom
 
@@ -85,4 +85,4 @@ end.parse!
 ng = AddKingdom.new options[:gamefile], options[:player], options[:kingdom], options[:capital]
 
 
-# bundle exec ruby add_kingdom.rb -g game.json -p jim2 -c lyn -k jim2
+# bundle exec ruby add_kingdom.rb -g game.json -p jim -c lyn -k "The Jimpire"

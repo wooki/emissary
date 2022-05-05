@@ -1,6 +1,6 @@
 require 'json'
 require 'optparse'
-require_relative 'game_state'
+require_relative '../game_state'
 
 class NewGame
 

@@ -1,7 +1,7 @@
 require 'json'
 require 'optparse'
-require_relative 'game_state'
-require_relative 'map_utils'
+require_relative '../game_state'
+require_relative '../map_utils'
 
 class DrawMap
 
@@ -123,7 +123,7 @@ class DrawMap
             io.print "<use href=\"#trade\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"black\" style=\"opacity:0.8\" />"
          end
 
-         io.print "<text font-size=\"8px\" x=\"#{x}\" y=\"#{pos[:y]}\" fill=\"white\">#{hex[:x]},#{hex[:y]}</text>"
+         # io.print "<text font-size=\"8px\" x=\"#{x}\" y=\"#{pos[:y]}\" fill=\"white\">#{hex[:x]},#{hex[:y]}</text>"
       }
 
       # town and city labels
@@ -144,6 +144,7 @@ class DrawMap
             font_size = '14px' if hex[:terrain] == "town"
 
             text = hex[:name]
+            # text = hex[:shortcut_help]
             text = hex[:trade][:name] if text.nil?
             io.print "<text font-size=\"#{font_size}\" x=\"#{x}\" y=\"#{y}\" fill=\"#{color}\">#{text}</text>"
 
@@ -177,4 +178,4 @@ end.parse!
 ng = DrawMap.new options[:gamefile], options[:mapfile]
 
 
-# bundle exec ruby draw_map.rb -g game.json -m world.svg -h 16
+# bundle exec ruby draw_map.rb -g game.json -m world.svg -h 6
