@@ -160,7 +160,7 @@ end
 # parse command line options
 options = Hash.new
 OptionParser.new do | opts |
-   opts.banner = "Usage: emissary.rb [options]"
+   opts.banner = "Usage: draw_map.rb [options]"
 
   opts.on("-gGAME", "--gamefile=GAME", "File to read game from") do |n|
      options[:gamefile] = n

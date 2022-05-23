@@ -1,17 +1,18 @@
-require_relative 'order_parser'
+require_relative 'rulesengine/rule_queue'
+require_relative 'rulesengine/rule_factory'
 
 module Emissary
 
   # runs a turn
   class Turn
 
-  def initialize(gamefile, ordersdir, randomseed)
+  def initialize(gamefile, ordersdir, seed)
 
       # get the game
       @state = Emissary::GameState.load(gamefile)
 
       # clear old data
-      @state.new_turn(randomseed)
+      @state.new_turn(seed)
 
       # build a rule queue from orders
       puts "building rule queue"

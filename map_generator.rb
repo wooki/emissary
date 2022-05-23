@@ -522,8 +522,9 @@ class MapGenerator
                   end
 
                   # also remember the settlement to which this area is attached
+                  closest_settlement = getHex path.last[:x], path.last[:y]
                   hex[:closest_settlement] = {
-                     :name => path.last[:name],
+                     :name => closest_settlement[:name],
                      :x => path.last[:x],
                      :y => path.last[:y],
                      :distance => path.length
