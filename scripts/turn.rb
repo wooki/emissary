@@ -1,11 +1,40 @@
+require 'json'
+require 'optparse'
 require_relative '../game_state'
 require_relative '../turn'
 
-codebase = ARGV[0]
-separator = ARGV[1]
-gamefile = ARGV[2]
-ordersdir = ARGV[3]
-simulate = ARGV[4]
-randomseed = ARGV[5]
+class Turn
 
-t = Emissary::Turn.new(gamefile, ordersdir, simulate, randomseed)
+  attr_accessor :state
+
+  # load game state and run turn
+  def initialize(gamefile, ordersdir, seed)
+
+    t = Emissary::Turn.new(gamefile, ordersdir, seed)
+
+  end
+
+end
+
+# parse command line options
+options = Hash.new
+OptionParser.new do | opts |
+   opts.banner = "Usage: turn.rb [options]"
+
+   opts.on("-gGAME", "--gamefile=GAME", "File to read/write game to") do |n|
+     options[:gamefile] = n
+   end
+
+   opts.on("-oORDERSDIR", "--orders=ORDERSDIR", "folder from which to read orders") do |n|
+    options[:ordersdir] = n
+  end
+
+  opts.on("-sSEED", "--seed=SEED", "random seed for repeatable order run") do |n|
+    options[:seed] = n
+  end
+
+end.parse!
+
+ng = Turn.new options[:gamefile], options[:ordersdir], options[:seed]
+
+# bundle exec ruby turn.rb -g game.json -o ../orders/

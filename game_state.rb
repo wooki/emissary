@@ -15,7 +15,7 @@ class GameState
     # keyed by "x,y" (areas contain units)
     @map = Hash.new
 
-    @turn = 1
+    @turn = 0
   end
 
   def self.load(gamefile)
@@ -27,7 +27,7 @@ class GameState
   def self.from_json(json)
     hash = JSON.parse(json, {:symbolize_names => true})
     state = GameState.new
-    state.turn = hash[:map]
+    state.turn = hash[:turn]
     state.map = hash[:map]
     state.kingdoms = hash[:kingdoms]
     state.my_kingdom = hash[:my_kingdom]

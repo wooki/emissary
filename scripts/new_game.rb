@@ -24,7 +24,7 @@ end
 # parse command line options
 options = Hash.new
 OptionParser.new do | opts |
-   opts.banner = "Usage: emissary.rb [options]"
+   opts.banner = "Usage: new_game.rb [options]"
 
    opts.on("-gGAME", "--gamefile=GAME", "File to read/write game to") do |n|
      options[:gamefile] = n
