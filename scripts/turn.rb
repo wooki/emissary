@@ -30,11 +30,11 @@ OptionParser.new do | opts |
   end
 
   opts.on("-sSEED", "--seed=SEED", "random seed for repeatable order run") do |n|
-    options[:seed] = n
+    options[:seed] = n.to_i
   end
 
 end.parse!
 
 ng = Turn.new options[:gamefile], options[:ordersdir], options[:seed]
 
-# bundle exec ruby turn.rb -g game.json -o ../orders/
+# bundle exec ruby turn.rb -g game.json -o ../orders/ -s 123456
