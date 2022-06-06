@@ -30,6 +30,34 @@ module Emissary
       puts "adding system rules"
       rf = RuleFactory.new
 
+      # system rules generate notifications for players. Depending on how good (or many)
+      # peeple they have on internal affairs they get top x, based on each notifications magnitude.
+      # Their spymaster plus spies report based on where they are?
+
+      # production
+
+      # trade
+
+      # loyalty
+
+      # development
+
+      # prosperity
+
+      # uprisings
+
+      # wars - start, continue, end
+
+      # population growth
+
+      # migration - prosperity causes pull from rural to urban, development causes pull
+
+      # sieges
+
+      # battles - details are written to game file so can be reported and cleared in new_turn
+
+
+
       # rules for each ship
       # game.each_ship { | ship |
 
@@ -89,7 +117,8 @@ module Emissary
       }
 
       # save game file
-      @state.save gamefile
+      puts "## skipping save in dev ##"
+      # @state.save gamefile
 
     end
   end
