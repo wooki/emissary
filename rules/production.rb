@@ -1,5 +1,6 @@
 require_relative "../rulesengine/rule"
 require_relative "../rulesengine/turn_sequence"
+require_relative '../constants'
 
 module Emissary
 
@@ -15,6 +16,10 @@ module Emissary
         end
 
         def Execute(gameState)
+
+            # PRODUCTION_FOOD_TRAVEL_LOSS
+            # PRODUCTION_GOODS_TRAVEL_LOSS
+
         end
 
     end
