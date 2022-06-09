@@ -137,35 +137,29 @@ class GameState
     @kingdoms.values.find { | kingdom | kingdom[:x] == coord[:x] and kingdom[:y] == coord[:y] }
   end
 
-  ##################################
-  # find a random empty village, update to
-  # this user and return it
-  ##################################
-  def random_unowned_village(user_id)
-
-    villages = self.each_area('village') { | v |
-      v.belongs_to == nil
-    }
-    villages.sample
+  def rural
+    ['lowland', 'mountain', 'forest', 'desert']
   end
 
-  ##################################
   # get all of the specified terrain from the map
   # and return array - if block then only include
   # items where block returns true
-  ##################################
   def each_area(terrain)
     matched = []
     terrain = [terrain] if !terrain.kind_of? Array
 
     @map.each { | key, value |
-      if terrain.include? value.terrain
+      if terrain.include? value[:terrain]
         if !block_given? or yield value
           matched.push value
         end
       end
     }
     matched
+  end
+
+  def each_rural
+    self.each_area self.rural
   end
 
   ##################################

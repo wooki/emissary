@@ -6,10 +6,10 @@ module Emissary
     attr_accessor :player, :turnSequence, :systemrule
 
     # Constructor requires some basic info
-    def initialize(player, turnSequence)
+    def initialize(player, turnSequence, systemrule=false)
       @player = player
       @turnSequence = turnSequence
-      @systemrule = false
+      @systemrule = systemrule
     end
 
     # executes this rule against the gamestate

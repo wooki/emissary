@@ -35,6 +35,11 @@ module Emissary
       # Their spymaster plus spies report based on where they are?
 
       # production
+      @state.each_rural.each { | area |
+        prod = rf.CreateRule("production", {"area" => area}, area[:owner], @state)
+        queue.AddRule(prod) if prod != nil
+      }
+
 
       # trade
 
@@ -113,7 +118,7 @@ module Emissary
       # evaluate rules
       puts "evaluating rules"
       queue.each { | rule |
-        rule.Execute(game)
+        rule.Execute(@state)
       }
 
       # save game file

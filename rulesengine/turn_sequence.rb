@@ -4,7 +4,8 @@ module Emissary
     # values here will re-arrange the turn sequence
     #
 
-    TS_DIPLOMACY = 10
+    TS_PRODUCTION = 10
+
     TS_MESSAGE = 20
     TS_COLONISE = 30
     TS_MOVE = 40
