@@ -1,4 +1,5 @@
 require_relative '../rules/production'
+require_relative '../rules/import'
 
 module Emissary
 
@@ -11,7 +12,8 @@ module Emissary
     def initialize
 
       @rules = {
-        "production" => Production
+        "production" => Production,
+        "import" => Import
       }
 
     end

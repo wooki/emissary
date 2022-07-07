@@ -41,7 +41,11 @@ module Emissary
       }
 
 
-      # trade
+      # import
+      @state.each_urban.each { | area |
+        imp = rf.CreateRule("import", {"urban" => area}, area[:owner], @state)
+        queue.AddRule(imp) if imp != nil
+      }
 
       # loyalty
 
@@ -122,8 +126,8 @@ module Emissary
       }
 
       # save game file
-      puts "## skipping save in dev ##"
-      # @state.save gamefile
+      #puts "## skipping save in dev ##"
+      @state.save gamefile
 
     end
   end

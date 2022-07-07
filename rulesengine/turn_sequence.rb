@@ -5,6 +5,7 @@ module Emissary
     #
 
     TS_PRODUCTION = 10
+    TS_IMPORT = 20
 
     TS_MESSAGE = 20
     TS_COLONISE = 30

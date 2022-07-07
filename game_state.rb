@@ -35,6 +35,10 @@ class GameState
     state
   end
 
+  def getHex(x, y)
+    @map["#{x},#{y}".to_sym]
+ end
+
   # work out the largest x/y dimension
   def size
     largest = 0
@@ -141,6 +145,10 @@ class GameState
     ['lowland', 'mountain', 'forest', 'desert']
   end
 
+  def urban
+    ['town', 'city']
+  end
+
   # get all of the specified terrain from the map
   # and return array - if block then only include
   # items where block returns true
@@ -160,6 +168,10 @@ class GameState
 
   def each_rural
     self.each_area self.rural
+  end
+
+  def each_urban
+    self.each_area self.urban
   end
 
   ##################################

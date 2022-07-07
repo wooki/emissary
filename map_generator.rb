@@ -62,7 +62,7 @@ class MapGenerator
       @food = {
          'city' => 0,
          'town' => 0,
-         'lowland' => 0.003,
+         'lowland' => 0.002,
          'forest' => 0.0015,
          'mountain' => 0.0007,
          'desert' => 0.0002
@@ -70,10 +70,10 @@ class MapGenerator
       @goods = {
          'city' => 0,
          'town' => 0,
-         'lowland' => 0.0004,
-         'forest' => 0.002,
-         'mountain' => 0.0015,
-         'desert' => 0.0001
+         'lowland' => 0.001,
+         'forest' => 0.003,
+         'mountain' => 0.002,
+         'desert' => 0.001
       }
       @population_settlement_boost = [4.0, 3.0, 2.0, 1.0, 1.0, 0.75, 0.5, 0.25, 0.2, 0.15];
 
@@ -502,7 +502,7 @@ class MapGenerator
                adjustment = adjustment + (adj['ocean'].to_f * 0.05) if adj['ocean'] > 0
 
                base_population = (base_population.to_f * adjustment).round.to_i
-               hex[:popupulation] = base_population
+               hex[:population] = base_population
 
             else
 
@@ -533,7 +533,7 @@ class MapGenerator
                # no path to a settlement - isolated islands stay x1
 
                base_population = (base_population.to_f * adjustment).round.to_i
-               hex[:popupulation] = base_population
+               hex[:population] = base_population
 
                # extra food in lowland adjacent to desert and water
                if hex[:terrain] == 'lowland' and adj['desert'] > 0 and adj['ocean'] > 0
