@@ -37,4 +37,4 @@ end.parse!
 
 ng = Turn.new options[:gamefile], options[:ordersdir], options[:seed]
 
-# bundle exec ruby turn.rb -g game.json -o ../orders/ -s 123456
+# bundle exec ruby turn.rb -g game.yaml -o ../orders/ -s 123456

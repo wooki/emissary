@@ -21,8 +21,8 @@ class DrawMap
   end
 
   def is_trade_node?(map, coords)
-      hex = getHex(map, coords[:x], coords[:y])
-      hex[:trade] and hex[:trade][:is_node]
+      hex = getHex(map, coords.x, coords.y)
+      hex.trade_node 
    end
 
    def getHex(map, x, y)
@@ -68,13 +68,13 @@ class DrawMap
 
       @state.map.each { | key, hex |
 
-         terrain = hex[:terrain]
+         terrain = hex.terrain
          if terrain == "peak"
             # terrain = "silver"
             terrain_color = "dimgray"
          elsif terrain == "ocean"
             if is_trade_node? @state.map, hex
-               # terrain_color = hex[:tradenode]
+               # terrain_color = hex.tradenode
                # terrain_color = "blueviolet"
                terrain_color = trade_node_colors[key]
             else
@@ -94,7 +94,7 @@ class DrawMap
             terrain_color = "red"
          end
 
-         pos = Emissary::MapUtils::hex_pos(hex[:x], hex[:y], hexsize, xoffset, yoffset)
+         pos = Emissary::MapUtils::hex_pos(hex.x, hex.y, hexsize, xoffset, yoffset)
          hexsizes = Emissary::MapUtils::hexsizes(hexsize)
          hex_points = Emissary::MapUtils::hex_points(pos[:x], pos[:y], hexsize)
 
@@ -106,10 +106,10 @@ class DrawMap
          # io.print "\" fill=\"#{terrain_color}\" stroke=\"black\" stroke-width=\"0.5\" />"
          stroke = "black"
          stroke_width= 0.1
-         if !is_trade_node?(@state.map, hex) and hex[:trade]
-            # stroke = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]
+         if !is_trade_node?(@state.map, hex) and hex.trade_node
+            # stroke = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}"]
             # stroke_width = 2.0
-            terrain_color = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}".to_sym]
+            terrain_color = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}".to_sym]
          end
          io.print "\" fill=\"#{terrain_color}\" stroke=\"#{stroke}\" stroke-width=\"#{stroke_width}\" />"
 
@@ -123,16 +123,16 @@ class DrawMap
             io.print "<use href=\"#trade\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"black\" style=\"opacity:0.8\" />"
          end
 
-         # io.print "<text font-size=\"8px\" x=\"#{x}\" y=\"#{pos[:y]}\" fill=\"white\">#{hex[:x]},#{hex[:y]}</text>"
+         # io.print "<text font-size=\"8px\" x=\"#{x}\" y=\"#{pos[:y]}\" fill=\"white\">#{hex.x},#{hex.y}</text>"
       }
 
       # town and city labels
       @state.map.each { | key, hex |
 
-         if hex[:terrain] == "city" or hex[:terrain] == "town" or
-            (hex[:terrain] == "ocean" and is_trade_node? @state.map, hex)
+         if hex.terrain == "city" or hex.terrain == "town" or
+            (hex.terrain == "ocean" and is_trade_node? @state.map, hex)
 
-            pos = Emissary::MapUtils::hex_pos(hex[:x], hex[:y], hexsize, xoffset, yoffset)
+            pos = Emissary::MapUtils::hex_pos(hex.x, hex.y, hexsize, xoffset, yoffset)
             hexsizes = Emissary::MapUtils::hexsizes(hexsize)
             hex_points = Emissary::MapUtils::hex_points(pos[:x], pos[:y], hexsize)
 
@@ -141,11 +141,11 @@ class DrawMap
             color = "black"
 
             font_size = '20px'
-            font_size = '14px' if hex[:terrain] == "town"
+            font_size = '14px' if hex.terrain == "town"
 
-            text = hex[:name]
-            # text = hex[:shortcut_help]
-            text = hex[:trade][:name] if text.nil?
+            text = hex.name
+            # text = hex.shortcut_help
+            text = hex.trade_node.name if text.nil?
             io.print "<text font-size=\"#{font_size}\" x=\"#{x}\" y=\"#{y}\" fill=\"#{color}\">#{text}</text>"
 
          end
@@ -178,4 +178,4 @@ end.parse!
 ng = DrawMap.new options[:gamefile], options[:mapfile], options[:hexsize]
 
 
-# bundle exec ruby draw_map.rb -g game.json -m world.svg -h 6
+# bundle exec ruby draw_map.rb -g game.yaml -m world.svg -h 6

@@ -1,6 +1,12 @@
 module Emissary
 
 require 'json'
+require 'yaml'
+require_relative './area'
+require_relative './settlement'
+require_relative './trade_node'
+require_relative './area_link'
+require_relative './store'
 
 class GameState
 
@@ -20,8 +26,11 @@ class GameState
 
   def self.load(gamefile)
     # load the gamestate
-    data = File.read(gamefile)
-    self.from_json(data)
+    # data = File.read(gamefile)
+    # self.from_json(data)
+    state = YAML.unsafe_load_file(gamefile)
+    state.load_settlements
+    state
   end
 
   def self.from_json(json)
@@ -43,8 +52,8 @@ class GameState
   def size
     largest = 0
     @map.each { | key, hex |
-      largest = hex[:x] if hex[:x] > largest
-      largest = hex[:y] if hex[:y] > largest
+      largest = hex.x if hex.x > largest
+      largest = hex.y if hex.y > largest
     }
     largest
   end
@@ -58,14 +67,14 @@ class GameState
     # iterate settlements and assign shortcuts to each
     @map.each { | key, hex |
 
-      if ['town', 'city'].include? hex[:terrain]
+      if ['town', 'city'].include? hex.terrain
 
-        if hex[:shortcut]
-          code = hex[:shortcut]
-          shortcut_help = hex[:shortcut_help]
+        if hex.shortcut
+          code = hex.shortcut
+          shortcut_help = hex.shortcut_help
 
-        elsif hex[:name].include? " "
-          parts = hex[:name].downcase.split
+        elsif hex.name.include? " "
+          parts = hex.name.downcase.split
           code = parts.collect { | part | part[0, 1] }.join
           shortcut_help = parts.collect { | part | part[0, 1].upcase + part[1, 99].downcase }.join(' ')
 
@@ -90,27 +99,27 @@ class GameState
           end
         else
 
-          code = hex[:name][0, 3].downcase
-          shortcut_help =  hex[:name][0, 3].upcase +  hex[:name][3, 99].downcase
+          code = hex.name[0, 3].downcase
+          shortcut_help =  hex.name[0, 3].upcase +  hex.name[3, 99].downcase
 
           if @settlements.include? code.to_sym
-            code = hex[:name][0, 4].downcase
-            shortcut_help =  hex[:name][0, 4].upcase +  hex[:name][4, 99].downcase
+            code = hex.name[0, 4].downcase
+            shortcut_help =  hex.name[0, 4].upcase +  hex.name[4, 99].downcase
           end
 
           if @settlements.include? code.to_sym
-            code = hex[:name][0, 5].downcase
-            shortcut_help =  hex[:name][0, 5].upcase +  hex[:name][5, 99].downcase
+            code = hex.name[0, 5].downcase
+            shortcut_help =  hex.name[0, 5].upcase +  hex.name[5, 99].downcase
           end
 
           if @settlements.include? code.to_sym
-            code = hex[:name].downcase
-            shortcut_help =  hex[:name].upcase
+            code = hex.name.downcase
+            shortcut_help =  hex.name.upcase
           end
         end
 
-        hex[:shortcut] = code.to_sym
-        hex[:shortcut_help] = shortcut_help.to_sym
+        hex.shortcut = code.to_sym
+        hex.shortcut_help = shortcut_help.to_sym
         @settlements[code.to_sym] = key
 
       end
@@ -157,7 +166,7 @@ class GameState
     terrain = [terrain] if !terrain.kind_of? Array
 
     @map.each { | key, value |
-      if terrain.include? value[:terrain]
+      if terrain.include? value.terrain
         if !block_given? or yield value
           matched.push value
         end
@@ -266,9 +275,16 @@ class GameState
 
     def save(gamefile)
       # save the gamestate
+      # File.open(gamefile, 'w') do | file |
+      #   file.print JSON.pretty_generate(self)
+      # end
+
       File.open(gamefile, 'w') do | file |
-        file.print JSON.pretty_generate(self)
+        file.print YAML.dump(self)
       end
+
+      
+
     end
 
 end
