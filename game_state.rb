@@ -16,6 +16,11 @@ class GameState
     @map = Hash.new
 
     @turn = 0
+
+    # 0 = public, increasing means more private
+    @@info_levels = {
+      "PRODUCTION": 1
+    }
   end
 
   def self.load(gamefile)
@@ -37,7 +42,27 @@ class GameState
 
   def getHex(x, y)
     @map["#{x},#{y}".to_sym]
- end
+  end
+
+  # log information to hex, for filter and reporting to players
+  # "PRODUCTION", @area, "Food and Goods sent to #{@settlement[:name]}", {food: food, goods: goods}
+  def info(type, area, message, data)
+
+    # info evel determined by looking up type
+    level = @@info_levels[type]
+
+    if area
+      area[:info] = Array.new if !area[:info]
+
+      area[:info].push {
+        level: level,
+        type: type,
+        message: message,
+        data: data
+      }
+
+    end
+  end
 
   # work out the largest x/y dimension
   def size
@@ -152,12 +177,12 @@ class GameState
   # get all of the specified terrain from the map
   # and return array - if block then only include
   # items where block returns true
-  def each_area(terrain)
+  def each_area(terrain=nil)
     matched = []
-    terrain = [terrain] if !terrain.kind_of? Array
+    terrain = [terrain] if !terrain.nil? and !terrain.kind_of? Array
 
     @map.each { | key, value |
-      if terrain.include? value[:terrain]
+      if terrain.nil? or terrain.include? value[:terrain]
         if !block_given? or yield value
           matched.push value
         end
@@ -207,10 +232,10 @@ class GameState
     puts "clearing old data"
     @messages = Array.new
 
-  	# reset planets
-  	# self.each_planet { | planet |
-  	# 	planet.new_turn
-  	# }
+  	# reset information
+  	self.each_area { | area |
+      area[:info] = Array.new
+    }
 
     # reset ships
   	# self.each_ship { | ship |

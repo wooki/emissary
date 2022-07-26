@@ -24,10 +24,10 @@ module Emissary
                 food = @area[:food].to_f * @area[:population].to_f
                 goods = @area[:goods].to_f * @area[:population].to_f
 
-                # maybe adjust based on state of hex e.g. rebellion / occupied
+                # adjust based on state of hex e.g. rebellion / occupied
 
 
-                # maybe split into another rule but for now just sell to closest
+                # maybe split into another rule but for now just send to closest
                 distance.times { | i |
                     food = food * PRODUCTION_FOOD_TRAVEL_LOSS
                     goods = goods * PRODUCTION_GOODS_TRAVEL_LOSS
@@ -42,6 +42,9 @@ module Emissary
                     @settlement[:store] = {food: 0, goods: 0} if !@settlement[:store]
                     @settlement[:store][:food] = @settlement[:store][:food] + food
                     @settlement[:store][:goods] = @settlement[:store][:goods] + goods
+
+                    # log info
+                    gameState.info "PRODUCTION", @area, "Food and Goods sent to #{@settlement[:name]}", {food: food, goods: goods}
                 end
 
             end
