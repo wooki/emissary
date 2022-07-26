@@ -1,6 +1,7 @@
 require_relative "../rulesengine/rule"
 require_relative "../rulesengine/turn_sequence"
 require_relative '../constants'
+require_relative '../store'
 
 module Emissary
 
@@ -17,12 +18,12 @@ module Emissary
 
         def Execute(gameState)
 
-            if @area and @area[:closest_settlement]
+            if @area and @area.closest_settlement
 
-                distance = @area[:closest_settlement][:distance]
+                distance = @area.closest_settlement.distance
 
-                food = @area[:food].to_f * @area[:population].to_f
-                goods = @area[:goods].to_f * @area[:population].to_f
+                food = @area.food.to_f * @area.population.to_f
+                goods = @area.goods.to_f * @area.population.to_f
 
                 # adjust based on state of hex e.g. rebellion / occupied
 
@@ -36,15 +37,15 @@ module Emissary
                 food = food.floor.to_i
                 goods = goods.floor.to_i
 
-                @settlement = gameState.getHex(@area[:closest_settlement][:x], @area[:closest_settlement][:y])
+                @settlement = gameState.getHex(@area.closest_settlement.x, @area.closest_settlement.y)
                 if @settlement
 
-                    @settlement[:store] = {food: 0, goods: 0} if !@settlement[:store]
-                    @settlement[:store][:food] = @settlement[:store][:food] + food
-                    @settlement[:store][:goods] = @settlement[:store][:goods] + goods
+                    @settlement.store = Store.new if !@settlement.store
+                    @settlement.store.food = @settlement.store.food + food
+                    @settlement.store.goods = @settlement.store.goods + goods
 
                     # log info
-                    gameState.info "PRODUCTION", @area, "Food and Goods sent to #{@settlement[:name]}", {food: food, goods: goods}
+                    gameState.info "PRODUCTION", @area, "Food and Goods sent to #{@settlement.name}", {food: food, goods: goods}
                 end
 
             end

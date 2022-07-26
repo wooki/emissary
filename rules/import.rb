@@ -18,19 +18,18 @@ module Emissary
 
         def Execute(gameState)
 
-            if @urban and @urban[:trade]
+            if @urban and @urban.trade
 
                 # how many food and goods do we need to import
-                food_required = (@urban[:population].to_f * FOOD_CONSUMPTION).floor.to_i
-                goods_required = (@urban[:population].to_f * INDUSTRY_RATE).floor.to_i
-                distance = @urban[:trade][:distance]
+                food_required = (@urban.population.to_f * FOOD_CONSUMPTION).floor.to_i
+                goods_required = (@urban.population.to_f * INDUSTRY_RATE).floor.to_i
+                distance = @urban.trade.distance
 
-                @trade = gameState.getHex(@urban[:trade][:x], @urban[:trade][:y])
-                if @trade and @trade[:trade] and @trade[:trade][:is_node]
+                @trade = gameState.getHex(@urban.trade.x, @urban.trade.y)
+                if @trade and @trade.trade_node
 
-                    puts "trading with: #{@trade[:trade][:name]}"
+                    puts "trading with: #{@trade.trade_node.name}"
                     puts "food_required: #{food_required}, goods:#{goods_required}"
-
                 end
 
             end

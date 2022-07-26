@@ -36,14 +36,14 @@ module Emissary
 
       # production
       @state.each_rural.each { | area |
-        prod = rf.CreateRule("production", {"area" => area}, area[:owner], @state)
+        prod = rf.CreateRule("production", {"area" => area}, nil, @state)
         queue.AddRule(prod) if prod != nil
       }
 
 
       # import
       @state.each_urban.each { | area |
-        imp = rf.CreateRule("import", {"urban" => area}, area[:owner], @state)
+        imp = rf.CreateRule("import", {"urban" => area}, area.owner, @state)
         queue.AddRule(imp) if imp != nil
       }
 
@@ -127,7 +127,7 @@ module Emissary
 
       # save game file
       #puts "## skipping save in dev ##"
-      @state.save gamefile
+      @state.save gamefile      
 
     end
   end

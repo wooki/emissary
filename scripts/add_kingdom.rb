@@ -47,13 +47,13 @@ class AddKingdom
     @state.kingdoms[player] = {
       :name => kingdom,
       :player => player,
-      :x => hex[:x],
-      :y => hex[:y],
-      :capital => hex[:name]
+      :x => hex.x,
+      :y => hex.y,
+      :capital => hex.name
     }
 
     # set ownership
-    hex[:owner] = player
+    hex.owner = player
 
     # save the gamestate
     @state.save gamefile
@@ -87,4 +87,4 @@ end.parse!
 ng = AddKingdom.new options[:gamefile], options[:player], options[:kingdom], options[:capital]
 
 
-# bundle exec ruby add_kingdom.rb -g game.json -p jim -c lyn -k "The Jimpire"
+# bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c val -k "The Jimpire"
