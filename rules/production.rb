@@ -46,6 +46,7 @@ module Emissary
 
                     # log info
                     gameState.info "PRODUCTION", @area, "Food and Goods sent to #{@settlement.name}", {food: food, goods: goods}
+                    gameState.info "PRODUCTION", @settlement, "Food and Goods arrived from #{@area.name}", {food: food, goods: goods}
                 end
 
             end

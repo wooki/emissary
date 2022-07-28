@@ -23,8 +23,11 @@ class GameState
 
     @turn = 0
 
+  end
+
+  def self.info_levels
     # 0 = public, increasing means more private
-    @@info_levels = {
+    {
       "PRODUCTION": 1
     }
   end
@@ -58,17 +61,17 @@ class GameState
   def info(type, area, message, data)
 
     # info evel determined by looking up type
-    level = @@info_levels[type]
+    level = GameState.info_levels[type.to_sym]
 
     if area
-      area[:info] = Array.new if !area[:info]
+      area.info = Array.new if !area.info
 
-      area[:info].push {
+      area.info.push({
         level: level,
         type: type,
         message: message,
         data: data
-      }
+      })
 
     end
   end
@@ -243,7 +246,7 @@ class GameState
 
   	# reset information
   	self.each_area { | area |
-      area[:info] = Array.new
+      area.new_turn
     }
 
     # reset ships
