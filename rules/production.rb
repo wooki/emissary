@@ -12,8 +12,9 @@ module Emissary
 
         attr_accessor :area
 
-        def initialize(player)
-            super(player, TS_PRODUCTION, true)
+        def initialize(area)
+            super(nil, TS_PRODUCTION, true)
+            self.area = area
         end
 
         def Execute(gameState)
@@ -45,10 +46,13 @@ module Emissary
                     @settlement.store.goods = @settlement.store.goods + goods
 
                     # log info
-                    gameState.info "PRODUCTION", @area, "Food and Goods sent to #{@settlement.name}", {food: food, goods: goods}
-                    gameState.info "PRODUCTION", @settlement, "Food and Goods arrived from #{@area.name}", {food: food, goods: goods}
+                    if food > 0 or goods > 0
+                        gameState.info "PRODUCTION", @area, "Food and Goods sent to #{@settlement.name}", {food: food, goods: goods}
+                        gameState.info "PRODUCTION", @settlement, "Food and Goods arrived from #{@area.name}", {food: food, goods: goods}
+                    end
                 end
 
+                nil
             end
         end
 

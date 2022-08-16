@@ -1,5 +1,11 @@
 require_relative 'rulesengine/rule_queue'
-require_relative 'rulesengine/rule_factory'
+# require_relative 'rulesengine/rule_factory'
+require_relative 'rules/production'
+require_relative 'rules/import'
+require_relative 'rules/export'
+require_relative 'rules/industry'
+require_relative 'rules/upkeep'
+require_relative 'rules/trade_prices'
 
 module Emissary
 
@@ -26,25 +32,34 @@ module Emissary
       #   }
       # }
 
-      # add system orders for ships. factions and planets
+      # add system orders for areas, settlements etc.
       puts "adding system rules"
-      rf = RuleFactory.new
 
       # system rules generate notifications for players. Depending on how good (or many)
       # peeple they have on internal affairs they get top x, based on each notifications magnitude.
       # Their spymaster plus spies report based on where they are?
 
-      # production
+      # Production
       @state.each_rural.each { | area |
-        prod = rf.CreateRule("production", {"area" => area}, nil, @state)
-        queue.AddRule(prod) if prod != nil
+        queue.AddRule(Production.new(area))
+
+        if area.trade_node and area.trade_node.is_node
+          queue.AddRule(TradePrices.new(area))
+        end
       }
 
 
-      # import
+      # Import, Export, Industry, Upkeep
       @state.each_urban.each { | area |
-        imp = rf.CreateRule("import", {"urban" => area}, area.owner, @state)
-        queue.AddRule(imp) if imp != nil
+        queue.AddRule(Import.new(area))
+        queue.AddRule(Export.new(area))
+        queue.AddRule(Industry.new(area))
+        queue.AddRule(Upkeep.new(area))
+      }
+
+      # TradePrices
+      @state.each_trade_node.each { | area |
+        queue.AddRule(TradePrices.new(area.trade_node))
       }
 
       # loyalty
@@ -119,15 +134,17 @@ module Emissary
       puts "sorting rule queue"
       queue.Sort
 
-      # evaluate rules
+      # evaluate rules one at a time, allowing rules to create new rules
       puts "evaluating rules"
-      queue.each { | rule |
-        rule.Execute(@state)
-      }
+      while queue.More?
+
+        rule = queue.Next
+        queue.Insert rule.Execute(@state)
+      end
 
       # save game file
       #puts "## skipping save in dev ##"
-      @state.save gamefile      
+      @state.save gamefile
 
     end
   end

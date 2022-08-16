@@ -12,6 +12,7 @@ class Area
 
   def new_turn
     @info = Array.new
+    @trade_node.new_turn if @trade_node and @trade_node.is_node
   end
 
   def name

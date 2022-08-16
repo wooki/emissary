@@ -2,14 +2,24 @@ module Emissary
 
 class Store
 
-  attr_accessor :food, :goods
+  attr_accessor :food, :goods, :gold
 
   def initialize
-    super()    
+    super()
     @food = 0
     @goods = 0
+    @gold = 0
   end
 
+  def bought_food(food, cost)
+    @food = @food + food
+    @gold = @gold - cost
+  end
+
+  def bought_goods(goods, cost)
+    @goods = @goods + goods
+    @gold = @gold - cost
+  end
 
 end
 

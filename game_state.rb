@@ -28,7 +28,8 @@ class GameState
   def self.info_levels
     # 0 = public, increasing means more private
     {
-      "PRODUCTION": 1
+      "PRODUCTION": 1,
+      "TRADE": 2
     }
   end
 
@@ -209,6 +210,19 @@ class GameState
 
   def each_urban
     self.each_area self.urban
+  end
+
+  def each_trade_node
+    matched = Array.new
+
+    @map.each { | key, value |
+      if value.trade_node and value.trade_node.is_node
+        if !block_given? or yield value
+          matched.push value
+        end
+      end
+    }
+    matched
   end
 
   ##################################

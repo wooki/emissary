@@ -1,4 +1,5 @@
 require_relative './area'
+require_relative './store'
 
 module Emissary
 
@@ -8,6 +9,7 @@ class Settlement < Area
 
   def initialize
     super()
+    @store = Store.new
   end
 
   def name

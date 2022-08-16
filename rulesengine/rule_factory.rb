@@ -6,6 +6,7 @@ module Emissary
   # dynamically creates rules and populates their
   # properties from the "raw" version being passed
   # in
+  # only for parsing input from players - no need to do this for internal
   class RuleFactory
 
     # map orders to rules

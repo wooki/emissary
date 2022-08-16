@@ -6,18 +6,23 @@ module Emissary
 
     TS_PRODUCTION = 10
     TS_IMPORT = 20
+    TS_TRADEPRICES = 50
+    TS_INDUSTRY = 150
+    TS_UPKEEP = 160
+    TS_EXPORT = 200
+    TS_TRADE = 300
 
-    TS_MESSAGE = 20
-    TS_COLONISE = 30
-    TS_MOVE = 40
-    TS_INTERCEPT = 50
-    TS_REPAIR = 60
-    TS_COMBAT = 70
-    TS_BUILD = 80
-    TS_UPGRADE = 90
-    TS_MINING = 100
-    TS_RESEARCH = 110
-    TS_DISCOVERY = 120
-    TS_NAME = 130 # must be last in case any orders used old name
+    # TS_MESSAGE = 20
+    # TS_COLONISE = 30
+    # TS_MOVE = 40
+    # TS_INTERCEPT = 50
+    # TS_REPAIR = 60
+    # TS_COMBAT = 70
+    # TS_BUILD = 80
+    # TS_UPGRADE = 90
+    # TS_MINING = 100
+    # TS_RESEARCH = 110
+    # TS_DISCOVERY = 120
+    # TS_NAME = 130 # must be last in case any orders used old name
 
 end
