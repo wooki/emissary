@@ -23,7 +23,7 @@ class NewGame
     @state.map = Hash.new
     map.each { | key, area |
       if @state.urban.include? area[:terrain]
-        
+
         a = Emissary::Settlement.new
         a.x = area[:x]
         a.y = area[:y]
@@ -44,17 +44,17 @@ class NewGame
           a.trade.y = area[:trade][:y]
           a.trade.distance = area[:trade][:distance]
           a.trade.name = area[:trade][:name]
-        end   
+        end
 
       else
         a = Emissary::Area.new
         a.x = area[:x]
         a.y = area[:y]
         a.terrain = area[:terrain]
-        a.name = area[:name]
+        # a.name = area[:name] # should areas have names? maybe later
         a.population = area[:population]
         a.food = area[:food]
-        a.goods = area[:goods]        
+        a.goods = area[:goods]
 
         if area[:closest_settlement]
           a.closest_settlement = Emissary::AreaLink.new
@@ -62,17 +62,17 @@ class NewGame
           a.closest_settlement.y = area[:closest_settlement][:y]
           a.closest_settlement.distance = area[:closest_settlement][:distance]
           a.closest_settlement.name = area[:closest_settlement][:name]
-        end   
-        
-      end    
+        end
+
+      end
 
       if area[:trade] and area[:trade][:is_node]
         a.trade_node = Emissary::TradeNode.new
         a.trade_node.name = area[:trade][:name]
-        
+
         if area[:trade][:connected]
           area[:trade][:connected].each { | node_key, node |
-            connection = Emissary::AreaLink.new            
+            connection = Emissary::AreaLink.new
             connection.x = node[:x]
             connection.y = node[:y]
             connection.distance = node[:distance]
@@ -81,7 +81,7 @@ class NewGame
           }
         end
       end
-      
+
       @state.map[key] = a
     }
 
