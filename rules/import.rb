@@ -29,7 +29,7 @@ module Emissary
                 # how many food and goods do we need to import
                 food_required = (@urban.population.to_f * FOOD_CONSUMPTION).floor.to_i
                 goods_required = (@urban.population.to_f * INDUSTRY_RATE).floor.to_i
-                distance = @urban.trade.distance
+                # distance = @urban.trade.distance
 
                 @trade = gameState.getHex(@urban.trade.x, @urban.trade.y)
                 if @trade and @trade.trade_node
@@ -40,14 +40,20 @@ module Emissary
 
                         # register that we will buy and create order to do so for any cost
                         @trade.trade_node.buy_later(:food, buy_food)
-                        trades.push Trade.new(@urban, @trade.trade_node, :food, false, buy_food, nil, "Food imported to feed population")
+                        trades.push Trade.new(@urban, @trade.trade_node, :food, false, buy_food, nil, "Food imported to feed population", true)
+
+                        # we will payonly in the trade so deliver immeditely
+                        @urban.store.food = @urban.store.food + buy_food
                     end
 
                     if @urban.store.goods < goods_required
                         buy_goods = goods_required - @urban.store.goods
 
                         @trade.trade_node.buy_later(:goods, buy_goods)
-                        trades.push Trade.new(@urban, @trade.trade_node, :goods, false, buy_goods, nil, "Goods imported to match industrial capacity")
+                        trades.push Trade.new(@urban, @trade.trade_node, :goods, false, buy_goods, nil, "Goods imported to match industrial capacity", true)
+
+                        # we will payonly in the trade so deliver immeditely
+                        @urban.store.goods = @urban.store.goods + buy_goods
                     end
 
                 end

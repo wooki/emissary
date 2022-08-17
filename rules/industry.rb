@@ -1,11 +1,8 @@
 require_relative "../rulesengine/rule"
 require_relative "../rulesengine/turn_sequence"
-require_relative '../constants'
 require_relative '../store'
 
 module Emissary
-
-    POPULATION_PER_INDUSTRY = 0.001
 
     # all settlements produces 1 good for each good+1000 population they have
     class Industry < Rule
@@ -19,7 +16,14 @@ module Emissary
 
         def Execute(gameState)
 
-            if @urban and @urban.trade
+            if @urban
+
+                new_goods = [@urban.industry, @urban.store.goods].min
+                if new_goods > 0
+                    @urban.store.goods = @urban.store.goods + new_goods
+                    gameState.info "INDUSTRY", @urban, "Industry produced #{new_goods} Goods", {goods: new_goods}
+                end
+
             end
 
         end

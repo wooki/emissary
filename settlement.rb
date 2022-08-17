@@ -1,5 +1,6 @@
 require_relative './area'
 require_relative './store'
+require_relative './constants'
 
 module Emissary
 
@@ -10,6 +11,10 @@ class Settlement < Area
   def initialize
     super()
     @store = Store.new
+  end
+
+  def industry
+    (@population.to_f * INDUSTRY_RATE).floor
   end
 
   def name

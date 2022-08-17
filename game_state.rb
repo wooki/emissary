@@ -29,7 +29,8 @@ class GameState
     # 0 = public, increasing means more private
     {
       "PRODUCTION": 1,
-      "TRADE": 2
+      "TRADE": 2,
+      "INDUSTRY": 3
     }
   end
 

@@ -24,15 +24,21 @@ module Emissary
     end
 
     def Insert(rules)
+
       return nil if !rules or rules.length == 0
+
+      rules = [rules] if rules.is_a?(Rule)
+      return nil if !rules.is_a?(Array)
 
       # insert in correct position, don't want to resort a sorted array
       rules.each { | rule |
-        position = rules.index { | x | x.turnSequence > rule.turnSequence }
-        if position
-          @rules.insert(position, rule)
-        else
-          self.AddRule rule
+        if rule.is_a?(Rule)
+          position = rules.index { | x | x.turnSequence > rule.turnSequence }
+          if position
+            @rules.insert(position, rule)
+          else
+            self.AddRule rule
+          end
         end
       }
     end

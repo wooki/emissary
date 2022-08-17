@@ -52,8 +52,9 @@ module Emissary
                     end
                 end
 
-                nil
             end
+
+            nil
         end
 
     end

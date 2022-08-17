@@ -10,9 +10,9 @@ module Emissary
     # calculated based on total quantities at nodes
     class Trade < Rule
 
-        attr_accessor :urban, :trade, :commodity, :sell, :number, :spend, :narrative
+        attr_accessor :urban, :trade, :commodity, :sell, :number, :spend, :narrative, :payonly
 
-        def initialize(urbal, trade, commodity, sell=false, narrative=nil, number=nil, spend=nil)
+        def initialize(urbal, trade, commodity, sell=false, narrative=nil, number=nil, spend=nil, payonly=false)
             super(nil, TS_TRADE, true)
             self.urban = urban
             self.trade = trade
@@ -21,10 +21,14 @@ module Emissary
             self.narrative = narrative
             self.number = number
             self.spend = spend
+
+            # allow for goods to be paid for ahead of
+            # knowing the price and paying with this
+            self.payonly = payonly
         end
 
         def Execute(gameState)
-            puts "TRADE"
+            puts "TRADE #{(@sell ? 'SELL' : 'BUY')} #{@number} #{@commodity}"
             if @urban and @trade and @trade.is_node
 
 # @urban.store.bought_food(buy_food, food_cost)

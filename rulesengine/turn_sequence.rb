@@ -4,12 +4,12 @@ module Emissary
     # values here will re-arrange the turn sequence
     #
 
-    TS_PRODUCTION = 10
-    TS_IMPORT = 20
-    TS_TRADEPRICES = 50
-    TS_INDUSTRY = 150
+    TS_PRODUCTION = 10 # raw materials collected
+    TS_IMPORT = 20 # urbans buy food and goods required
+    TS_INDUSTRY = 100 # urbans generate goods from goods
+    TS_EXPORT = 130
     TS_UPKEEP = 160
-    TS_EXPORT = 200
+    TS_TRADEPRICES = 200
     TS_TRADE = 300
 
     # TS_MESSAGE = 20
