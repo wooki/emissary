@@ -28,7 +28,7 @@ module Emissary
         end
 
         def Execute(gameState)
-            puts "TRADE #{(@sell ? 'SELL' : 'BUY')} #{@number} #{@commodity}"
+            # puts "TRADE #{(@sell ? 'SELL' : 'BUY')} #{@number} #{@commodity}"
             if @urban and @trade and @trade.is_node
 
 # @urban.store.bought_food(buy_food, food_cost)

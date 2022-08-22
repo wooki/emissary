@@ -25,10 +25,11 @@ module Emissary
 
     def Insert(rules)
 
-      return nil if !rules or rules.length == 0
+      return nil if !rules
 
       rules = [rules] if rules.is_a?(Rule)
       return nil if !rules.is_a?(Array)
+      return nil if rules.length == 0
 
       # insert in correct position, don't want to resort a sorted array
       rules.each { | rule |

@@ -29,8 +29,9 @@ class GameState
     # 0 = public, increasing means more private
     {
       "PRODUCTION": 1,
-      "TRADE": 2,
-      "INDUSTRY": 3
+      "TRADE": 3,
+      "INDUSTRY": 4,
+      "UPKEEP": 2
     }
   end
 
@@ -60,7 +61,7 @@ class GameState
 
   # log information to hex, for filter and reporting to players
   # "PRODUCTION", @area, "Food and Goods sent to #{@settlement[:name]}", {food: food, goods: goods}
-  def info(type, area, message, data)
+  def info(type, area, message, data={})
 
     # info evel determined by looking up type
     level = GameState.info_levels[type.to_sym]

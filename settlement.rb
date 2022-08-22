@@ -17,6 +17,10 @@ class Settlement < Area
     (@population.to_f * INDUSTRY_RATE).floor
   end
 
+  def upkeep_food
+    (@population.to_f * FOOD_CONSUMPTION).round
+  end
+
   def name
     @name
   end
