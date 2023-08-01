@@ -19,6 +19,7 @@ module Emissary
 
         def Execute(gameState)
 
+
             if @urban
 
                 # consume food based on population, if not enough then lose
@@ -26,14 +27,17 @@ module Emissary
 
                 # wealthy settlements consume more food (also apply this to the import rule)
 
-                if @urban.store.food > @urban.upkeep_food
+                if @urban.store.food >= @urban.upkeep_food
 
                     @urban.store.food = @urban.store.food - @urban.upkeep_food
 
+                    puts "Consumed: #{urban.name} #{@urban.upkeep_food} leaves #{@urban.store.food}"
                     gameState.info "UPKEEP", @urban, "Population consumed #{@urban.upkeep_food} food"
                 else
-                    unrest = @urban.store.food # do something with this
+                    unrest = @urban.upkeep_food - @urban.store.food # do something with this
+                    @urban.store.food = 0
 
+                    puts "Not enough: #{urban.name} #{unrest}"
                     gameState.info "UPKEEP", @urban, "There was not enough food for the population. They required #{@urban.upkeep_food} food, unrest is growing"
 
                     @urban.store.food = 0

@@ -26,7 +26,7 @@ module Emissary
                 # how many food and goods do we require
                 food_required = (@urban.population.to_f * FOOD_CONSUMPTION).floor.to_i
 
-                # goods required epends on wealth as some will be kept back
+                # goods required depends on wealth as some will be kept back
                 # and converted to gold/wealth etc.
                 # for now set to zero and sell all each turn
                 # goods_required = (@urban.population.to_f * INDUSTRY_RATE).floor.to_i
@@ -40,14 +40,14 @@ module Emissary
                         excess_food = @urban.store.food - food_required
 
                         @trade.trade_node.sell_later(:food, excess_food)
-                        trades.push Trade.new(@urban, @trade.trade_node, :food, true, excess_food, nil, "Food exported")
+                        trades.push Trade.new(@urban, @trade.trade_node, :food, true, "Food exported", excess_food)
                     end
 
                     if @urban.store.goods > goods_required
                         excess_goods = @urban.store.goods - goods_required
 
                         @trade.trade_node.sell_later(:goods, excess_goods)
-                        trades.push Trade.new(@urban, @trade.trade_node, :goods, true, excess_goods, nil, "Goods exported")
+                        trades.push Trade.new(@urban, @trade.trade_node, :goods, true, "Goods exported", excess_goods)
                     end
 
                 end

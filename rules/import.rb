@@ -40,7 +40,7 @@ module Emissary
 
                         # register that we will buy and create order to do so for any cost
                         @trade.trade_node.buy_later(:food, buy_food)
-                        trades.push Trade.new(@urban, @trade.trade_node, :food, false, buy_food, nil, "Food imported to feed population", true)
+                        trades.push Trade.new(@urban, @trade.trade_node, :food, false, "Food imported to feed population", buy_food, nil, true)
 
                         # we will payonly in the trade so deliver immeditely
                         @urban.store.food = @urban.store.food + buy_food
@@ -50,7 +50,7 @@ module Emissary
                         buy_goods = goods_required - @urban.store.goods
 
                         @trade.trade_node.buy_later(:goods, buy_goods)
-                        trades.push Trade.new(@urban, @trade.trade_node, :goods, false, buy_goods, nil, "Goods imported to match industrial capacity", true)
+                        trades.push Trade.new(@urban, @trade.trade_node, :goods, false, "Goods imported to match industrial capacity", buy_goods, nil, true)
 
                         # we will payonly in the trade so deliver immeditely
                         @urban.store.goods = @urban.store.goods + buy_goods

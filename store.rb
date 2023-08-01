@@ -11,12 +11,12 @@ class Store
     @gold = 0
   end
 
-  def bought_food(food, cost)
+  def trade_food(food, cost)
     @food = @food + food
     @gold = @gold - cost
   end
 
-  def bought_goods(goods, cost)
+  def trade_goods(goods, cost)
     @goods = @goods + goods
     @gold = @gold - cost
   end

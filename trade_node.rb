@@ -19,6 +19,7 @@ class TradeNode
     max_qty = 1000.0
     curve_factor = 32.0 #64.0
     price = base_price * (curve_factor ** -(demand.to_f/max_qty))
+    price = 0.01 if price < 0.01
     price.round(2)
   end
 

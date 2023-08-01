@@ -12,7 +12,7 @@ module Emissary
 
         attr_accessor :urban, :trade, :commodity, :sell, :number, :spend, :narrative, :payonly
 
-        def initialize(urbal, trade, commodity, sell=false, narrative=nil, number=nil, spend=nil, payonly=false)
+        def initialize(urban, trade, commodity, sell=false, narrative=nil, number=nil, spend=nil, payonly=false)
             super(nil, TS_TRADE, true)
             self.urban = urban
             self.trade = trade
@@ -22,18 +22,34 @@ module Emissary
             self.number = number
             self.spend = spend
 
-            # allow for goods to be paid for ahead of
+            # allow for goods to be acquired for ahead of time (import)
             # knowing the price and paying with this
             self.payonly = payonly
         end
 
         def Execute(gameState)
+            # puts "TRADE"
             # puts "TRADE #{(@sell ? 'SELL' : 'BUY')} #{@number} #{@commodity}"
             if @urban and @trade and @trade.is_node
 
-# @urban.store.bought_food(buy_food, food_cost)
+                # check number/spend allowed
+                price = @trade.prices[@commodity]
 
-                #         gameState.info "TRADE", @urban, "Food imported to feed population", {food: buy_food, cost: food_cost}
+                if @commodity == :food && @sell
+                    @urban.store.trade_food(-1 * number, -1 * price)
+                    gameState.info "TRADE", @urban, "Food exported", {food: number, cost: price}
+                elsif @commodity == :food
+                    @urban.store.trade_food(number, price)
+                    gameState.info "TRADE", @urban, "Food imported", {food: number, cost: price}
+                elsif @commodity == :goods && @sell
+                    @urban.store.trade_goods(-1 * number, -1 * price)
+                    gameState.info "TRADE", @urban, "Goods exported", {goods: number, cost: price}
+                elsif @commodity == :goods
+                    @urban.store.trade_goods(number, price)
+                    gameState.info "TRADE", @urban, "Goods imported", {goods: number, cost: price}
+                else
+
+                end
 
 
             end
