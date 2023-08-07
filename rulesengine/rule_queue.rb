@@ -34,7 +34,9 @@ module Emissary
       # insert in correct position, don't want to resort a sorted array
       rules.each { | rule |
         if rule.is_a?(Rule)
-          position = rules.index { | x | x.turnSequence > rule.turnSequence }
+          position = @rules.index { | x |
+            x.turnSequence > rule.turnSequence
+          }
           if position
             @rules.insert(position, rule)
           else

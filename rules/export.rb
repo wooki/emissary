@@ -24,7 +24,7 @@ module Emissary
             if @urban and @urban.trade
 
                 # how many food and goods do we require
-                food_required = (@urban.population.to_f * FOOD_CONSUMPTION).floor.to_i
+                food_required = @urban.upkeep_food
 
                 # goods required depends on wealth as some will be kept back
                 # and converted to gold/wealth etc.

@@ -27,8 +27,9 @@ module Emissary
             if @urban and @urban.trade
 
                 # how many food and goods do we need to import
-                food_required = (@urban.population.to_f * FOOD_CONSUMPTION).floor.to_i
-                goods_required = (@urban.population.to_f * INDUSTRY_RATE).floor.to_i
+                food_required = @urban.upkeep_food
+                goods_required = @urban.industry
+
                 # distance = @urban.trade.distance
 
                 @trade = gameState.getHex(@urban.trade.x, @urban.trade.y)
@@ -44,6 +45,8 @@ module Emissary
 
                         # we will payonly in the trade so deliver immeditely
                         @urban.store.food = @urban.store.food + buy_food
+                    else
+                        puts "has enough food #{urban.name} #{@urban.store.food} #{food_required}"
                     end
 
                     if @urban.store.goods < goods_required

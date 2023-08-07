@@ -28,24 +28,27 @@ module Emissary
         end
 
         def Execute(gameState)
-            # puts "TRADE"
+
             # puts "TRADE #{(@sell ? 'SELL' : 'BUY')} #{@number} #{@commodity}"
             if @urban and @trade and @trade.is_node
 
                 # check number/spend allowed
                 price = @trade.prices[@commodity]
 
+                qty_multiplier = 1
+                qty_multiplier = 0 if payonly
+
                 if @commodity == :food && @sell
-                    @urban.store.trade_food(-1 * number, -1 * price)
+                    @urban.store.trade_food(qty_multiplier * -1 * number, -1 * price)
                     gameState.info "TRADE", @urban, "Food exported", {food: number, cost: price}
                 elsif @commodity == :food
-                    @urban.store.trade_food(number, price)
+                    @urban.store.trade_food(qty_multiplier * number, price)
                     gameState.info "TRADE", @urban, "Food imported", {food: number, cost: price}
                 elsif @commodity == :goods && @sell
-                    @urban.store.trade_goods(-1 * number, -1 * price)
+                    @urban.store.trade_goods(qty_multiplier * -1 * number, -1 * price)
                     gameState.info "TRADE", @urban, "Goods exported", {goods: number, cost: price}
                 elsif @commodity == :goods
-                    @urban.store.trade_goods(number, price)
+                    @urban.store.trade_goods(qty_multiplier * number, price)
                     gameState.info "TRADE", @urban, "Goods imported", {goods: number, cost: price}
                 else
 

@@ -8,9 +8,9 @@ module Emissary
     TS_IMPORT = 20 # urbans buy food and goods required
     TS_INDUSTRY = 100 # urbans generate goods from goods
     TS_EXPORT = 130
-    TS_UPKEEP = 160
     TS_TRADEPRICES = 200
     TS_TRADE = 300
+    TS_UPKEEP = 360
 
     # TS_MESSAGE = 20
     # TS_COLONISE = 30

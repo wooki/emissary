@@ -53,8 +53,6 @@ class TradeNode
 
     # for connected node split surplus buys/sells across all nodes connected to that node
     # and add to this node for this calculation. Further decrease surplus based on distance
-
-
     self.food_price = self.commodity_price(@orders[:food][:buy], @orders[:food][:sell])
     self.goods_price = self.commodity_price(@orders[:goods][:buy], @orders[:goods][:sell])
   end
