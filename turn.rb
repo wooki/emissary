@@ -35,9 +35,6 @@ module Emissary
       # add system orders for areas, settlements etc.
       puts "adding system rules"
 
-      puts "DEBUG #{@state.find_settlement(:exe).store.inspect}"
-      puts "DEBUG2 #{@state.getHex('44', '34').store.inspect}"
-
       # system rules generate notifications for players. Depending on how good (or many)
       # peeple they have on internal affairs they get top x, based on each notifications magnitude.
       # Their spymaster plus spies report based on where they are?
@@ -144,9 +141,6 @@ module Emissary
         rule = queue.Next
         queue.Insert rule.Execute(@state)
       end
-
-      puts "DEBUG #{@state.find_settlement(:exe).store.inspect}"
-      puts "DEBUG2 #{@state.getHex('44', '34').store.inspect}"
 
       # save game file
       #puts "## skipping save in dev ##"

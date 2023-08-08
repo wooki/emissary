@@ -46,8 +46,14 @@ class TradeNode
     (@prices[commodity] * n).round(0)
   end
 
+  # cost of trading with a specific urban area based on the distance
+  def trade_percentage(urban)
+    return 0 if !urban.trade
+    TRADE_RATE + (TRADE_RATE_TRAVEL * urban.trade.distance)
+  end
+
   # sets the price based on quantity being traded
-  def setPrices
+  def set_prices
 
     # also look at connected trade nodes
 

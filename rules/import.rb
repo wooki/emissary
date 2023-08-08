@@ -45,8 +45,6 @@ module Emissary
 
                         # we will payonly in the trade so deliver immeditely
                         @urban.store.food = @urban.store.food + buy_food
-                    else
-                        puts "has enough food #{urban.name} #{@urban.store.food} #{food_required}"
                     end
 
                     if @urban.store.goods < goods_required
