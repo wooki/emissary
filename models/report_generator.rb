@@ -8,16 +8,18 @@ class ReportGenerator
     # create a new gamestate for the turn data
     turn = Emissary::GameState.new
 
-    # add the kingdoms (only ones met?  or all?)
+    # add the kingdoms (only ones met? or all?)
     turn.kingdoms = game.kingdoms
 
     # add the players kingdom separately
-    game.kingdoms.each { | kingdom |
-      turn.my_kingdom = kingdom if kingdom.belongs_to == user_id
-    }
+    turn.my_kingdom = game.kingdom_by_player player
+    
+    # iterate the urban areas adding if owned, 
+    # and adding all areas that are "closest"
+    game.each_urban { | key, urban |
 
-    # iterate the areas this player owns and add areas plus adjacent
-    # game.areas(user_id) { | key, area |
+      # if player owns this area then add all areas that are closest
+
 
     #   # add this area
     #   turn.map[key] = area
@@ -28,13 +30,9 @@ class ReportGenerator
     #     turn.map["#{adj.x},#{adj.y}"] = adj
     #   }
 
-    #   false # return false to stop iterator from building return hash
-    # }
-
-    # iterate units and add those areas along with areas within vision
-    # of the units
-
-
+      false # return false to stop iterator from building return hash
+    }
+    
 
   end
 

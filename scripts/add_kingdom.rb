@@ -1,6 +1,7 @@
 require 'json'
 require 'optparse'
-require_relative '../game_state'
+require_relative '../models/game_state'
+require_relative '../models/kingdom'
 
 class AddKingdom
 
@@ -44,13 +45,12 @@ class AddKingdom
     end
 
     # add them
-    @state.kingdoms[player] = {
-      :name => kingdom,
-      :player => player,
-      :x => hex.x,
-      :y => hex.y,
-      :capital => hex.name
-    }
+    k = Emissary::Kingdom.new
+    k.name = kingdom
+    k.player = player
+    k.capital = hex.name
+    k.capital_coord = {:x => hex.x, :y => hex.y}
+    @state.kingdoms[player] = k
 
     # set ownership
     hex.owner = player
@@ -87,4 +87,4 @@ end.parse!
 ng = AddKingdom.new options[:gamefile], options[:player], options[:kingdom], options[:capital]
 
 
-# bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c val -k "The Jimpire"
+# bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c ock -k "The Jimpire"

@@ -1,7 +1,7 @@
 require_relative "../rulesengine/rule"
 require_relative "../rulesengine/turn_sequence"
-require_relative '../constants'
-require_relative '../store'
+require_relative '../models/constants'
+require_relative '../models/store'
 
 module Emissary
 

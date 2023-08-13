@@ -1,10 +1,10 @@
 require 'json'
 require 'optparse'
-require_relative '../game_state'
-require_relative '../area'
-require_relative '../settlement'
-require_relative '../trade_node'
-require_relative '../area_link'
+require_relative '../models/game_state'
+require_relative '../models/area'
+require_relative '../models/settlement'
+require_relative '../models/trade_node'
+require_relative '../models/area_link'
 
 class NewGame
 

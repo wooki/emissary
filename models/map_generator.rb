@@ -596,7 +596,7 @@ class MapGenerator
       # any near edge will be found anyway - so safe to remove a lot
       possible_nodes.filter! { | hex |
          dist_from_middle = MapUtils::distance(hex, {:x => (size/2).round, :y => (size/2).round})
-         dist_from_middle < (size/2).round-4
+         dist_from_middle < (size/2).round-4         
       }
 
       # just remove 1 in X nodes in the list - will be found anyway

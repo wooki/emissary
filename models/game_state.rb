@@ -7,6 +7,7 @@ require_relative './settlement'
 require_relative './trade_node'
 require_relative './area_link'
 require_relative './store'
+require_relative './kingdom'
 
 class GameState
 
@@ -168,12 +169,23 @@ class GameState
     end
   end
 
+  def each_player
+    players = Array.new
+    @kingdoms.each { | key, kingdom |
+      if !block_given? or yield kingdom.player, kingdom
+        players.push players
+      end
+    }
+    
+    return nil if players.length == 0
+    players
+  end
+
   def kingdom_by_name(name)
     @kingdoms.values.find { | kingdom | kingdom[:name] == name }
   end
 
   def kingdom_by_player(name)
-
     @kingdoms[name]
   end
 
@@ -232,7 +244,7 @@ class GameState
   ##################################
   def kingdom_for_user(user_id)
     @kingdoms.each { | key, kingdom |
-      return kingdom if kingdom.belongs_to == user_id
+      return kingdom if kingdom.player == user_id
     }
     return nil
   end
