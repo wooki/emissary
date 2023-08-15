@@ -504,6 +504,35 @@ class MapGenerator
                base_population = (base_population.to_f * adjustment).round.to_i
                hex[:population] = base_population
 
+               # find neighbouring settlements
+               # neighbours
+               settlement_found = lambda do | coord, path |
+                  return false if hex[:x] == coord[:x] and hex[:y] == coord[:y]
+                  mapcoord = getHex(coord[:x], coord[:y])
+                  ["city", "town"].include? mapcoord[:terrain]
+               end
+
+               can_be_traversed = lambda do | coord, path, is_first |
+                  mapcoord = getHex(coord[:x], coord[:y])
+                  not (["ocean", "peak"].include? mapcoord[:terrain])
+               end
+
+               # find closest neighbour - implement something in settlement found to
+               # find closest 2/3 in the future.
+               path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
+               if path_to_closest
+                  closest_settlement = getHex path_to_closest.last[:x], path_to_closest.last[:y]
+                  hex[:neighbours] = Array.new
+                  hex[:neighbours].push({
+                     :name => closest_settlement[:name],
+                     :x => path_to_closest.last[:x],
+                     :y => path_to_closest.last[:y],
+                     :distance => path_to_closest.length
+                  })
+               end
+
+
+
             else
 
                # adjusted by adjacent oceans
@@ -596,7 +625,7 @@ class MapGenerator
       # any near edge will be found anyway - so safe to remove a lot
       possible_nodes.filter! { | hex |
          dist_from_middle = MapUtils::distance(hex, {:x => (size/2).round, :y => (size/2).round})
-         dist_from_middle < (size/2).round-4         
+         dist_from_middle < (size/2).round-4
       }
 
       # just remove 1 in X nodes in the list - will be found anyway

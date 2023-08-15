@@ -208,7 +208,6 @@ class MapUtils
       })
 
       startnode = true
-
       while queue.length > 0 do
 
          # get coord to process
@@ -256,6 +255,7 @@ class MapUtils
    # when we are searching for a path to a know coord then we can do better
    # with A* which estimates min distance and prioritises direct route
    def self.a_star_search()
+      raise NotImplementedError
    end
 
 end

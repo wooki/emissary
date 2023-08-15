@@ -6,11 +6,12 @@ module Emissary
 
 class Settlement < Area
 
-  attr_accessor :shortcut, :shortcut_help, :owner, :trade, :store
+  attr_accessor :shortcut, :shortcut_help, :owner, :trade, :store, :neighbours
 
   def initialize
     super()
     @store = Store.new
+    @neighbours = Array.new
   end
 
   def industry
@@ -27,6 +28,26 @@ class Settlement < Area
 
   def name=(val)
     @name = val
+  end
+
+  def wealth
+
+  end
+
+  def guilds
+
+  end
+
+  def loyalty
+
+  end
+
+  def tax
+
+  end
+
+  def neighbours
+
   end
 
 end
