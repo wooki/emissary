@@ -2,7 +2,7 @@ module Emissary
 
 class TradeNode
 
-  attr_accessor :name, :connected, :is_node, :prices
+  attr_accessor :name, :connected, :is_node, :prices, :trade_value
 
   def initialize
     super()
@@ -10,6 +10,7 @@ class TradeNode
     @is_node = true
     @prices = Hash.new
     @orders = Hash.new # temporary during turn, keep track for setting prices
+    @trade_value = 0
   end
 
   # calcluate a price based on demand
@@ -79,6 +80,10 @@ class TradeNode
 
   def goods_price=(price)
     @prices[:goods] = price
+  end
+
+  def add_trade_value(value)
+    @trade_value = @trade_value + value
   end
 
 end

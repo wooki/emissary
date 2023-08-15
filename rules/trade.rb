@@ -36,8 +36,10 @@ module Emissary
                 price = @trade.price(@commodity, @number)
 
                 # skim off cost of trade
-                cost_of_trade = price * @trade.trade_percentage(@urban)
+                cost_of_trade = (price * @trade.trade_percentage(@urban)).round(0).to_i
                 gross_price = price + cost_of_trade
+
+                @trade.add_trade_value(cost_of_trade)
 
                 # if selling then limit can set a max to pay and will reduce
                 # to buy as many as can without going over that limit
@@ -48,7 +50,7 @@ module Emissary
                         max_items = (@limit.to_f / allowed_price_per_item.to_f).floor.to_i
                         @number = max_items
                         price = @trade.price(@commodity, @number)
-                        cost_of_trade = price * @trade.trade_percentage(@urban)
+                        cost_of_trade = price * @trade.trade_percentage(@urban).round(0).to_i
                         gross_price = price + cost_of_trade
                     end
                 end
@@ -68,10 +70,7 @@ module Emissary
                 elsif @commodity == :goods
                     @urban.store.trade_goods(qty_multiplier * number, gross_price)
                     gameState.info "TRADE", @urban, "Goods imported", {goods: number, cost: gross_price}
-                else
-
                 end
-
 
             end
         end

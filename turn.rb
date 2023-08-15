@@ -142,6 +142,11 @@ module Emissary
         queue.Insert rule.Execute(@state)
       end
 
+      puts "trade value of each node"
+      @state.each_trade_node.each { | area |
+        puts "#{area.trade_node.name}, value=#{area.trade_node.trade_value}"
+      }
+
       # save game file
       #puts "## skipping save in dev ##"
       @state.save gamefile
