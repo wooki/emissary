@@ -1,8 +1,8 @@
 require 'json'
 require 'optparse'
-require_relative '../game_state'
-require_relative '../map_utils'
-require_relative '../map_generator'
+require_relative '../models/game_state'
+require_relative '../models/map_utils'
+require_relative '../models/map_generator'
 
 # parse command line options
 options = {

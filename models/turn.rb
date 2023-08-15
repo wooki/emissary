@@ -1,11 +1,11 @@
-require_relative 'rulesengine/rule_queue'
-# require_relative 'rulesengine/rule_factory'
-require_relative 'rules/production'
-require_relative 'rules/import'
-require_relative 'rules/export'
-require_relative 'rules/industry'
-require_relative 'rules/upkeep'
-require_relative 'rules/trade_prices'
+require_relative '../rulesengine/rule_queue'
+require_relative '../rules/production'
+require_relative '../rules/import'
+require_relative '../rules/export'
+require_relative '../rules/industry'
+require_relative '../rules/upkeep'
+require_relative '../rules/trade_prices'
+require_relative './report_generator'
 
 module Emissary
 
@@ -151,6 +151,12 @@ module Emissary
       #puts "## skipping save in dev ##"
       @state.save gamefile
 
+      # produce reports
+      puts "producing player reports"
+      reports = ReportGenerator.new
+      @state.each_player { | player, kingdom |
+        reports.run @state, player
+      }
     end
   end
 end
