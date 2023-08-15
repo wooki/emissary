@@ -5,6 +5,7 @@ require_relative '../models/area'
 require_relative '../models/settlement'
 require_relative '../models/trade_node'
 require_relative '../models/area_link'
+require_relative '../models/constants'
 
 class NewGame
 
@@ -37,6 +38,10 @@ class NewGame
         a.shortcut_help = area[:shortcut_help]
         a.owner = area[:owner]
         a.trade = area[:trade]
+
+        # lets have some starting gold
+        a.store.gold = [Emissary::START_GOLD_MAX,
+                        (Emissary::START_GOLD_PER_POPULATION * a.population).round(0).to_i].min
 
         if area[:neighbours]
           a.neighbours = area[:neighbours]

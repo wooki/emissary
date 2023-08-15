@@ -7,6 +7,7 @@ module Emissary
     INDUSTRY_RATE = 0.001
     TRADE_RATE = 0.10
     TRADE_RATE_TRAVEL = 0.01
-
+    START_GOLD_PER_POPULATION = 0.002
+    START_GOLD_MAX = 50
 
 end
