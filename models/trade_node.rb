@@ -30,6 +30,8 @@ class TradeNode
     @orders = Hash.new
     @orders[:food] = {buy: 0, sell: 0}
     @orders[:goods] = {buy: 0, sell: 0}
+
+    @trade_value = 0
   end
 
   # buy/sell_later registers the trade and effects the price
