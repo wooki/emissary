@@ -218,6 +218,11 @@ class GameState
     matched
   end
 
+  def areas(coords=nil)
+    return @map if coords.nil?
+    @map.select { | key, area | coords.include? area.coord}
+  end
+
   def each_rural
     self.each_area self.rural
   end

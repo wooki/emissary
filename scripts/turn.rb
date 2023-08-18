@@ -8,9 +8,9 @@ class Turn
   attr_accessor :state
 
   # load game state and run turn
-  def initialize(gamefile, ordersdir, seed)
+  def initialize(gamefile, ordersdir, reportsdir, seed)
 
-    t = Emissary::Turn.new(gamefile, ordersdir, seed)
+    t = Emissary::Turn.new(gamefile, ordersdir, reportsdir, seed)
 
   end
 
@@ -29,12 +29,16 @@ OptionParser.new do | opts |
     options[:ordersdir] = n
   end
 
+  opts.on("-rREPORTSDIR", "--reports=REPORTSDIR", "folder to write report files") do |n|
+    options[:reportsdir] = n
+  end
+
   opts.on("-sSEED", "--seed=SEED", "random seed for repeatable order run") do |n|
     options[:seed] = n.to_i
   end
 
 end.parse!
 
-ng = Turn.new options[:gamefile], options[:ordersdir], options[:seed]
+ng = Turn.new options[:gamefile], options[:ordersdir], options[:reportsdir], options[:seed]
 
-# bundle exec ruby turn.rb -g game.yaml -o ../orders/ -s 123456
+# bundle exec ruby turn.rb -g game.yaml -o ../orders/ -r ../reports/ -s 123456

@@ -13,26 +13,50 @@ class ReportGenerator
 
     # add the players kingdom separately
     turn.my_kingdom = game.kingdom_by_player player
+    puts "my_kingdom: #{turn.my_kingdom.inspect}"    
     
-    # iterate the urban areas adding if owned, 
-    # and adding all areas that are "closest"
-    game.each_urban { | key, urban |
+    # check which trade node the players capital is in
+    capital = game.map[turn.my_kingdom.capital_coord_sym]
+    puts "capital: #{capital.inspect}"
 
-      # if player owns this area then add all areas that are closest
+    # build array of urban areas from which all map info is discovered
+    known_urbans = Array.new
+    known_urbans.push capital.coord_sym
+    
+    # iterate the urban areas adding if owned, or in the same trade node    
+    game.each_urban { | urban |
 
+      if urban.owner == player or 
+         urban.trade.coord_sym == capital.trade.coord_sym        
 
-    #   # add this area
-    #   turn.map[key] = area
+        known_urbans.push urban.coord_sym
+      end                
 
-    #   # add adjacent
-    #   adjacent = area.adjacent(1, game.areas, game.map_size)
-    #   adjacent.each { | adj |
-    #     turn.map["#{adj.x},#{adj.y}"] = adj
-    #   }
+      false
+    }
+
+    # add all areas that are closest to the urbans this player knows about
+    game.each_area { | area |
+    
+      if known_urbans.include? area.coord_sym or
+        (area.closest_settlement and known_urbans.include? area.closest_settlement.coord_sym)
+
+        turn.map[area.coord_sym] = area
+
+        # add adjacent
+        adjacent_coords = MapUtils::adjacent(area.coord, game.size)
+        adjacent = game.areas adjacent_coords
+        adjacent.each { | adj |
+          turn.map[adj.coord_sym] = adj
+        }
+      end
 
       false # return false to stop iterator from building return hash
     }
     
+    # save the player turn
+    
+
 
   end
 

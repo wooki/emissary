@@ -8,6 +8,13 @@ class AreaLink
     super()    
   end
 
+  def coord_sym
+    "#{@x},#{@y}".to_sym
+  end
+
+  def coord
+    {x: @x, y: @y}
+  end
 
 end
 

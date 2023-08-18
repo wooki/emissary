@@ -3,7 +3,7 @@ module Emissary
 require 'json'
 require 'optparse'
 require 'fantasynamegenerator'
-require File.expand_path(File.dirname(__FILE__) + '/map_utils.rb')
+require_relative './map_utils'
 
 #
 # Class for creating a random map

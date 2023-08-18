@@ -17,7 +17,9 @@ class Kingdom
 
   end
 
-
+  def capital_coord_sym
+    "#{@capital_coord[:x]},#{@capital_coord[:y]}".to_sym
+  end  
 
 end
 
