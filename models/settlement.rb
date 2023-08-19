@@ -30,6 +30,15 @@ class Settlement < Area
     @name = val
   end
 
+  def report(level)
+    details = super(level)
+    details[:owner] = @owner
+
+    # add details dependent on level
+
+    details
+  end
+
   def wealth
     # increases the cost payed when buying goods or food
     # increases gold generated from tax

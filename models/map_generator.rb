@@ -1,6 +1,5 @@
 module Emissary
 
-require 'json'
 require 'optparse'
 require 'fantasynamegenerator'
 require_relative './map_utils'

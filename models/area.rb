@@ -1,3 +1,5 @@
+require_relative './constants'
+
 module Emissary
 
 class Area
@@ -25,6 +27,19 @@ class Area
 
   def coord
     {x: @x, y: @y}
+  end
+
+  def report(level)
+    
+    details = {x: @x, y: @y, terrain: @terrain, closest_settlement: @closest_settlement, trade_node: @trade_node}
+    details[:population] = @population if level >= INFO_LEVELS[:POPULATION]
+    
+    if level >= INFO_LEVELS[:PRODUCTION]
+      details[:food] = @food
+      details[:goods] = @goods
+    end
+
+    details
   end
 
 end

@@ -20,7 +20,7 @@ module Emissary
             if @trade_node and @trade_node.is_node
 
                 @trade_node.set_prices
-                puts "TRADE PRICES: #{@trade_node.name} #{@trade_node.prices.inspect}"
+                # puts "TRADE PRICES: #{@trade_node.name} #{@trade_node.prices.inspect}"
             end
         end
 
