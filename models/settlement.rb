@@ -35,6 +35,13 @@ class Settlement < Area
     details[:owner] = @owner
 
     # add details dependent on level
+    if level >= INFO_LEVELS[:TRADE]
+      details[:trade] = @trade      
+    end
+
+    if level >= INFO_LEVELS[:STORE]
+      details[:store] = @store      
+    end
 
     details
   end

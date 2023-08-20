@@ -17,6 +17,7 @@ module Emissary
         INDUSTRY: 5,
         UPKEEP: 3,  
         POPULATION: 3,
+        STORE: 6,
         
         # what levels does each access have
         PUBLIC: 1,

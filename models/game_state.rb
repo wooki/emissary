@@ -12,14 +12,13 @@ require_relative './constants'
 
 class GameState
 
-  attr_accessor :kingdoms, :map, :my_kingdom, :settlements, :turn
+  attr_accessor :kingdoms, :map, :settlements, :turn
 
   def initialize
     super()
 
     # keyed by user id
-    @kingdoms = Hash.new
-    @my_kingdom = nil
+    @kingdoms = Hash.new    
 
     # keyed by "x,y" (areas contain units)
     @map = Hash.new
@@ -298,24 +297,7 @@ class GameState
     }
     maparray
   end
-
-
-
-  def as_json(options={})
   
-  # :kingdoms, :map, :my_kingdom
-      data = {
-        :kingdoms => @kingdoms,
-        :map => @map,
-        :turn => @turn
-      }
-      data[:my_kingdom] = @my_kingdom if !@my_kingdom.nil?
-      data
-    end
-
-    def to_json(*options)
-        as_json(*options).to_json(*options)
-    end
 
     def save(gamefile)
       # save the gamestate

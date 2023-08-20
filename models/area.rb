@@ -39,8 +39,14 @@ class Area
       details[:goods] = @goods
     end
 
+    if @trade_node and @trade_node.is_node
+      if level >= INFO_LEVELS[:TRADE]
+        details[:trade_node] = @trade_node
+      end
+    end
+
     details
-  end
+  end  
 
 end
 
