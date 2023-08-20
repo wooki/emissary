@@ -39,12 +39,16 @@ class ReportGenerator
     known_urbans = Hash.new
     known_urbans[capital.coord_sym] = INFO_LEVELS[:OWNED]
     
+    known_trade_nodes = array.new
+    known_trade_nodes.push capital.trade.coord_sym
+    
     # iterate the urban areas adding if owned, or in the same trade node    
     game.each_urban { | urban |
 
       if urban.owner == player 
 
         known_urbans[urban.coord_sym] = INFO_LEVELS[:OWNED]        
+        known_trade_nodes.push urban.trade.coord_sym if urban.trade
 
       elsif urban.trade.coord_sym == capital.trade.coord_sym        
 
@@ -77,9 +81,9 @@ class ReportGenerator
       false # return false to stop iterator from building return hash
     }
 
-    # add trade node plus all ocean in that trade node - which means
-    # connecting ocean to trade nodes
-
+    # add all ocean for known trade nodes
+    known_trade_nodes.uniq!
+    
 
     # rename closest settlement as in-game relationship "feilty" or something
 
