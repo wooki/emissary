@@ -63,3 +63,6 @@ end
 # pipe seed from json gen to svg so we get same map twice
 # bundle exec ruby new_map.rb -f map.json -F json -S 100 -h 6 | xargs -I % sh -c 'bundle exec ruby new_map.rb -f map.svg -S 100 -h 6 --seed=%'
 
+# inland sea
+#bundle exec ruby new_map.rb -f map.svg -S 100 -h 6 --seed=127381668545450955056731370432757770900
+#<!-- SEED: "127381668545450955056731370432757770900" -->

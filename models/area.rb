@@ -1,3 +1,5 @@
+require_relative './constants'
+
 module Emissary
 
 class Area
@@ -18,6 +20,33 @@ class Area
   def name
     "#{@terrain} #{@x},#{y}"
   end
+
+  def coord_sym
+    "#{@x},#{@y}".to_sym
+  end
+
+  def coord
+    {x: @x, y: @y}
+  end
+
+  def report(level)
+    
+    details = {x: @x, y: @y, terrain: @terrain, closest_settlement: @closest_settlement, trade_node: @trade_node}
+    details[:population] = @population if level >= INFO_LEVELS[:POPULATION]
+    
+    if level >= INFO_LEVELS[:PRODUCTION]
+      details[:food] = @food
+      details[:goods] = @goods
+    end
+
+    if @trade_node and @trade_node.is_node
+      if level >= INFO_LEVELS[:TRADE]
+        details[:trade_node] = @trade_node
+      end
+    end
+
+    details
+  end  
 
 end
 

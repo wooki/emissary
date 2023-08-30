@@ -88,6 +88,19 @@ class TradeNode
     @trade_value = @trade_value + value
   end
 
+  def as_json(options={})  
+    {
+      name: @name,
+      connected: @connected,
+      prices: @prices,
+      trade_value: @trade_value
+    }
+  end
+
+  def to_json(*options)
+    as_json(*options).to_json(*options)
+  end
+
 end
 
 end

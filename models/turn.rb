@@ -6,13 +6,14 @@ require_relative '../rules/industry'
 require_relative '../rules/upkeep'
 require_relative '../rules/trade_prices'
 require_relative './report_generator'
+require_relative './map_utils'
 
 module Emissary
 
   # runs a turn
   class Turn
 
-  def initialize(gamefile, ordersdir, seed)
+  def initialize(gamefile, ordersdir, reportsdir, seed)
 
       # get the game
       @state = Emissary::GameState.load(gamefile)
@@ -153,7 +154,7 @@ module Emissary
 
       # produce reports
       puts "producing player reports"
-      reports = ReportGenerator.new
+      reports = ReportGenerator.new reportsdir
       @state.each_player { | player, kingdom |
         reports.run @state, player
       }

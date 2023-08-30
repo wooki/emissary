@@ -1,9 +1,8 @@
 module Emissary
 
-require 'json'
 require 'optparse'
 require 'fantasynamegenerator'
-require File.expand_path(File.dirname(__FILE__) + '/map_utils.rb')
+require_relative './map_utils'
 
 #
 # Class for creating a random map
@@ -379,6 +378,52 @@ class MapGenerator
                   :name => tradenode[:trade][:name],
                   :distance => path_to_closest.length * @trade_node_land_multiplier
                }
+            end
+         end
+      }
+
+      # assign each ocean to the closest tradenode
+      get_terrain(['ocean']).each { | hex |
+
+         if !is_trade_node?({:x => hex[:x], :y => hex[:y]})
+            tradenode = nil
+
+            tradenode_found = lambda do | coord, path |
+               if is_trade_node?(coord)
+                  tradenode = getHex(coord[:x], coord[:y])
+               else
+                  false
+               end
+            end
+
+            can_be_traversed = lambda do | coord, path, is_first |
+               mapcoord = getHex(coord[:x], coord[:y])            
+               ["ocean"].include? mapcoord[:terrain]            
+            end
+
+            can_be_traversed_extended = lambda do | coord, path, is_first |
+               true
+            end
+
+            path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, tradenode_found)
+            if path_to_closest
+               hex[:trade] = {
+                  :x => tradenode[:x],
+                  :y => tradenode[:y],
+                  :name => tradenode[:trade][:name],
+                  :distance => path_to_closest.length
+               }
+            else
+               # find closest with any path
+               path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed_extended, tradenode_found)
+               if path_to_closest
+                  hex[:trade] = {
+                     :x => tradenode[:x],
+                     :y => tradenode[:y],
+                     :name => tradenode[:trade][:name],
+                     :distance => path_to_closest.length
+                  }
+               end
             end
          end
       }
@@ -1046,7 +1091,13 @@ class MapGenerator
          # io.print "\" fill=\"#{terrain_color}\" stroke=\"black\" stroke-width=\"0.5\" />"
          stroke = "black"
          stroke_width= 0.1
-         if !is_trade_node?(hex) and hex[:trade]
+         if terrain == "ocean" and !(is_trade_node?(hex) and hex[:trade])
+            
+            stroke = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]
+            stroke_width = 1.0
+            # terrain_color = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}".to_sym]
+
+         elsif !is_trade_node?(hex) and hex[:trade]
             # stroke = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]
             # stroke_width = 2.0
             terrain_color = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]

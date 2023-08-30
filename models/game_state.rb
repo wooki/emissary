@@ -8,50 +8,30 @@ require_relative './trade_node'
 require_relative './area_link'
 require_relative './store'
 require_relative './kingdom'
+require_relative './constants'
 
 class GameState
 
-  attr_accessor :kingdoms, :map, :my_kingdom, :settlements, :turn
+  attr_accessor :kingdoms, :map, :settlements, :turn
 
   def initialize
     super()
 
     # keyed by user id
-    @kingdoms = Hash.new
+    @kingdoms = Hash.new    
 
     # keyed by "x,y" (areas contain units)
     @map = Hash.new
 
     @turn = 0
 
-  end
-
-  def self.info_levels
-    # 0 = public, increasing means more private
-    {
-      "PRODUCTION": 1,
-      "TRADE": 3,
-      "INDUSTRY": 4,
-      "UPKEEP": 2
-    }
-  end
+  end  
 
   def self.load(gamefile)
     # load the gamestate
     # data = File.read(gamefile)
     # self.from_json(data)
     state = YAML.unsafe_load_file(gamefile)
-    state.load_settlements
-    state
-  end
-
-  def self.from_json(json)
-    hash = JSON.parse(json, {:symbolize_names => true})
-    state = GameState.new
-    state.turn = hash[:turn]
-    state.map = hash[:map]
-    state.kingdoms = hash[:kingdoms]
-    state.my_kingdom = hash[:my_kingdom]
     state.load_settlements
     state
   end
@@ -64,8 +44,8 @@ class GameState
   # "PRODUCTION", @area, "Food and Goods sent to #{@settlement[:name]}", {food: food, goods: goods}
   def info(type, area, message, data={})
 
-    # info evel determined by looking up type
-    level = GameState.info_levels[type.to_sym]
+    # info level determined by looking up type
+    level = INFO_LEVELS[type.to_sym]
 
     if area
       area.info = Array.new if !area.info
@@ -186,6 +166,7 @@ class GameState
   end
 
   def kingdom_by_player(name)
+    puts "kingdom_by_player: #{@kingdoms.inspect}"
     @kingdoms[name]
   end
 
@@ -216,6 +197,11 @@ class GameState
       end
     }
     matched
+  end
+
+  def areas(coords=nil)
+    return @map if coords.nil?
+    @map.select { | key, area | coords.include? area.coord}
   end
 
   def each_rural
@@ -311,23 +297,7 @@ class GameState
     }
     maparray
   end
-
-
-
-  def as_json(options={})
-  # :kingdoms, :map, :my_kingdom
-      data = {
-        :kingdoms => @kingdoms,
-        :map => @map,
-        :turn => @turn
-      }
-      data[:my_kingdom] = @mykingdom if !@my_kingdom.nil?
-      data
-    end
-
-    def to_json(*options)
-        as_json(*options).to_json(*options)
-    end
+  
 
     def save(gamefile)
       # save the gamestate
