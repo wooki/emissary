@@ -252,11 +252,63 @@ class MapUtils
       nil
    end
 
+   def calculate_heuristic(hex_a, hex_b, terrain_weights)
+      dx = (hex_a[:x] - hex_b[:x]).abs
+      dy = (hex_a[:y] - hex_b[:y]).abs
+
+      # terrain_weight = @terrain_weights[hex_b[:terrain]] || 1
+      # (dx + dy + [dx, dy].min) * terrain_weight
+
+      dx + dy + [dx, dy].min
+   end
+
+   def reconstruct_path(came_from, current)
+      path = [current]
+      while came_from.key?(current)
+        current = came_from[current]
+        path.unshift(current)
+      end
+      path
+   end
+
    # when we are searching for a path to a know coord then we can do better
    # with A* which estimates min distance and prioritises direct route
-   def self.a_star_search()
-      raise NotImplementedError
-   end
+   def find_path(startcoord, endcoord, state, terrain_weights)
+
+      start = state.getHex(startcoord[:x], startcoord[:y])
+      end_hex = state.getHex(endcoord[:x], endcoord[:y])
+
+      return nil unless start && end_hex
+
+      open_set = [start]
+      came_from = {}
+      g_score = {}
+      f_score = {}
+
+      g_score[start] = 0
+      f_score[start] = calculate_heuristic(start, end_hex, terrain_weights)
+
+      while open_set.any?
+        current = open_set.min_by { |hex| f_score[hex] }
+        open_set.delete(current)
+
+        return reconstruct_path(came_from, current) if current == end_hex
+
+        neighbors = get_neighbors(current)
+        neighbors.each do |neighbor|
+          tentative_g_score = g_score[current] + 1
+          if tentative_g_score < (g_score[neighbor] || Float::INFINITY)
+            came_from[neighbor] = current
+            g_score[neighbor] = tentative_g_score
+            f_score[neighbor] = tentative_g_score + calculate_heuristic(neighbor, end_hex)
+
+            open_set << neighbor unless open_set.include?(neighbor)
+          end
+        end
+      end
+
+      nil # No path found
+    end
 
 end
 
