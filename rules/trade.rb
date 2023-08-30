@@ -27,7 +27,7 @@ module Emissary
             self.payonly = payonly
         end
 
-        def Execute(gameState)
+        def execute(gameState)
 
             # puts "TRADE #{(@sell ? 'SELL' : 'BUY')} #{@number} #{@commodity}"
             if @urban and @trade and @trade.is_node

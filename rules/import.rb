@@ -20,7 +20,7 @@ module Emissary
 
         # registers the buys and returns buy orders to be evaluated
         # after the price is set
-        def Execute(gameState)
+        def execute(gameState)
 
             trades = Array.new
 

@@ -1,6 +1,7 @@
 require_relative "../rulesengine/rule"
 require_relative "../rulesengine/turn_sequence"
 require_relative '../models/store'
+require_relative './behaviour/wealth'
 
 module Emissary
 
@@ -14,9 +15,11 @@ module Emissary
             self.urban = urban
         end
 
-        def Execute(gameState)
+        def execute(gameState)
 
             if @urban
+
+                Wealth.industry(@urban)
 
                 new_goods = [@urban.industry, @urban.store.goods].min
                 if new_goods > 0

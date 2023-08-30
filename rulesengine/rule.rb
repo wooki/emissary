@@ -13,8 +13,8 @@ module Emissary
     end
 
     # executes this rule against the gamestate
-    def Execute(gameState)
-      raise "Rule must implement an Execute method"
+    def execute(gameState)
+      raise "Rule must implement an execute method"
     end
 
     # compare rule using sequence

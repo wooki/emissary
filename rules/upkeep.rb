@@ -17,7 +17,7 @@ module Emissary
             self.urban = urban
         end
 
-        def Execute(gameState)
+        def execute(gameState)
 
 
             if @urban

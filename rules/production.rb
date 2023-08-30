@@ -17,7 +17,7 @@ module Emissary
             self.area = area
         end
 
-        def Execute(gameState)
+        def execute(gameState)
 
             if @area and @area.closest_settlement
 

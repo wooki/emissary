@@ -139,7 +139,7 @@ module Emissary
       while queue.More?
 
         rule = queue.Next
-        queue.Insert rule.Execute(@state)
+        queue.Insert rule.execute(@state)
       end
 
       puts "trade value of each node"

@@ -15,7 +15,7 @@ module Emissary
             self.trade_node = trade_node
         end
 
-        def Execute(gameState)
+        def execute(gameState)
 
             if @trade_node and @trade_node.is_node
 
