@@ -382,8 +382,8 @@ class MapGenerator
          end
       }
 
-      # assign each ocean to the closest tradenode
-      get_terrain(['ocean']).each { | hex |
+      # assign each ocean and peak to the closest tradenode
+      get_terrain(['ocean', 'peak']).each { | hex |
 
          if !is_trade_node?({:x => hex[:x], :y => hex[:y]})
             tradenode = nil
@@ -1097,7 +1097,7 @@ class MapGenerator
             stroke_width = 1.0
             # terrain_color = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}".to_sym]
 
-         elsif !is_trade_node?(hex) and hex[:trade]
+         elsif terrain != "peak" and !is_trade_node?(hex) and hex[:trade]
             # stroke = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]
             # stroke_width = 2.0
             terrain_color = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]

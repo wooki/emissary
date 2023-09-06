@@ -5,7 +5,7 @@ module Emissary
 class Area
 
   attr_accessor :x, :y, :terrain, :population,
-    :food, :goods, :closest_settlement, :trade_node, :info
+    :food, :goods, :closest_settlement, :trade_node, :info, :trade
 
   def initialize
     super()

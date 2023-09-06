@@ -6,7 +6,7 @@ module Emissary
 
 class Settlement < Area
 
-  attr_accessor :shortcut, :shortcut_help, :owner, :trade, :store, :neighbours
+  attr_accessor :shortcut, :shortcut_help, :owner, :store, :neighbours
 
   def initialize
     super()
