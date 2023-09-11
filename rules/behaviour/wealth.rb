@@ -5,7 +5,7 @@ require_relative './industry_utilisation'
 # for example Wealth microrule is called from many other rules and contains logic
 # for updating wealth property based on behaviour in those rules, implementation is
 # left open to accomodate all sorts of uses
-module Emissary::Behaviours
+module Emissary
 
     # increases the cost payed when buying goods or food
     # increases gold generated from tax

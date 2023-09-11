@@ -79,7 +79,7 @@ class ReportGenerator
         # adjacent.each { | adj |
         #   report.map[adj.coord_sym] = adj.report(99)
         # }
-      elsif ["ocean", "peak"].include?(area.terrain)  and area.trade and known_trade_nodes.include? area.trade.coord_sym
+      elsif ["ocean"].include?(area.terrain)  and area.trade and known_trade_nodes.include? area.trade.coord_sym
 
         add_area(area, INFO_LEVELS[:PUBLIC], report)        
 
