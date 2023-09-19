@@ -310,6 +310,18 @@ class MapUtils
       nil # No path found
     end
 
+    def get_neighbors()
+      neighbors = Array.new
+      transforms = self.adjacent_transforms
+      transforms.each { | transform |
+
+         # add to queue
+         nextcoord = MapUtils::transform_coord(coord, transform)
+         hex = getHex(nextcoord) # cant use this here - make sure the new find_path code uses coords and not hexs for score
+         neighbors.push hex
+      }
+   end
+
 end
 
 end
