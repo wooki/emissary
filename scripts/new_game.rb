@@ -32,13 +32,20 @@ class NewGame
         a.name = area[:name]
         a.population = area[:population]
         a.food = area[:food]
-        a.goods = area[:goods]
+        a.goods = area[:goods]        
 
         a.shortcut = area[:shortcut]
         a.shortcut_help = area[:shortcut_help]
         a.owner = area[:owner]
-        a.trade = area[:trade]
-
+        
+        if area[:trade] 
+          a.trade = Emissary::AreaLink.new
+          a.trade.x = area[:trade][:x]
+          a.trade.y = area[:trade][:y]
+          a.trade.distance = area[:trade][:distance]
+          a.trade.name = area[:trade][:name]
+        end
+        
         # lets have some starting gold
         a.store.gold = [Emissary::START_GOLD_MAX,
                         (Emissary::START_GOLD_PER_POPULATION * a.population).round(0).to_i].min
@@ -64,6 +71,14 @@ class NewGame
         a.population = area[:population]
         a.food = area[:food]
         a.goods = area[:goods]
+
+        if area[:trade] 
+          a.trade = Emissary::AreaLink.new
+          a.trade.x = area[:trade][:x]
+          a.trade.y = area[:trade][:y]
+          a.trade.distance = area[:trade][:distance]
+          a.trade.name = area[:trade][:name]
+        end
 
         if area[:closest_settlement]
           a.closest_settlement = Emissary::AreaLink.new

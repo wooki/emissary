@@ -165,8 +165,7 @@ class GameState
     @kingdoms.values.find { | kingdom | kingdom[:name] == name }
   end
 
-  def kingdom_by_player(name)
-    puts "kingdom_by_player: #{@kingdoms.inspect}"
+  def kingdom_by_player(name)    
     @kingdoms[name]
   end
 
@@ -190,7 +189,7 @@ class GameState
     terrain = [terrain] if !terrain.nil? and !terrain.kind_of? Array
 
     @map.each { | key, value |
-      if terrain.nil? or terrain.include? value.terrain
+      if terrain.nil? or terrain.include? value.terrain        
         if !block_given? or yield value
           matched.push value
         end
@@ -204,12 +203,12 @@ class GameState
     @map.select { | key, area | coords.include? area.coord}
   end
 
-  def each_rural
-    self.each_area self.rural
+  def each_rural(&block)
+    self.each_area self.rural, &block
   end
 
-  def each_urban
-    self.each_area self.urban
+  def each_urban(&block)
+    self.each_area self.urban, &block
   end
 
   def each_trade_node

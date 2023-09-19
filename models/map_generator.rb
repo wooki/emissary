@@ -382,7 +382,7 @@ class MapGenerator
          end
       }
 
-      # assign each ocean to the closest tradenode
+      # assign each ocean and peak to the closest tradenode
       get_terrain(['ocean']).each { | hex |
 
          if !is_trade_node?({:x => hex[:x], :y => hex[:y]})
@@ -532,9 +532,10 @@ class MapGenerator
          base_food = @food[hex[:terrain]]
          base_goods = @goods[hex[:terrain]]
 
-         if !base_population.nil?
+         # if !base_population.nil?
 
             # always adjusted a bit for randomness
+            base_population = 0 if base_population.nil?
             base_population = base_population + ((base_population.to_f / 100.0) * rand() * rand(-15..15).to_f).round.to_i
 
             if ['city', 'town'].include? hex[:terrain]
@@ -563,7 +564,7 @@ class MapGenerator
                end
 
                # find closest neighbour - implement something in settlement found to
-               # find closest 2/3 in the future.
+               # find closest 2 or 3 in the future.
                path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
                if path_to_closest
                   closest_settlement = getHex path_to_closest.last[:x], path_to_closest.last[:y]
@@ -617,7 +618,7 @@ class MapGenerator
                hex[:food] = base_food
                hex[:goods] = base_goods
             end
-         end
+         # end
       }
 
 
@@ -1097,7 +1098,7 @@ class MapGenerator
             stroke_width = 1.0
             # terrain_color = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}".to_sym]
 
-         elsif !is_trade_node?(hex) and hex[:trade]
+         elsif terrain != "peak" and !is_trade_node?(hex) and hex[:trade]
             # stroke = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]
             # stroke_width = 2.0
             terrain_color = trade_node_colors["#{hex[:trade][:x]},#{hex[:trade][:y]}"]

@@ -1,6 +1,6 @@
 require_relative '../../models/constants'
 
-module Emissary::Behaviours
+module Emissary
 
     # work out percentage of industry that is active
     class IndustryUtilisation

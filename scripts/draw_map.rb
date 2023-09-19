@@ -112,7 +112,7 @@ class DrawMap
             stroke_width = 1.0
             # terrain_color = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}".to_sym]
 
-         elsif !is_trade_node?(@state.map, hex) and hex.trade_node
+         elsif terrain != "peak" and !is_trade_node?(@state.map, hex) and hex.trade_node
             # stroke = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}"]
             # stroke_width = 2.0
             terrain_color = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}".to_sym]

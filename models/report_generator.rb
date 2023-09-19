@@ -39,12 +39,11 @@ class ReportGenerator
     known_urbans = Hash.new
     known_urbans[capital.coord_sym] = INFO_LEVELS[:OWNED]
     
-    known_trade_nodes = array.new
+    known_trade_nodes = Array.new
     known_trade_nodes.push capital.trade.coord_sym
     
     # iterate the urban areas adding if owned, or in the same trade node    
     game.each_urban { | urban |
-
       if urban.owner == player 
 
         known_urbans[urban.coord_sym] = INFO_LEVELS[:OWNED]        
@@ -59,9 +58,13 @@ class ReportGenerator
       false
     }    
 
+      # add all ocean for known trade nodes
+      known_trade_nodes.uniq!
+
+
     # add all areas that are closest to the urbans this player knows about
     game.each_area { | area |
-    
+
       if known_urbans.has_key? area.coord_sym
         
         add_area(area, known_urbans[area.coord_sym], report)
@@ -76,13 +79,18 @@ class ReportGenerator
         # adjacent.each { | adj |
         #   report.map[adj.coord_sym] = adj.report(99)
         # }
+      elsif ["ocean"].include?(area.terrain)  and area.trade and known_trade_nodes.include? area.trade.coord_sym
+
+        add_area(area, INFO_LEVELS[:PUBLIC], report)        
+
+      elsif area.terrain == "ocean" and known_trade_nodes.include? area.coord_sym
+
+        add_area(area, INFO_LEVELS[:PUBLIC], report)        
+
       end
 
       false # return false to stop iterator from building return hash
     }
-
-    # add all ocean for known trade nodes
-    known_trade_nodes.uniq!
     
 
     # rename closest settlement as in-game relationship "feilty" or something
