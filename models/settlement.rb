@@ -6,16 +6,26 @@ module Emissary
 
 class Settlement < Area
 
-  attr_accessor :shortcut, :shortcut_help, :owner, :store, :neighbours
+  attr_accessor :shortcut, :shortcut_help, :owner, :store, :neighbours,
+                :wealth
 
   def initialize
     super()
     @store = Store.new
     @neighbours = Array.new
+    @wealth = 0
+  end
+
+  def wealth_percentage
+    1 + (@wealth * 0.01)
+  end
+
+  def wealth_percentage_ten_percent
+    1 + (@wealth * 0.001)
   end
 
   def industry
-    (@population.to_f * INDUSTRY_RATE).floor
+    (@population.to_f * INDUSTRY_RATE * wealth_percentage).floor
   end
 
   def upkeep_food
@@ -30,13 +40,24 @@ class Settlement < Area
     @name = val
   end
 
+  def add_wealth(val) 
+    @wealth = 0 if !@wealth
+    @wealth = @wealth + val
+  end
+
   def report(level)
     details = super(level)
+
+    details.delete(:food)
+    details.delete(:goods)    
+
     details[:owner] = @owner
+    details[:name] = @name
 
     # add details dependent on level
     if level >= INFO_LEVELS[:TRADE]
-      details[:trade] = @trade      
+      details[:trade] = @trade
+      details[:wealth] = @wealth
     end
 
     if level >= INFO_LEVELS[:STORE]
@@ -44,20 +65,6 @@ class Settlement < Area
     end
 
     details
-  end
-
-  def wealth
-    # increases the cost payed when buying goods or food
-    # increases gold generated from tax
-    #
-    # is increased when industry is fully utilised
-    # is increased when food or goods are exported
-    # is reduced by tax rate
-    # is reduced when industry is not fully utilised
-    # is reduced when armies are recruited
-    # is reduced when food upkeep is not met
-    # is reduced when gold < 0
-
   end
 
   def guilds

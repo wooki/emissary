@@ -21,6 +21,18 @@ class Store
     @gold = @gold - cost
   end
 
+  def as_json(options={})  
+    {
+      food: @food,
+      goods: @goods,
+      gold: @gold
+    }
+  end
+
+  def to_json(*options)
+    as_json(*options).to_json(*options)
+  end
+
 end
 
 end

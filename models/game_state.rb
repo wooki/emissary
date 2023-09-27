@@ -46,8 +46,9 @@ class GameState
 
     # info level determined by looking up type
     level = INFO_LEVELS[type.to_sym]
-
+    
     if area
+
       area.info = Array.new if !area.info
 
       area.info.push({

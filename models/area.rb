@@ -31,7 +31,11 @@ class Area
 
   def report(level)
     
-    details = {x: @x, y: @y, terrain: @terrain, closest_settlement: @closest_settlement, trade_node: @trade_node}
+    details = {x: @x, y: @y, terrain: @terrain }
+
+    details[:closest_settlement] = @closest_settlement if @closest_settlement
+    details[:trade_node] = @trade_node if @trade_node
+
     details[:population] = @population if level >= INFO_LEVELS[:POPULATION]
     
     if level >= INFO_LEVELS[:PRODUCTION]

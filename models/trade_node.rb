@@ -50,9 +50,10 @@ class TradeNode
   end
 
   # cost of trading with a specific urban area based on the distance
+  # and 10% of the wealth
   def trade_percentage(urban)
     return 0 if !urban.trade
-    TRADE_RATE + (TRADE_RATE_TRAVEL * urban.trade.distance)
+    (TRADE_RATE + (TRADE_RATE_TRAVEL * urban.trade.distance)) * urban.wealth_percentage_ten_percent
   end
 
   # sets the price based on quantity being traded

@@ -19,7 +19,7 @@ module Emissary
 
             if @urban
 
-                Wealth.industry(@urban)
+                Wealth.industry(@urban, gameState)
 
                 new_goods = [@urban.industry, @urban.store.goods].min
                 if new_goods > 0

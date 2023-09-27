@@ -2,6 +2,7 @@ require_relative "../rulesengine/rule"
 require_relative "../rulesengine/turn_sequence"
 require_relative '../models/constants'
 require_relative '../rules/trade'
+require_relative './behaviour/wealth'
 
 module Emissary
 
@@ -35,9 +36,12 @@ module Emissary
                 @trade = gameState.getHex(@urban.trade.x, @urban.trade.y)
                 if @trade and @trade.trade_node
 
+                    total_exported = 0
+
                     # do we have excess
                     if @urban.store.food > food_required
                         excess_food = @urban.store.food - food_required
+                        total_exported = total_exported + excess_food
 
                         @trade.trade_node.sell_later(:food, excess_food)
                         trades.push Trade.new(@urban, @trade.trade_node, :food, true, "Food exported", excess_food)
@@ -45,11 +49,15 @@ module Emissary
 
                     if @urban.store.goods > goods_required
                         excess_goods = @urban.store.goods - goods_required
+                        total_exported = total_exported + excess_goods
 
                         @trade.trade_node.sell_later(:goods, excess_goods)
                         trades.push Trade.new(@urban, @trade.trade_node, :goods, true, "Goods exported", excess_goods)
                     end
 
+                    if total_exported > 0
+                        Wealth.exported(@urban, total_exported, gameState)
+                    end
                 end
 
             end

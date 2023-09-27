@@ -2,6 +2,7 @@ require_relative "../rulesengine/rule"
 require_relative "../rulesengine/turn_sequence"
 require_relative '../models/constants'
 require_relative '../models/store'
+require_relative './behaviour/wealth'
 
 module Emissary
 
@@ -30,13 +31,13 @@ module Emissary
                 if @urban.store.food >= @urban.upkeep_food
 
                     @urban.store.food = @urban.store.food - @urban.upkeep_food
-
                     gameState.info "UPKEEP", @urban, "Population consumed #{@urban.upkeep_food} food"
                 else
                     unrest = @urban.upkeep_food - @urban.store.food # do something with this
 
-                    gameState.info "UPKEEP", @urban, "There was not enough food for the population. They required #{@urban.upkeep_food} food, unrest is growing"
+                    Wealth.failedUpkeep(@urban, unrest, gameState)
 
+                    gameState.info "UPKEEP", @urban, "There was not enough food for the population. They required #{@urban.upkeep_food} food, unrest is growing"
                     @urban.store.food = 0
                 end
 
