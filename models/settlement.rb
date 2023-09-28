@@ -7,13 +7,14 @@ module Emissary
 class Settlement < Area
 
   attr_accessor :shortcut, :shortcut_help, :owner, :store, :neighbours,
-                :wealth
+                :wealth, :guilds
 
   def initialize
     super()
     @store = Store.new
     @neighbours = Array.new
     @wealth = 0
+    @guilds = 0
   end
 
   def wealth_percentage
@@ -40,28 +41,32 @@ class Settlement < Area
     @name = val
   end
 
-  def add_wealth(val) 
+  def add_wealth(val)
     @wealth = 0 if !@wealth
     @wealth = @wealth + val
+  end
+
+  def add_guild_power(val)
+    @guilds = 0 if !@guilds
+    @guilds = @guilds + val
   end
 
   def report(level)
     details = super(level)
 
     details.delete(:food)
-    details.delete(:goods)    
+    details.delete(:goods)
 
     details[:owner] = @owner
     details[:name] = @name
 
     # add details dependent on level
-    if level >= INFO_LEVELS[:TRADE]
-      details[:trade] = @trade
-      details[:wealth] = @wealth
-    end
+    details[:trade] = @trade if level >= INFO_LEVELS[:TRADE]
+    details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH]
+    details[:guilds] = @guilds.round(2) if level >= INFO_LEVELS[:GUILDS]
 
     if level >= INFO_LEVELS[:STORE]
-      details[:store] = @store      
+      details[:store] = @store
     end
 
     details
@@ -85,9 +90,9 @@ class Settlement < Area
   def unrest
     # when unrest is high there may be a peasant revolt
     #
-    # is increased when food upkeep is met
+    # is increased when food upkeep is not met
     # is increased when armies are recruited
-    # is reduced when food upkeep is not met
+    # is reduced when food upkeep is  met
     # is reduced when army is present
 
   end
