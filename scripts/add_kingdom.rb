@@ -25,7 +25,6 @@ class AddKingdom
       return
     end
 
-
     # check existing data
     hex = @state.find_settlement capital
 
@@ -40,8 +39,9 @@ class AddKingdom
 
 
     else
-      puts "Capital not found"
-      return
+      puts "Capital not found, selecting random"
+      urbans = @state.each_urban.select { | urban | !urban.owner }
+      hex = urbans.sample
     end
 
     # add them
@@ -87,4 +87,4 @@ end.parse!
 ng = AddKingdom.new options[:gamefile], options[:player], options[:kingdom], options[:capital]
 
 
-# bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c mon -k "The Jimpire"
+# bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k "The Jimpire"
