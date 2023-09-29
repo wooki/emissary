@@ -567,10 +567,10 @@ class MapGenerator
                # find closest 2 or 3 in the future.
                path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
                if path_to_closest
-                  closest_settlement = getHex path_to_closest.last[:x], path_to_closest.last[:y]
+                  province = getHex path_to_closest.last[:x], path_to_closest.last[:y]
                   hex[:neighbours] = Array.new
                   hex[:neighbours].push({
-                     :name => closest_settlement[:name],
+                     :name => province[:name],
                      :x => path_to_closest.last[:x],
                      :y => path_to_closest.last[:y],
                      :distance => path_to_closest.length
@@ -597,9 +597,9 @@ class MapGenerator
                   end
 
                   # also remember the settlement to which this area is attached
-                  closest_settlement = getHex path.last[:x], path.last[:y]
-                  hex[:closest_settlement] = {
-                     :name => closest_settlement[:name],
+                  province = getHex path.last[:x], path.last[:y]
+                  hex[:province] = {
+                     :name => province[:name],
                      :x => path.last[:x],
                      :y => path.last[:y],
                      :distance => path.length

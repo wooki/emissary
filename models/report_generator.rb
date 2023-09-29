@@ -69,9 +69,9 @@ class ReportGenerator
         
         add_area(area, known_urbans[area.coord_sym], report)
 
-      elsif area.closest_settlement and known_urbans.has_key? area.closest_settlement.coord_sym
+      elsif area.province and known_urbans.has_key? area.province.coord_sym
 
-        add_area(area, known_urbans[area.closest_settlement.coord_sym], report)        
+        add_area(area, known_urbans[area.province.coord_sym], report)        
 
         # # add adjacent
         # adjacent_coords = MapUtils::adjacent(area.coord, game.size)
