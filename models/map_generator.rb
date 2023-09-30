@@ -550,34 +550,31 @@ class MapGenerator
                base_population = (base_population.to_f * adjustment).round.to_i
                hex[:population] = base_population
 
-               # find neighbouring settlements
-               # neighbours
-               settlement_found = lambda do | coord, path |
-                  return false if hex[:x] == coord[:x] and hex[:y] == coord[:y]
-                  mapcoord = getHex(coord[:x], coord[:y])
-                  ["city", "town"].include? mapcoord[:terrain]
-               end
+               # find closest other settlement (now done later)               
+               # settlement_found = lambda do | coord, path |
+               #    return false if hex[:x] == coord[:x] and hex[:y] == coord[:y]
+               #    mapcoord = getHex(coord[:x], coord[:y])
+               #    ["city", "town"].include? mapcoord[:terrain]
+               # end
 
-               can_be_traversed = lambda do | coord, path, is_first |
-                  mapcoord = getHex(coord[:x], coord[:y])
-                  not (["ocean", "peak"].include? mapcoord[:terrain])
-               end
+               # can_be_traversed = lambda do | coord, path, is_first |
+               #    mapcoord = getHex(coord[:x], coord[:y])
+               #    not (["ocean", "peak"].include? mapcoord[:terrain])
+               # end
 
-               # find closest neighbour - implement something in settlement found to
-               # find closest 2 or 3 in the future.
-               path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
-               if path_to_closest
-                  province = getHex path_to_closest.last[:x], path_to_closest.last[:y]
-                  hex[:neighbours] = Array.new
-                  hex[:neighbours].push({
-                     :name => province[:name],
-                     :x => path_to_closest.last[:x],
-                     :y => path_to_closest.last[:y],
-                     :distance => path_to_closest.length
-                  })
-               end
-
-
+               # # find closest neighbour - implement something in settlement found to
+               # # find closest 2 or 3 in the future.
+               # path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
+               # if path_to_closest
+               #    province = getHex path_to_closest.last[:x], path_to_closest.last[:y]
+               #    hex[:neighbours] = Array.new
+               #    hex[:neighbours].push({
+               #       :name => province[:name],
+               #       :x => path_to_closest.last[:x],
+               #       :y => path_to_closest.last[:y],
+               #       :distance => path_to_closest.length
+               #    })                                    
+               # end
 
             else
 
@@ -604,6 +601,10 @@ class MapGenerator
                      :y => path.last[:y],
                      :distance => path.length
                   }
+
+                  # settlement also stores reference to coords that it owns
+                  province[:areas] = Array.new if !province[:areas]
+                  province[:areas].push({:x => hex[:x], :y => hex[:y]})
                end
                # no path to a settlement - isolated islands stay x1
 
@@ -621,9 +622,32 @@ class MapGenerator
          # end
       }
 
+      # work out border areas and adjacent provinces
+      @map.each { | key, hex |
+         if ['city', 'town'].include? hex[:terrain]
 
+            # work out all border areas of a province and which provinces
+            # are it's neighbours
+            neighbours = Array.new
+            borders = Array.new
+            hex[:areas].each { | area |
+               # check if adjacent areas are in a different province
+               adjacent = MapUtils::adjacent({:x => area[:x], :y => area[:y]}, size)
+               adjacent.each { | adjacent_area |
+                  adjacent_hex = getHex(adjacent_area[:x], adjacent_area[:y]);
+                  if !['city', 'town'].include? adjacent_hex[:terrain] 
+                     if adjacent_hex[:province][:x] != hex[:x] or adjacent_hex[:province][:y] != hex[:y]
+                        borders.push({x: area[:x], y: area[:y]})
+                        neighbours.push({x: adjacent_hex[:province][:x], y: adjacent_hex[:province][:y]})
+                     end
+                  end
+               }
+            }
 
-
+            hex[:neighbours] = neighbours.uniq
+            hex[:borders] = borders.uniq
+         end
+      }
 
 
       # remove some side-effect keys e.g. :z and :required_distance

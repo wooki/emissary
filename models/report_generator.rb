@@ -47,22 +47,26 @@ class ReportGenerator
       if urban.owner == player 
 
         known_urbans[urban.coord_sym] = INFO_LEVELS[:OWNED]        
-        known_trade_nodes.push urban.trade.coord_sym if urban.trade
+        known_trade_nodes.push urban.trade.coord_sym if urban.trade        
 
       elsif urban.trade.coord_sym == capital.trade.coord_sym        
 
         known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
+      
+      elsif capital.neighbours.any? { | coord | urban.x == coord[:x] and urban.y == coord[:y] }
         
+        known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
+
       end                
 
       false
-    }    
+    }            
 
-      # add all ocean for known trade nodes
-      known_trade_nodes.uniq!
+    # add all ocean for known trade nodes
+    known_trade_nodes.uniq!
 
 
-    # add all areas that are closest to the urbans this player knows about
+    # add all areas that are in provinces this player knows about
     game.each_area { | area |
 
       if known_urbans.has_key? area.coord_sym

@@ -54,6 +54,10 @@ class NewGame
           a.neighbours = area[:neighbours]
         end
 
+        if area[:borders]
+          a.borders = area[:borders]
+        end
+
         if area[:trade] and !area[:trade][:is_node]
           a.trade = Emissary::AreaLink.new
           a.trade.x = area[:trade][:x]
