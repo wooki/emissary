@@ -7,14 +7,14 @@ module Emissary
 class Settlement < Area
 
   attr_accessor :shortcut, :shortcut_help, :owner, :store, :neighbours,
-                :wealth, :guilds
+                :wealth, :unrest
 
   def initialize
     super()
     @store = Store.new
     @neighbours = Array.new
     @wealth = 0
-    @guilds = 0
+    @unrest = 0
   end
 
   def wealth_percentage
@@ -46,9 +46,9 @@ class Settlement < Area
     @wealth = @wealth + val
   end
 
-  def add_guild_power(val)
-    @guilds = 0 if !@guilds
-    @guilds = @guilds + val
+  def add_unrest(val)
+    @unrest = 0 if !@unrest
+    @unrest = @unrest + val
   end
 
   def report(level)
@@ -63,7 +63,6 @@ class Settlement < Area
     # add details dependent on level
     details[:trade] = @trade if level >= INFO_LEVELS[:TRADE]
     details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH]
-    details[:guilds] = @guilds.round(2) if level >= INFO_LEVELS[:GUILDS]
 
     if level >= INFO_LEVELS[:STORE]
       details[:store] = @store
@@ -72,36 +71,11 @@ class Settlement < Area
     details
   end
 
-  def guilds
-    # when guild power is high they may seize power
-    #
-    # increases the cost payed when buying goods or food
-    # increases the cost of recruiting armies
-    #
-    # is increased by tax rate
-    # is increased when industry is fully utilised
-    # is increased when food or goods are exported
-    # is increased when gold < 0
-    # is reduced when industry is not fully utilised
-    # is reduced when army is present
-
-  end
-
-  def unrest
-    # when unrest is high there may be a peasant revolt
-    #
-    # is increased when food upkeep is not met
-    # is increased when armies are recruited
-    # is reduced when food upkeep is  met
-    # is reduced when army is present
-
-  end
-
   def tax
     # player can set rate, they generate gold from industry.  10% tax = 1 gold from 10 utilised industry
     #
     # reduces wealth
-    # increases guilds
+    # increases likelyhood that guilds will seize power
 
   end
 

@@ -14,9 +14,11 @@ module Emissary
     # is increased when food or goods are exported
     # is reduced when industry is not fully utilised
     # is reduced when food upkeep is not met
-    
+
     # TODO
     # increases gold generated from tax
+    # increases the cost of recruiting armies
+    # when wealth is high guilds may seize power (wealth & tax rate combine for this check)
     # is reduced when gold < 0 (code below has been added but not being called, needs specific rule)
     # is reduced by tax rate
     # is reduced when armies are recruited
@@ -52,7 +54,7 @@ module Emissary
 
                 if total_exported > 0
                     # increase wealth and add message
-                    increase = (total_exported.to_f * WEALTH_EXPORT_RATE).round(4)                    
+                    increase = (total_exported.to_f * WEALTH_EXPORT_RATE).round(4)
                     if increase > 0
 
                         urban.add_wealth(increase)
@@ -67,13 +69,13 @@ module Emissary
         # is reduced when gold < 0
         def bankrupt(urban, gameState)
 
-            if urban                
+            if urban
                 if urban.store.gold <= 0
 
                     # decrease wealth and add message
                     urban.add_wealth(0 - WEALTH_BANKRUPT)
                     gameState.info "WEALTH", urban, "Wealth decreased by #{WEALTH_BANKRUPT} as the state is brankrupt", {wealth: 0 - WEALTH_BANKRUPT}
-                
+
                 end
             end
         end
@@ -89,7 +91,7 @@ module Emissary
                     decrease = unrest.to_f * WEALTH_FAILED_UPKEEP_RATE * urban.population.to_f
                     urban.add_wealth(0 - decrease)
                     gameState.info "WEALTH", urban, "Wealth decreased by #{decrease} following food shortage", {wealth: 0 - decrease}
-                
+
                 end
             end
         end

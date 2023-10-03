@@ -14,7 +14,6 @@ module Emissary
     WEALTH_INDUSTRY = 0.01 # fixed increase to wealth if industry fully used
     WEALTH_EXPORT_RATE = 0.0005 # wealth increase this per good/food exported rounded to 4 decimals
     WEALTH_BANKRUPT = 0.2 # reduced wealth a standard amount if crown has no gold in coffers
-    GUILDS_INDUSTRY = 0.008 # fixed increase to guild power if industry fully used
 
     INFO_LEVELS = {
         # level required to gain this info
@@ -25,7 +24,6 @@ module Emissary
         POPULATION: 3,
         STORE: 6,
         WEALTH: 4,
-        GUILDS: 4,
 
         # spies will gain levels here as the expand their network
         # spy level should probably just equal this level
