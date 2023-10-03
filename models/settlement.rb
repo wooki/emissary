@@ -7,7 +7,7 @@ module Emissary
 class Settlement < Area
 
   attr_accessor :shortcut, :shortcut_help, :owner, :store, :neighbours,
-                :wealth, :unrest
+                :wealth, :unrest, :borders
 
   def initialize
     super()
@@ -59,6 +59,7 @@ class Settlement < Area
 
     details[:owner] = @owner
     details[:name] = @name
+    details[:borders] = @borders
 
     # add details dependent on level
     details[:trade] = @trade if level >= INFO_LEVELS[:TRADE]

@@ -5,7 +5,7 @@ module Emissary
 class Area
 
   attr_accessor :x, :y, :terrain, :population,
-    :food, :goods, :closest_settlement, :trade_node, :info, :trade
+    :food, :goods, :province, :trade_node, :info, :trade
 
   def initialize
     super()
@@ -33,7 +33,7 @@ class Area
     
     details = {x: @x, y: @y, terrain: @terrain }
 
-    details[:closest_settlement] = @closest_settlement if @closest_settlement
+    details[:province] = @province if @province
     details[:trade_node] = @trade_node if @trade_node
 
     details[:population] = @population if level >= INFO_LEVELS[:POPULATION]

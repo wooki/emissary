@@ -54,6 +54,10 @@ class NewGame
           a.neighbours = area[:neighbours]
         end
 
+        if area[:borders]
+          a.borders = area[:borders]
+        end
+
         if area[:trade] and !area[:trade][:is_node]
           a.trade = Emissary::AreaLink.new
           a.trade.x = area[:trade][:x]
@@ -80,12 +84,12 @@ class NewGame
           a.trade.name = area[:trade][:name]
         end
 
-        if area[:closest_settlement]
-          a.closest_settlement = Emissary::AreaLink.new
-          a.closest_settlement.x = area[:closest_settlement][:x]
-          a.closest_settlement.y = area[:closest_settlement][:y]
-          a.closest_settlement.distance = area[:closest_settlement][:distance]
-          a.closest_settlement.name = area[:closest_settlement][:name]
+        if area[:province]
+          a.province = Emissary::AreaLink.new
+          a.province.x = area[:province][:x]
+          a.province.y = area[:province][:y]
+          a.province.distance = area[:province][:distance]
+          a.province.name = area[:province][:name]
         end
 
       end

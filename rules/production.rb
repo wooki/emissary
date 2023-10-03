@@ -19,9 +19,9 @@ module Emissary
 
         def execute(gameState)
 
-            if @area and @area.closest_settlement
+            if @area and @area.province
 
-                distance = @area.closest_settlement.distance
+                distance = @area.province.distance
 
                 food = @area.food.to_f * @area.population.to_f
                 goods = @area.goods.to_f * @area.population.to_f
@@ -38,7 +38,7 @@ module Emissary
                 food = food.floor.to_i
                 goods = goods.floor.to_i
 
-                @settlement = gameState.getHex(@area.closest_settlement.x, @area.closest_settlement.y)
+                @settlement = gameState.getHex(@area.province.x, @area.province.y)
                 if @settlement
 
                     @settlement.store = Store.new if !@settlement.store
