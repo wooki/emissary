@@ -10,30 +10,54 @@ module Emissary
     # when unrest is high there may be a peasant revolt
     # reduced the availability of soliders for recruitment
     #
-    # is increased when food upkeep is not met
+    # DONE is increased when food upkeep is not met
     # is increased when armies are recruited
-    # is reduced when food upkeep is  met
+    # DONE is reduced when food upkeep is  met
     # is reduced when army is present
-    # is increased when wealth is very high
+    # DONE is increased when wealth is very high
     class Unrest
 
-        def metUpkeep(urban, gameState)
+        def self.wealth(urban, gameState)
+            # TODO: need to check this in it's own rule (or attached to UNREST check)
 
             if urban
+
+                # calculate unrest level based on "high" wealth
+                unrest = ((urban.wealth ** UNREST_INEQUALITY_EXPONENT).to_f * UNREST_INEQUALITY_RATE).round(4)
+
+                if unrest > 0
+
+                    # increase unrest and add message
+                    urban.add_unrest(increase)
+                    gameState.info "UNREST", urban, "Unrest increased by #{increase} due to inequality between the workers and the elites", {unrest: increase}
+
+                end
+            end
+        end
+
+        def self.metUpkeep(urban, gameState)
+
+            if urban
+
+                # decrease unrest and add message
+                decrease = UNREST_MET_UPKEEP_RATE
+                urban.add_unrest(0 - decrease)
+                gameState.info "UNREST", urban, "Unrest decreased by #{decrease} following normal food supply", {unrest: 0 - decrease}
+
             end
         end
 
         # is reduced when food upkeep is not met
-        def failedUpkeep(urban, unrest, gameState)
+        def self.failedUpkeep(urban, unrest, gameState)
 
             if urban
 
                 if unrest > 0
 
-                    # decrease wealth and add message
-                    decrease = unrest.to_f * WEALTH_FAILED_UPKEEP_RATE * urban.population.to_f
-                    urban.add_wealth(0 - decrease)
-                    gameState.info "WEALTH", urban, "Wealth decreased by #{decrease} following food shortage", {wealth: 0 - decrease}
+                    # increase unrest and add message
+                    increase = unrest.to_f * UNREST_UNMET_UPKEEP_RATE
+                    urban.add_unrest(increase)
+                    gameState.info "UNREST", urban, "Unrest increased by #{increase} following food shortage", {unrest: increase}
 
                 end
             end
