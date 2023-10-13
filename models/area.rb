@@ -49,6 +49,12 @@ class Area
       end
     end
 
+    if @info and @info.length > 0
+      details[:info] = @info.select do | info_item | 
+      info_item[:level] <= level
+      end
+    end
+
     details
   end  
 
