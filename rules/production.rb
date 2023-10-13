@@ -26,21 +26,29 @@ module Emissary
                 food = @area.food.to_f * @area.population.to_f
                 goods = @area.goods.to_f * @area.population.to_f
 
-                # adjust based on state of hex e.g. rebellion / occupied
-
-
-                # maybe split into another rule but for now just send to closest
-                distance.times { | i |
-                    food = food * PRODUCTION_FOOD_TRAVEL_LOSS
-                    goods = goods * PRODUCTION_GOODS_TRAVEL_LOSS
-                }
-
-                food = food.floor.to_i
-                goods = goods.floor.to_i
-
                 @settlement = gameState.getHex(@area.province.x, @area.province.y)
                 if @settlement
 
+                    # adjust based on state of hex e.g. rebellion / occupied / unrest                    
+                    if @settlement.unrest > 0
+                        rate = 1 - ((@settlement.unrest.to_f * UNREST_PRODUCTION_FACTOR) / 100.0)
+                        rate = 0 if rate < 0
+
+                        gameState.info "PRODUCTION", @area, "Production hampered by local unrest", {rate: rate}
+
+                        food = food * production_rate
+                        goods = goods * production_rate
+                    end
+
+                    # maybe split into another rule but for now just send to closest
+                    distance.times { | i |
+                        food = food * PRODUCTION_FOOD_TRAVEL_LOSS
+                        goods = goods * PRODUCTION_GOODS_TRAVEL_LOSS
+                    }
+
+                    food = food.floor.to_i
+                    goods = goods.floor.to_i
+                
                     @settlement.store = Store.new if !@settlement.store
                     @settlement.store.food = @settlement.store.food + food
                     @settlement.store.goods = @settlement.store.goods + goods

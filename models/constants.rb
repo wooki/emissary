@@ -18,6 +18,7 @@ module Emissary
     UNREST_MET_UPKEEP_RATE = 0.005 # decrease unrest a proportion of how much upkeep was failed by
     UNREST_INEQUALITY_RATE = 0.001 # scaling of actual unrest from calculated inequality
     UNREST_INEQUALITY_EXPONENT = 3 # power the wealth is raised to create exponential growth
+    UNREST_PRODUCTION_FACTOR = 5.0 # unrest mutiplied by this is % of production reduction
 
     INFO_LEVELS = {
         # level required to gain this info

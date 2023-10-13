@@ -9,6 +9,7 @@ module Emissary
 
     # when unrest is high there may be a peasant revolt
     # reduced the availability of soliders for recruitment
+    # DONE reduces foood and goods production
     #
     # DONE is increased when food upkeep is not met
     # is increased when armies are recruited
