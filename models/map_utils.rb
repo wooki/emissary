@@ -168,6 +168,15 @@ class MapUtils
       coords
    end
 
+   def self.same_coord?(a, b)
+      a[:x] == b[:x] and a[:y] == b[:y]
+   end
+
+   def self.same_line?(a, b)
+      (same_coord?(a[0], b[0]) and same_coord?(a[1], b[1])) or
+      (same_coord?(a[0], b[1]) and same_coord?(a[1], b[0]))
+   end   
+
    # keep transforming coord until terrain type found and return
    # the distance
    def find_terrain_by_transform(start, transform, terrain, size, exclude=[])
