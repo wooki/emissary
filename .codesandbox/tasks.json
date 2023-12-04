@@ -10,8 +10,16 @@
   // These tasks can be run from CodeSandbox. Running one will open a log in the app.
   "tasks": {
     "map": {
-      "name": "newmap",
-      "command": "cd scripts && bundle exec ruby new_map.rb -f map.json -F json -S 100 -h 6 | xargs -I % sh -c 'bundle exec ruby new_map.rb -f map.svg -S 100 -h 6 --seed=%'"
+      "name": "New Map",
+      "command": "cd ./scripts && bundle exec ruby new_map.rb -f map.json -F json -S 100 -h 6"
+    },
+    "drawmap": {
+      "name": "Draw Map",
+      "command": "cd ./scripts && bundle exec ruby draw_map.rb -g game.yaml -m world.svg -h 6"
+    },
+    "newgame": {
+      "name": "New Game",
+      "command": "cd ./scripts && bundle exec ruby new_game.rb -g game.yaml -m map.json"
     }
   }
 }
