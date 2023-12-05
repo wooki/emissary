@@ -1,19 +1,14 @@
-GIT
-  remote: https://github.com/wooki/fantasynamegenerator.git
-  revision: 2b89269001f72df8188ad2da640dae4b08273029
-  specs:
-    fantasynamegenerator (0.0.3)
-
 GEM
   remote: https://rubygems.org/
   specs:
+    titleize (1.4.1)
 
 PLATFORMS
   x86_64-darwin-18
   x86_64-linux
 
 DEPENDENCIES
-  fantasynamegenerator!
+  titleize
 
 BUNDLED WITH
    2.3.10

@@ -106,16 +106,15 @@ class DrawMap
          # io.print "\" fill=\"#{terrain_color}\" stroke=\"black\" stroke-width=\"0.5\" />"
          stroke = "black"
          stroke_width= 0.1
-         if terrain == "ocean" and !(is_trade_node?(@state.map, hex) and hex.trade_node)
-            
-            stroke = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}"]
+         if terrain == "ocean" and !(is_trade_node?(@state.map, hex) and hex.trade)            
+            stroke = trade_node_colors["#{hex.trade.x},#{hex.trade.y}"]
             stroke_width = 1.0
             # terrain_color = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}".to_sym]
 
-         elsif terrain != "peak" and !is_trade_node?(@state.map, hex) and hex.trade_node
+         elsif terrain != "peak" and !is_trade_node?(@state.map, hex) and hex.trade
             # stroke = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}"]
             # stroke_width = 2.0
-            terrain_color = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}".to_sym]
+            terrain_color = trade_node_colors["#{hex.trade.x},#{hex.trade.y}".to_sym]
          end
          io.print "\" fill=\"#{terrain_color}\" stroke=\"#{stroke}\" stroke-width=\"#{stroke_width}\" />"
 

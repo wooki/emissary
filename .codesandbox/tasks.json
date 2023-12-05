@@ -20,6 +20,18 @@
     "newgame": {
       "name": "New Game",
       "command": "cd ./scripts && bundle exec ruby new_game.rb -g game.yaml -m map.json"
+    },
+    "ruby:typecheck": {
+      "name": "Typecheck",
+      "command": "solargraph typecheck"
+    },
+    "cd ./scripts && bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k \"The Jimpire\"": {
+      "name": "Add Jimpire",
+      "command": "cd ./scripts && bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k \"The Jimpire\""
+    },
+    "cd ./scripts && bundle exec ruby turn.rb -g game.yaml -o ../orders/ -r ../reports/ -s 123456": {
+      "name": "Run Turn",
+      "command": "cd ./scripts && bundle exec ruby turn.rb -g game.yaml -o ../orders/ -r ../reports/ -s 123456"
     }
   }
 }
