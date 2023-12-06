@@ -13,8 +13,6 @@ module Emissary
    
       def initialize(seed=nil)
    
-         @namer = NameGenererator.new
-   
          @seed = seed
          @seed = Random.new_seed if !@seed
          @random = srand @seed
@@ -665,8 +663,9 @@ module Emissary
                end
             }
             
-
-            name_gen = @namer.pick_naming_generator(terrain_in_region)
+            region = NameGenererator.get_region_for_terrain(terrain_in_region)
+            namer = NameGenererator.for_region(region)
+            puts "#{namer.region} #{namer.get_name}"            
          }
    
          # remove some side-effect keys e.g. :z and :required_distance

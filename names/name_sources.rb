@@ -547,25 +547,205 @@ module Emissary
       'Sternenheim'
     ]
 
-
-
-    @@fantasy = [
-      "Narnia",
-      "Hobbit",
-      "Lord of the Rings",
-      "Hitchhiker's Guide to the Galaxy",
-    ]
-
     def for_region(region)
       return @@persian if region == :persian
       return @@scandinavian if region == :scandinavian      
       return @@andalusian if region == :andalusian            
       return @@welsh if region == :welsh     
       return @@italian if region == :italian            
-      return @@germanic if region == :germanic            
-      return @@fantasy if region == :fantasy
-      @@fantasy
+      return @@germanic if region == :germanic                        
     end
+
+    def self.data_for_fantasy
+      
+      prefixes = [
+        "Bannog",
+        "Bannock",
+        "King's",
+        "Queen's",
+        "Royal"
+      ]
+
+      start_words = [
+        "Dún",
+        "Kjerke",
+        "Kirchen",
+        "Ock",
+        "Avon",
+        "Ash",
+        "Axe",
+        "Exe",
+        "Usk",
+        "Esk",
+        "Beck",
+        "Bach",
+        "Ben",
+        "Beinn",
+        "Beann",
+        "Ban",
+        "Ard",
+        "Berry",
+        "Berg",
+        "Bex",
+        "Blaen",
+        "Crag",
+        "Craig",
+        "Druin",
+        "Gart",
+        "Glen",
+        "Holm",
+        "Herst",
+        "Inch",
+        "Insch",
+        "Keld",
+        "Knock",
+        "Ling",
+        "Moss",
+        "Stow",
+        "Traeth",
+        "Weald",
+        "Aber",
+        "Ast",
+        "Auch",
+        "Bal",
+        "Brad",
+        "Caer",
+        "Dal",
+        "Drum",
+        "Dun",
+        "Dum",
+        "Don",
+        "Inver",
+        "Kil",
+        "Kin",
+        "Lang",
+        "Nant",
+        "Nor",
+        "Pont",
+        "Shep",
+        "Stam",
+        "Stan",
+        "Wraith",
+        "Gloom",
+        "Sud",
+        "Wes",
+        "Win",
+        "Llan",
+        "Pen",
+        "Rams",
+        "Lynn",
+        "Ost"
+      ]
+
+      end_words = [
+        "wald",
+        "dorf",
+        "stein",
+        "röd",
+        "rød",
+        "brück",
+        "veld",
+        "fjord",
+        "hafen",
+        "heim",
+        "hoff",
+        "hove",
+        "holm",
+        "berg",
+        "berg",
+        "bergen",
+        "afon",
+        "bergh",
+        "bourne",
+        "burn",
+        "clere",
+        "combe",
+        "coombe",
+        "coed",
+        "crag",
+        "each",
+        "bridge",
+        "castle",
+        "eig",
+        "firth",
+        "ford",
+        "forth",
+        "ffordd",
+        "fos",
+        "foss",
+        "gate",
+        "garth",
+        "gill",
+        "glyn",
+        "hithe",
+        "hythe",
+        "holm",
+        "hurst",
+        "keld",
+        "lough",
+        "magna",
+        "mawr",
+        "mere",
+        "more",
+        "moss",
+        "stow",
+        "thorp",
+        "thorpe",
+        "dreath",
+        "tun",
+        "ton",
+        "wold",
+        "burgh",
+        "bury",
+        "shaw",
+        "bost",
+        "carden",
+        "cott",
+        "dale",
+        "den",
+        "dean",
+        "don",
+        "caster",
+        "cester",
+        "field",
+        "frith",
+        "ham",
+        "hays",
+        "ing",
+        "krth",
+        "cheth",
+        "mouth",
+        "ness",
+        "port",
+        "stead",
+        "ster",
+        "thwaite",
+        "wick",
+        "wich",
+        "wych",
+        "wyke",
+        "ay",
+        "toft",
+        "worth",
+        "worthy",
+        "wardine"
+      ]
+
+      {
+        prefixes: prefixes,
+        suffixes: [],
+        base_words: [],
+        starts: start_words,
+        middles: [],
+        ends: end_words,
+        prefix_frequency: 0.01,
+        suffix_frequency: 0,
+        syllable_lengths: {0 => 1},
+        source: []
+      } 
+
+    end
+
   end
 
 end

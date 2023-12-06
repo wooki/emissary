@@ -14,7 +14,7 @@ class NameGenererator
       scandinavian: { lowland: 0..10, mountain: 4..100, ocean: 50..100, peak: 0..20 },
       welsh: { lowland: 0..15, forest: 3..60, mountain: 3..60, peak: 0..1, town: 0..3 },
       italian: { ocean: 82..100 },
-      germanic: { lowland: 3..50, forest: 2..100, ocean: 0..85 },
+      germanic: { lowland: 4..50, forest: 2..100, ocean: 0..85 },
       fantasy: {} # Fallback generator
     }
 
@@ -68,7 +68,12 @@ class NameGenererator
       @region = region
       @utils = Emissary::NameUtils.new
       @names = Emissary::NameSources.new
-      @data = @utils.get_data_for_words(@names.for_region(region))            
+
+      if region == :fantasy
+        @data = Emissary::NameSources.data_for_fantasy
+      else
+        @data = @utils.get_data_for_words(@names.for_region(region))            
+      end
     end    
 
     def self.passing_rules(terrain_hash, rules)
@@ -99,19 +104,4 @@ class NameGenererator
 end
 
 end
-# germanic: { lowland: 3..50, forest: 2..100, ocean: 0..85 },
-terrain_hash = {
-  # "lowland" => 30,
-  # "forest" => 20,
-  # "mountain" => 20,
-  # "ocean" => 86,
-  # "desert" => 11,
-  # "town" => 1,
-  # "peak" => 0
-}
-region = Emissary::NameGenererator.get_region_for_terrain(terrain_hash)
-puts "region: #{region}"
-generator = Emissary::NameGenererator.for_region(region)
-puts "generator: #{generator.data}"
 
-puts generator.get_name
