@@ -2,7 +2,7 @@ module Emissary
 
    require 'optparse'
    require_relative './map_utils'
-   require_relative '../names/generator'
+   require_relative '../names/name_generator'
    
    #
    # Class for creating a random map
@@ -310,7 +310,7 @@ module Emissary
             path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
             closest = getHex(path_to_closest.last[:x], path_to_closest.last[:y])
             hex[:trade] = {
-               :name => "#{closest[:name]} Trade Node",
+               :name => "#{closest[:name]} Region",
                :is_node => true
             }
          }
@@ -650,6 +650,7 @@ module Emissary
          # rename everything now we have it all linked up.
          trade_nodes.each { | trade_node |
             
+            # work out the namer we want for the region
             terrain_in_region = Hash.new
             @map.each { | key, hex |               
                if (hex[:x] == trade_node[:x] and hex[:y] == trade_node[:y]) or
@@ -661,17 +662,62 @@ module Emissary
                   end
                   terrain_in_region[hex[:terrain]] = terrain_in_region[hex[:terrain]] + 1                  
                end
-            }
-            
+            }            
             region = NameGenererator.get_region_for_terrain(terrain_in_region)
             namer = NameGenererator.for_region(region)
-            puts "#{namer.region} #{namer.get_name}"            
+            trade_node[:name_region] = namer.region
+            trade_node[:namer] = namer            
+         }
+
+         # iterate every settlement and name based on that settlements region
+         @map.each { | key, hex |
+            if ['city', 'town'].include? hex[:terrain]
+               trade = getTradeNode hex
+               if trade                  
+                  name = trade[:namer].get_name
+                  
+                  # name the node   
+                  hex[:name] = name
+
+                  # name the trade node                  
+                  trade[:trade][:name] = "#{name} Region"
+
+               else
+                  puts "no trade node found for #{hex[:x]},#{hex[:y]}"
+               end
+            end
+         }
+
+         # iterate every trade node and update connected trade nodes
+         trade_nodes.each { | trade_node |
+            if trade_node[:connected]
+               trade_node[:connected].each { | connect_trade_node |
+                  node = getTradeNode connect_trade_node
+                  connect_trade_node[:name] = node[:trade][:name]
+               }
+            end
+         }         
+
+         # iterate all non settlements setting province and trade node
+         @map.each { | key, hex |
+            if !['city', 'town'].include? hex[:terrain]
+               province = getHex(hex[:province][:x], hex[:province][:y])
+               hex[:province][:name] = province[:name]
+
+               if hex[:trade] && !hex[:trade][:is_node]
+                  node = getTradeNode hex    
+                  hex[:trade][:name] = node[:trade][:name]
+               end
+            end
          }
    
          # remove some side-effect keys e.g. :z and :required_distance
          @map.each { | key, hex |
             hex.delete(:z)
             hex.delete(:required_distance)
+         }
+         trade_nodes.each { | trade_node |
+            trade_node.delete(:namer)
          }
    
          @map
@@ -688,8 +734,8 @@ module Emissary
    
       def getTradeNode(coords)
          hex = getHex(coords[:x], coords[:y])
-         if hex[:trade] and trade[:x] and trade[:y]
-            getHex trade[:x], trade[:y]
+         if hex[:trade] and hex[:trade][:x] and hex[:trade][:y]
+            getHex hex[:trade][:x], hex[:trade][:y]
          else
             nil
          end

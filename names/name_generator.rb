@@ -1,4 +1,4 @@
-require_relative './utils'
+require_relative './name_utils'
 require_relative './name_sources'
 require 'titleize'
 
@@ -80,8 +80,6 @@ class NameGenererator
       total_rating = terrain_hash.values.sum.to_f    
       percentages = terrain_hash.transform_values { |rating| ((rating / total_rating) * 100).to_i }
 
-      puts "percentages: #{percentages}"
-      
       passed_rules = []
     
       rules.each do |group, terrain_rules|
