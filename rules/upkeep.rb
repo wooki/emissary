@@ -34,7 +34,7 @@ module Emissary
                     Unrest.metUpkeep(@urban, gameState)
 
                     @urban.store.food = @urban.store.food - @urban.upkeep_food
-                    gameState.info "UPKEEP", @urban, "Population consumed #{@urban.upkeep_food} food"
+                    gameState.info "UPKEEP", @urban, "Population consumed #{@urban.upkeep_food} food", {food: -1 * @urban.upkeep_food}
                 else
                     unrest = @urban.upkeep_food - @urban.store.food # do something with this
 
