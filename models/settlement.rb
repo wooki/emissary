@@ -44,11 +44,13 @@ class Settlement < Area
   def add_wealth(val)
     @wealth = 0 if !@wealth
     @wealth = @wealth + val
+    @wealth = 0 if @wealth < 0
   end
 
   def add_unrest(val)
     @unrest = 0 if !@unrest
     @unrest = @unrest + val
+    @unrest = 0 if @unrest < 0
   end
 
   def report(level)
@@ -64,6 +66,7 @@ class Settlement < Area
     # add details dependent on level
     details[:trade] = @trade if level >= INFO_LEVELS[:TRADE]
     details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH]
+    details[:unrest] = @unrest.round(2) if level >= INFO_LEVELS[:UNREST]
 
     if level >= INFO_LEVELS[:STORE]
       details[:store] = @store

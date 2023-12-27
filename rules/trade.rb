@@ -60,16 +60,16 @@ module Emissary
 
                 if @commodity == :food && @sell
                     @urban.store.trade_food(qty_multiplier * -1 * number, -1 * gross_price)
-                    gameState.info "TRADE", @urban, "Food exported", {food: -1 * number, cost: gross_price}
+                    gameState.info "TRADE", @urban, "Food exported", {food: -1 * number, gold: gross_price}
                 elsif @commodity == :food
                     @urban.store.trade_food(qty_multiplier * number, gross_price)
-                    gameState.info "TRADE", @urban, "Food imported", {food: number, cost: -1 * gross_price}
+                    gameState.info "TRADE", @urban, "Food imported", {food: number, gold: -1 * gross_price}
                 elsif @commodity == :goods && @sell
                     @urban.store.trade_goods(qty_multiplier * -1 * number, -1 * gross_price)
-                    gameState.info "TRADE", @urban, "Goods exported", {goods: -1 * number, cost: gross_price}
+                    gameState.info "TRADE", @urban, "Goods exported", {goods: -1 * number, gold: gross_price}
                 elsif @commodity == :goods
                     @urban.store.trade_goods(qty_multiplier * number, gross_price)
-                    gameState.info "TRADE", @urban, "Goods imported", {goods: number, cost: -1 * gross_price}
+                    gameState.info "TRADE", @urban, "Goods imported", {goods: number, gold: -1 * gross_price}
                 end
 
             end
