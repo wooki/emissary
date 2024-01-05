@@ -71,7 +71,6 @@ class NewGame
         a.x = area[:x]
         a.y = area[:y]
         a.terrain = area[:terrain]
-        # a.name = area[:name] # should areas have names? maybe later
         a.population = area[:population]
         a.food = area[:food]
         a.goods = area[:goods]

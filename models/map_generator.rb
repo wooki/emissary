@@ -16,7 +16,7 @@ module Emissary
          @seed = seed
          @seed = Random.new_seed if !@seed
          @random = srand @seed
-   
+
          # some variables for generation, usually # per size
          @mountain_ranges = 0.2
          @mountain_chance = 150
@@ -277,6 +277,29 @@ module Emissary
             {:x => hex[:x], :y => hex[:y]}
          }
    
+         # add trade node to map and find closest town/city for name
+         trade_nodes.each { | hex |
+            hex = getHex(hex[:x], hex[:y])         
+   
+            settlement_found = lambda do | coord, path |
+               mapcoord = getHex(coord[:x], coord[:y])
+               ["city", "town"].include? mapcoord[:terrain] and mapcoord[:trade].nil?
+            end
+   
+            can_be_traversed = lambda do | coord, path, is_first |
+               mapcoord = getHex(coord[:x], coord[:y])
+               ["city", "town", "ocean"].include? mapcoord[:terrain]
+            end
+   
+            # we won't have a path because we aren't going anywhere specific
+            path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
+            closest = getHex(path_to_closest.last[:x], path_to_closest.last[:y])
+            hex[:trade] = {
+               :name => "#{closest[:name]} Region",
+               :is_node => true
+            }
+         }
+            
          # assign each town/city to closest trade node via ocean
          get_terrain(['city', 'town']).each { | hex |
    
@@ -387,7 +410,7 @@ module Emissary
                end
             end
          }
-   
+
          # util for checking if node exists etc
          def connect_trade_node(addto_node, this_node, vector, path)
    
@@ -629,14 +652,15 @@ module Emissary
             namer = NameGenererator.for_region(region)
             trade_node[:name_region] = namer.region
             trade_node[:namer] = namer  
-            trade_node[:name] = "#{namer.get_name} Region"          
+            name = namer.get_name    
+            trade_node[:name] = "#{name} Region"          
+            trade_node[:trade][:name] = "#{name} Region"
          }
 
          # iterate every settlement and name based on that settlements region
          @map.each { | key, hex |
             if ['city', 'town'].include? hex[:terrain]
                trade = getTradeNode hex
-               puts "#{trade[:name]} #{hex[:name]} "
                
                if trade                  
                   name = trade[:namer].get_name
@@ -660,34 +684,22 @@ module Emissary
                hex[:province][:name] = province[:name]
 
                if hex[:trade] && !hex[:trade][:is_node]
-                  node = getTradeNode hex
+                  
+                  node = getTradeNode hex[:trade]                  
                   hex[:trade][:name] = node[:name]
+
+               elsif hex[:trade]
+                  
+                  if hex[:trade][:connected]
+                     hex[:trade][:connected].each { | key, connected |
+                     
+                     connected_node = getTradeNode connected
+                     connected[:name] = connected_node[:name]
+                     }
+                  end
                end
             end
-         }
-
-         # add trade node to map and find closest town/city for name
-         # trade_nodes.each { | hex |
-         #    hex = getHex(hex[:x], hex[:y])         
-   
-         #    settlement_found = lambda do | coord, path |
-         #       mapcoord = getHex(coord[:x], coord[:y])
-         #       ["city", "town"].include? mapcoord[:terrain] and mapcoord[:trade].nil?
-         #    end
-   
-         #    can_be_traversed = lambda do | coord, path, is_first |
-         #       mapcoord = getHex(coord[:x], coord[:y])
-         #       ["city", "town", "ocean"].include? mapcoord[:terrain]
-         #    end
-   
-         #    # we won't have a path because we aren't going anywhere specific
-         #    path_to_closest = MapUtils::breadth_search({:x => hex[:x], :y => hex[:y]}, size, can_be_traversed, settlement_found)
-         #    closest = getHex(path_to_closest.last[:x], path_to_closest.last[:y])
-         #    hex[:trade] = {
-         #       :name => "#{closest[:name]} Region",
-         #       :is_node => true
-         #    }
-         # }
+         }         
    
          # remove some side-effect keys e.g. :z and :required_distance
          @map.each { | key, hex |
@@ -712,7 +724,9 @@ module Emissary
    
       def getTradeNode(coords)
          hex = getHex(coords[:x], coords[:y])
-         if hex[:trade] and hex[:trade][:x] and hex[:trade][:y]
+         if hex[:trade] and hex[:trade][:is_node]
+            hex
+         elsif hex[:trade] and hex[:trade][:x] and hex[:trade][:y]
             getHex hex[:trade][:x], hex[:trade][:y]
          else
             nil

@@ -18,10 +18,11 @@ class Area
   end
 
   def name
+    return "#{@trade_node.name} Trade" if trade_node and trade_node.is_node
     "#{@terrain} #{@x},#{y}"
   end
 
-  def coord_sym
+  def coord_sym    
     "#{@x},#{@y}".to_sym
   end
 

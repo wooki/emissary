@@ -561,17 +561,13 @@ module Emissary
       prefixes = [
         "Bannog",
         "Bannock",
-        "King's",
-        "Queen's",
         "Royal"
       ]
 
       start_words = [
         "Dún",
-        "Kjerke",
+        "Kjer",
         "Kirchen",
-        "Ock",
-        "Avon",
         "Ash",
         "Axe",
         "Exe",
@@ -590,17 +586,12 @@ module Emissary
         "Blaen",
         "Crag",
         "Craig",
-        "Druin",
         "Gart",
-        "Glen",
-        "Holm",
-        "Herst",
         "Inch",
         "Insch",
         "Keld",
         "Knock",
         "Ling",
-        "Moss",
         "Stow",
         "Traeth",
         "Weald",
@@ -638,6 +629,7 @@ module Emissary
       ]
 
       end_words = [
+        "druin",
         "wald",
         "dorf",
         "stein",
@@ -738,7 +730,7 @@ module Emissary
         starts: start_words,
         middles: [],
         ends: end_words,
-        prefix_frequency: 0.01,
+        prefix_frequency: 0.005,
         suffix_frequency: 0,
         syllable_lengths: {0 => 1},
         source: []
