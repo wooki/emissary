@@ -49,17 +49,17 @@ module Emissary
          @population_nop_settlement = 0.1
          @population = {
             'city' => 30000,
-            'town' => 10000,
+            'town' => 12000,
             'lowland' => 1000,
-            'forest' => 500,
+            'forest' => 700,
             'mountain' => 500,
-            'desert' => 250
+            'desert' => 500
          }
          @food = {
             'city' => 0,
             'town' => 0,
             'lowland' => 0.002,
-            'forest' => 0.0015,
+            'forest' => 0.001,
             'mountain' => 0.0007,
             'desert' => 0.0002
          }
@@ -69,7 +69,7 @@ module Emissary
             'lowland' => 0.001,
             'forest' => 0.003,
             'mountain' => 0.002,
-            'desert' => 0.001
+            'desert' => 0.0015
          }
          @population_settlement_boost = [4.0, 3.0, 2.0, 1.0, 1.0, 0.75, 0.5, 0.25, 0.2, 0.15];
    

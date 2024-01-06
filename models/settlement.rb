@@ -7,7 +7,7 @@ module Emissary
 class Settlement < Area
 
   attr_accessor :shortcut, :shortcut_help, :owner, :store, :neighbours,
-                :wealth, :unrest, :borders
+                :wealth, :unrest, :borders, :tax, :trade_policy
 
   def initialize
     super()
@@ -15,6 +15,8 @@ class Settlement < Area
     @neighbours = Array.new
     @wealth = 0
     @unrest = 0
+    @tax = 0
+    @trade_policy = :sell_excess
   end
 
   def wealth_percentage
@@ -67,6 +69,8 @@ class Settlement < Area
     details[:trade] = @trade if level >= INFO_LEVELS[:TRADE]
     details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH]
     details[:unrest] = @unrest.round(2) if level >= INFO_LEVELS[:UNREST]
+    details[:tax] = @tax.round() if level >= INFO_LEVELS[:PRODUCTION]
+    details[:trade_policy] = @trade_policy.to_s if level >= INFO_LEVELS[:POLICY]
 
     if level >= INFO_LEVELS[:STORE]
       details[:store] = @store

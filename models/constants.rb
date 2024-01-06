@@ -30,6 +30,7 @@ module Emissary
         UNREST: 3,
         STORE: 6,
         WEALTH: 4,
+        POLICY: 7,
 
         # spies will gain levels here as the expand their network
         # spy level should probably just equal this level
