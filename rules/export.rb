@@ -26,12 +26,11 @@ module Emissary
 
                 # how many food and goods do we require
                 food_required = @urban.upkeep_food
+                goods_required = @urban.industry
 
-                # goods required depends on wealth as some will be kept back
-                # and converted to gold/wealth etc.
-                # for now set to zero and sell all each turn
-                # goods_required = (@urban.population.to_f * INDUSTRY_RATE).floor.to_i
-                goods_required = 0
+                # this is modified by the trade policy
+                food_required = (food_required.to_f * @urban.import_policy_modifier(:food)).ceil.to_i
+                goods_required = (goods_required.to_f * @urban.import_policy_modifier(:goods)).ceil.to_i
 
                 @trade = gameState.getHex(@urban.trade.x, @urban.trade.y)
                 if @trade and @trade.trade_node
