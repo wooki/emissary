@@ -8,7 +8,6 @@ module Emissary
     # decreases wealth
     class Tax
 
-
         # is increased when industry is fully utilised
         def self.industry(urban, gameState)
 
@@ -20,6 +19,7 @@ module Emissary
 
                     # generate gold and reduce wealth
                     gold = TAX_RATIO * urban.tax * utilisation
+                    gold = gold.to_f * (1 + @urban.wealth).floor.to_i
                     urban.store.gold += gold
                     wealth_reduction = TAX_WEALTH_REDUCTION * urban.tax * urban.industry * utilisation
                     urban.add_wealth(0 - wealth_reduction)

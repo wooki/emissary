@@ -14,13 +14,13 @@ module Emissary
     # is increased when food or goods are exported
     # is reduced when industry is not fully utilised
     # is reduced when food upkeep is not met
-
-    # TODO
     # increases gold generated from tax
+    # is reduced by tax rate
+    
+    # TODO    
     # increases the cost of recruiting armies
     # when wealth is high guilds may seize power (wealth & tax rate combine for this check)
     # is reduced when gold < 0 (code below has been added but not being called, needs specific rule)
-    # is reduced by tax rate
     # is reduced when armies are recruited
     class Wealth
 
