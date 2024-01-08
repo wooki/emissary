@@ -9,12 +9,9 @@ require_relative './report_generator'
 require_relative './map_utils'
 
 module Emissary
-
   # runs a turn
   class Turn
-
-  def initialize(gamefile, ordersdir, reportsdir, seed)
-
+    def initialize(gamefile, _ordersdir, reportsdir, seed)
       # get the game
       @state = Emissary::GameState.load(gamefile)
 
@@ -22,46 +19,43 @@ module Emissary
       @state.new_turn(seed)
 
       # build a rule queue from orders
-      puts "building rule queue"
+      puts 'building rule queue'
       queue = RuleQueue.new
 
-      # parse player orders
-      # Emissary::OrderParser.ParseFolder(ordersdir, game) { | parser |
-      #   puts "  parsing player #{game.faction_name(parser.player)} (#{parser.player})"
-      #   parser.each { | rule |
-      #     queue.AddRule(rule)
-      #   }
-      # }
+      # load player orders and create rules to be processed
+      Emissary::OrderParser.ParseFolder(ordersdir, game) do |parser|
+        puts "parsing player #{game.faction_name(parser.player)} (#{parser.player})"
+        parser.each do |rule|
+          queue.AddRule(rule)
+        end
+      end
 
       # add system orders for areas, settlements etc.
-      puts "adding system rules"
+      puts 'adding system rules'
 
       # system rules generate notifications for players. Depending on how good (or many)
       # peeple they have on internal affairs they get top x, based on each notifications magnitude.
       # Their spymaster plus spies report based on where they are?
 
       # Production
-      @state.each_rural.each { | area |
+      @state.each_rural.each do |area|
         queue.AddRule(Production.new(area))
 
-        if area.trade_node and area.trade_node.is_node
-          queue.AddRule(TradePrices.new(area))
-        end
-      }
-
+        queue.AddRule(TradePrices.new(area)) if area.trade_node and area.trade_node.is_node
+      end
 
       # Import, Export, Industry, Upkeep
-      @state.each_urban.each { | area |
+      @state.each_urban.each do |area|
         queue.AddRule(Import.new(area))
         queue.AddRule(Export.new(area))
         queue.AddRule(Industry.new(area))
         queue.AddRule(Upkeep.new(area))
-      }
+      end
 
       # TradePrices
-      @state.each_trade_node.each { | area |
+      @state.each_trade_node.each do |area|
         queue.AddRule(TradePrices.new(area.trade_node))
-      }
+      end
 
       # loyalty
 
@@ -80,8 +74,6 @@ module Emissary
       # sieges
 
       # battles - details are written to game file so can be reported and cleared in new_turn
-
-
 
       # rules for each ship
       # game.each_ship { | ship |
@@ -116,14 +108,14 @@ module Emissary
       #     end
       # }
 
-    # rules for each planet
-    # game.each_planet { | planet |
-    #   # add a mining rule for every populated planet
-    #   if planet.player != nil
-    #     minR = rf.CreateRule("mining", {"planet" => planet}, planet.player, game)
-    #     queue.AddRule(minR) if minR != nil
-    #   end
-    # }
+      # rules for each planet
+      # game.each_planet { | planet |
+      #   # add a mining rule for every populated planet
+      #   if planet.player != nil
+      #     minR = rf.CreateRule("mining", {"planet" => planet}, planet.player, game)
+      #     queue.AddRule(minR) if minR != nil
+      #   end
+      # }
 
       # rules for each faction
       # game.each_faction { | faction |
@@ -132,32 +124,32 @@ module Emissary
       # }
 
       # sort rule queue
-      puts "sorting rule queue"
+      puts 'sorting rule queue'
       queue.Sort
 
       # evaluate rules one at a time, allowing rules to create new rules
-      puts "evaluating rules"
+      puts 'evaluating rules'
       while queue.More?
 
         rule = queue.Next
         queue.Insert rule.execute(@state)
       end
 
-      puts "trade value of each node"
-      @state.each_trade_node.each { | area |
+      puts 'trade value of each node'
+      @state.each_trade_node.each do |area|
         puts "#{area.trade_node.name}, value=#{area.trade_node.trade_value}"
-      }
+      end
 
       # save game file
-      #puts "## skipping save in dev ##"
+      # puts "## skipping save in dev ##"
       @state.save gamefile
 
       # produce reports
-      puts "producing player reports"
+      puts 'producing player reports'
       reports = ReportGenerator.new reportsdir
-      @state.each_player { | player, kingdom |
+      @state.each_player do |player, _kingdom|
         reports.run @state, player
-      }
+      end
     end
   end
 end
