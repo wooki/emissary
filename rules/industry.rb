@@ -2,6 +2,7 @@ require_relative "../rulesengine/rule"
 require_relative "../rulesengine/turn_sequence"
 require_relative '../models/store'
 require_relative './behaviour/wealth'
+require_relative './behaviour/tax'
 
 module Emissary
 
@@ -20,6 +21,7 @@ module Emissary
             if @urban
 
                 Wealth.industry(@urban, gameState)
+                Tax.industry(@urban, gameState)
 
                 new_goods = [@urban.industry, @urban.store.goods].min
                 if new_goods > 0

@@ -15,7 +15,7 @@ class Settlement < Area
     @neighbours = Array.new
     @wealth = 0
     @unrest = 0
-    @tax = 0
+    @tax = 0.0
 
     # policy can be 
     # :none = don't buy or sell
@@ -43,16 +43,22 @@ class Settlement < Area
     (@population.to_f * FOOD_CONSUMPTION).round
   end
 
+  # :none = don't buy or sell
+  # :ration = buy/sell up to half upkeep and industy
+  # :trade = buy/sell up to upkeep and industy
+  # :reserve = buy/sell up to upkeep*2 and industy*2 will only buy at most 20% of stockpile
+  # :stockpile = upkeep/industy x3
+  # :hoard = upkeep/industy x5 and buy 30%  
   def import_policy_modifier(resource)
-    if @urban.trade_policy[resource] == :none
+    if @trade_policy[resource] == :none
       0      
-    elsif @urban.trade_policy[resource] == :ration
+    elsif @trade_policy[resource] == :ration
       0.5
-    elsif @urban.trade_policy[resource] == :reserve
+    elsif @trade_policy[resource] == :reserve
       2
-    elsif @urban.trade_policy[resource] == :stockpile
+    elsif @trade_policy[resource] == :stockpile
       3
-    elsif @urban.trade_policy[resource] == :hoard
+    elsif @trade_policy[resource] == :hoard
       5
     else
       1
@@ -63,24 +69,16 @@ class Settlement < Area
     verb = "feed population"
     verb = "match industrial capacity" if resource == :goods 
 
-    if @urban.trade_policy[resource] == :none
+    if @trade_policy[resource] == :none
       "No #{resource.to_s} imported due to import policy"      
-    elsif @urban.trade_policy[resource] == :ration
+    elsif @trade_policy[resource] == :ration
       "#{resource.to_s.capitalize} imported to partially #{verb}"
-    elsif @urban.trade_policy[resource] == :trade
+    elsif @trade_policy[resource] == :trade
       "#{resource.to_s.capitalize} imported to #{verb}"
     else
-      "#{resource.to_s.capitalize} imported to #{verb} and build #{@urban.trade_policy[resource]}"
+      "#{resource.to_s.capitalize} imported to #{verb} and build #{@trade_policy[resource]}"
     end    
-  end
-
-      # :none = don't buy or sell
-# :ration = buy/sell up to half upkeep and industy
-# :trade = buy/sell up to upkeep and industy
-# :reserve = buy/sell up to upkeep*2 and industy*2 will only buy at most 20% of stockpile
-# :stockpile = upkeep/industy x3
-# :hoard = upkeep/industy x5 and buy 30%
-  end
+  end      
 
   def name
     @name
@@ -124,16 +122,7 @@ class Settlement < Area
     end
 
     details
-  end
-
-  def tax
-    # player can set rate, they generate gold from industry.  10% tax = 1 gold from 10 utilised industry
-    #
-    # reduces wealth
-    # increases likelyhood that guilds will seize power
-
-  end
-
+  end  
 
 
 end

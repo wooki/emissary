@@ -19,6 +19,8 @@ module Emissary
     UNREST_INEQUALITY_RATE = 0.001 # scaling of actual unrest from calculated inequality
     UNREST_INEQUALITY_EXPONENT = 3 # power the wealth is raised to create exponential growth
     UNREST_PRODUCTION_FACTOR = 5.0 # unrest mutiplied by this is % of production reduction
+    TAX_RATIO = 10.0 # 1 industry creates 10 gold at tax rate 100%
+    TAX_WEALTH_REDUCTION = 0.1 # for each utilised industry reduce wealth by this amount at 100% tax
 
     INFO_LEVELS = {
         # level required to gain this info
