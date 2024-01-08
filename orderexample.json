@@ -1,0 +1,18 @@
+{
+  "player": "jim",
+  "turn": 2,
+  "orders": {
+     "43,48": {
+      "trade_policy": {
+        "food": "none",
+        "goods": "reserve"
+      },
+      "tax": 0.1,
+      "armies": {
+        "1": {
+          "move": "44,49"
+        }
+      }
+    }     
+  },
+}
