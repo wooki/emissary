@@ -43,14 +43,8 @@ class Settlement < Area
     (@population.to_f * FOOD_CONSUMPTION).round
   end
 
-  # :none = don't buy or sell
-  # :ration = buy/sell up to half upkeep and industy
-  # :trade = buy/sell up to upkeep and industy
-  # :reserve = buy/sell up to upkeep*2 and industy*2 will only buy at most 20% of stockpile
-  # :stockpile = upkeep/industy x3
-  # :hoard = upkeep/industy x5 and buy 30%  
-  def import_policy_modifier(resource)
-    if @trade_policy[resource] == :none
+  def trade_policy_modifier(resource)
+    if @urban.trade_policy[resource] == :none
       0      
     elsif @trade_policy[resource] == :ration
       0.5

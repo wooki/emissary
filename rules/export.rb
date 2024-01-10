@@ -29,8 +29,8 @@ module Emissary
                 goods_required = @urban.industry
 
                 # this is modified by the trade policy
-                food_required = (food_required.to_f * @urban.import_policy_modifier(:food)).ceil.to_i
-                goods_required = (goods_required.to_f * @urban.import_policy_modifier(:goods)).ceil.to_i
+                food_required = (food_required.to_f * @urban.trade_policy_modifier(:food)).ceil.to_i
+                goods_required = (goods_required.to_f * @urban.trade_policy_modifier(:goods)).ceil.to_i
 
                 @trade = gameState.getHex(@urban.trade.x, @urban.trade.y)
                 if @trade and @trade.trade_node
