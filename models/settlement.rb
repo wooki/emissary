@@ -44,7 +44,7 @@ class Settlement < Area
   end
 
   def trade_policy_modifier(resource)
-    if @urban.trade_policy[resource] == :none
+    if @trade_policy[resource] == :none
       0      
     elsif @trade_policy[resource] == :ration
       0.5

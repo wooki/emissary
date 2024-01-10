@@ -23,12 +23,12 @@ module Emissary
       queue = RuleQueue.new
 
       # load player orders and create rules to be processed
-      Emissary::OrderParser.ParseFolder(ordersdir, game) do |parser|
-        puts "parsing player #{game.faction_name(parser.player)} (#{parser.player})"
-        parser.each do |rule|
-          queue.AddRule(rule)
-        end
-      end
+      # Emissary::OrderParser.ParseFolder(ordersdir, game) do |parser|
+      #   puts "parsing player #{game.faction_name(parser.player)} (#{parser.player})"
+      #   parser.each do |rule|
+      #     queue.AddRule(rule)
+      #   end
+      # end
 
       # add system orders for areas, settlements etc.
       puts 'adding system rules'
