@@ -15,7 +15,13 @@ module Emissary
       @capital_coord = { x: nil, y: nil }
     end
 
-    def x=
+    def x
+      @capital_coord[:x]
+    end
+
+    def y
+      @capital_coord[:y]
+    end
 
     def capital_coord_sym
       "#{@capital_coord[:x]},#{@capital_coord[:y]}".to_sym

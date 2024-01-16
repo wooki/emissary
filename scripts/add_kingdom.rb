@@ -25,8 +25,8 @@ class AddKingdom
       return
     end
 
-    # flag must be four different digits
-    unless four_different_digits? flag
+    # flag must be five different digits
+    unless five_different_digits? flag
       flag = generate_unique_digits_string
       puts "Flag was invalid, generating a random flag (#{flag})"
     end
@@ -74,16 +74,16 @@ class AddKingdom
     @state.save gamefile
   end
 
-  def four_different_digits?(input_string)
-    # Check if the input string is exactly four characters long
-    return false unless !input_string.nil? and input_string.length == 4
+  def five_different_digits?(input_string)
+    # Check if the input string is exactly five characters long
+    return false unless !input_string.nil? and input_string.length == 5
 
     # Check if all characters are digits
     return false unless input_string.match?(/\A\d{4}\z/)
 
     # Check if all digits are unique
     digits = input_string.chars.map(&:to_i)
-    digits.uniq.length == 4
+    digits.uniq.length == 5
   end
 
   def generate_unique_digits_string
@@ -93,9 +93,11 @@ class AddKingdom
     # Shuffle the array to randomize the order
     shuffled_digits = all_digits.shuffle
 
-    # Take the first four digits from the shuffled array
-    unique_digits = shuffled_digits[0, 4]
-
+    # Take the first five digits from the shuffled array
+    unique_digits = shuffled_digits[0, 3]
+    unique_digits.unshift all_digits.sample
+    unique_digits.unshift all_digits.sample
+    
     # Convert the array to a string
     unique_digits.join
   end
@@ -139,7 +141,7 @@ OptionParser.new do | opts |
     options[:capital] = n.to_sym
   end
 
-  opts.on('--fFLAG', '--flag=FLAG', 'Four digit string representing flag') do |n|
+  opts.on('--fFLAG', '--flag=FLAG', 'Five digit string representing flag') do |n|
     options[:flag] = n
   end
 end.parse!
