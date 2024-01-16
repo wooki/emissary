@@ -150,6 +150,17 @@ class GameState
     end
   end
 
+  def each_flag
+    flags = Array.new
+    @kingdoms.each { | key, kingdom |
+      if !block_given? or yield kingdom.flag
+        flags.push kingdom.flag
+      end
+    }
+    return nil if flags.length == 0
+    flags
+  end
+
   def each_player
     players = Array.new
     @kingdoms.each { | key, kingdom |
