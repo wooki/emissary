@@ -174,7 +174,7 @@ class GameState
   end
 
   def kingdom_by_name(name)
-    @kingdoms.values.find { | kingdom | kingdom[:name] == name }
+    @kingdoms.values.find { | kingdom | kingdom.name == name }
   end
 
   def kingdom_by_player(name)    
@@ -182,7 +182,7 @@ class GameState
   end
 
   def kingdom_by_capital(coord)
-    @kingdoms.values.find { | kingdom | kingdom[:x] == coord[:x] and kingdom[:y] == coord[:y] }
+    @kingdoms.values.find { | kingdom | kingdom.x == coord[:x] and kingdom.y == coord[:y] }
   end
 
   def rural

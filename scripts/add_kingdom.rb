@@ -26,14 +26,14 @@ class AddKingdom
     end
 
     # flag must be four different digits
-    unless four_different_digits?
-      puts 'Flag was invalid, generating a random flag'
+    unless four_different_digits? flag
       flag = generate_unique_digits_string
+      puts "Flag was invalid, generating a random flag (#{flag})"
     end
 
     # check flag is sufficiently unique, allowed 2 to be the same
     @state.each_flag do |existing_flag|
-      if compare_flags flag, existing_flag > 2
+      if compare_flags(flag, existing_flag) > 2
         puts "Flag (#{flag}) was too similar to an existing flag (#{existing_flag})"
         return
       end
@@ -76,7 +76,7 @@ class AddKingdom
 
   def four_different_digits?(input_string)
     # Check if the input string is exactly four characters long
-    return false unless input_string.length == 4
+    return false unless !input_string.nil? and input_string.length == 4
 
     # Check if all characters are digits
     return false unless input_string.match?(/\A\d{4}\z/)
@@ -144,7 +144,7 @@ OptionParser.new do | opts |
   end
 end.parse!
 
-ng = AddKingdom.new options[:gamefile], options[:player], options[:kingdom], options[:capital]
+ng = AddKingdom.new options[:gamefile], options[:player], options[:kingdom], options[:capital], options[:flag]
 
 
 # bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k "The Jimpire" -f "1234"
