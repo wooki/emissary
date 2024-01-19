@@ -109,7 +109,7 @@ class Settlement < Area
     details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH]
     details[:unrest] = @unrest.round(2) if level >= INFO_LEVELS[:UNREST]
     details[:tax] = @tax.round() if level >= INFO_LEVELS[:PRODUCTION]
-    details[:trade_policy] = @trade_policy.to_s if level >= INFO_LEVELS[:POLICY]
+    details[:trade_policy] = @trade_policy if level >= INFO_LEVELS[:POLICY]
 
     if level >= INFO_LEVELS[:STORE]
       details[:store] = @store
