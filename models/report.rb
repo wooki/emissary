@@ -1,41 +1,39 @@
 module Emissary
+  require 'json'
 
-require 'json'
+  class Report
+    attr_accessor :kingdoms, :map, :my_kingdom, :turn, :errors, :messages
 
-class Report
+    def initialize
+      super()
 
-  attr_accessor :kingdoms, :map, :my_kingdom, :turn
+      # keyed by user id
+      @kingdoms = {}
+      @my_kingdom = nil
 
-  def initialize
-    super()
+      # keyed by "x,y" (areas contain units)
+      @map = {}
 
-    # keyed by user id
-    @kingdoms = Hash.new
-    @my_kingdom = nil
+      @turn = 0
+      @errors = []
+      @messages = []
+    end
 
-    # keyed by "x,y" (areas contain units)
-    @map = Hash.new
-
-    @turn = 0    
-
-  end  
-
-  def as_json(options={})
-  
-    # :kingdoms, :map, :my_kingdom
+    def as_json(_options = {})
+      # :kingdoms, :map, :my_kingdom
       data = {
-        :kingdoms => @kingdoms,
-        :map => @map,
-        :turn => @turn
+        kingdoms: @kingdoms,
+        map: @map,
+        errors: @errors,
+        messages: @messages,
+        turn: @turn
       }
-      data[:my_kingdom] = @my_kingdom if !@my_kingdom.nil?
+      data[:my_kingdom] = @my_kingdom unless @my_kingdom.nil?
       data
     end
 
     def to_json(*options)
-        as_json(*options).to_json(*options)
-    end    
-
-end
-
+      as_json(*options).to_json(*options)
+    end
+  end
 end

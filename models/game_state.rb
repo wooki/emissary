@@ -1,314 +1,317 @@
 module Emissary
+  require 'json'
+  require 'yaml'
+  require_relative './area'
+  require_relative './settlement'
+  require_relative './trade_node'
+  require_relative './area_link'
+  require_relative './store'
+  require_relative './kingdom'
+  require_relative './constants'
+  require_relative './message'
 
-require 'json'
-require 'yaml'
-require_relative './area'
-require_relative './settlement'
-require_relative './trade_node'
-require_relative './area_link'
-require_relative './store'
-require_relative './kingdom'
-require_relative './constants'
+  class GameState
+    attr_accessor :kingdoms, :map, :settlements, :turn, :messages, :errors
 
-class GameState
+    def initialize
+      super()
 
-  attr_accessor :kingdoms, :map, :settlements, :turn
+      # keyed by user id
+      @kingdoms = {}
 
-  def initialize
-    super()
+      # keyed by "x,y" (areas contain units)
+      @map = {}
 
-    # keyed by user id
-    @kingdoms = Hash.new    
+      @turn = 0
 
-    # keyed by "x,y" (areas contain units)
-    @map = Hash.new
+      @messages = {}
+      @errors = {}
+    end
 
-    @turn = 0
+    def self.load(gamefile)
+      # load the gamestate
+      # data = File.read(gamefile)
+      # self.from_json(data)
+      state = YAML.unsafe_load_file(gamefile)
+      state.load_settlements
+      state
+    end
 
-  end  
+    def getHex(x, y)
+      @map["#{x},#{y}".to_sym]
+    end
 
-  def self.load(gamefile)
-    # load the gamestate
-    # data = File.read(gamefile)
-    # self.from_json(data)
-    state = YAML.unsafe_load_file(gamefile)
-    state.load_settlements
-    state
-  end
+    # log information to hex, for filter and reporting to players
+    # "PRODUCTION", @area, "Food and Goods sent to #{@settlement[:name]}", {food: food, goods: goods}
+    def info(type, area, message, data = {})
+      # info level determined by looking up type
+      level = INFO_LEVELS[type.to_sym]
 
-  def getHex(x, y)
-    @map["#{x},#{y}".to_sym]
-  end
+      return unless area
 
-  # log information to hex, for filter and reporting to players
-  # "PRODUCTION", @area, "Food and Goods sent to #{@settlement[:name]}", {food: food, goods: goods}
-  def info(type, area, message, data={})
-
-    # info level determined by looking up type
-    level = INFO_LEVELS[type.to_sym]
-    
-    if area
-
-      area.info = Array.new if !area.info
+      area.info = [] unless area.info
 
       area.info.push({
-        level: level,
-        type: type,
-        message: message,
-        data: data
-      })
-
+                       level:,
+                       type:,
+                       message:,
+                       data:
+                     })
     end
-  end
 
-  # work out the largest x/y dimension
-  def size
-    largest = 0
-    @map.each { | key, hex |
-      largest = hex.x if hex.x > largest
-      largest = hex.y if hex.y > largest
-    }
-    largest
-  end
+    def order_error(player, message)
+      @errors[player] = [] unless @errors.include?(player)
+      @errors[player].push Message.new(player, message, 'host')
+    end
 
-  # shortcut to settlements in the map hash based on unique
-  # short strings
-  def load_settlements
+    def player_message(player, message, from)
+      @messages[player] = [] unless @messages.include?(player)
+      @messages[player].push Message.new(player, message, from)
+    end
 
-    @settlements = Hash.new
+    # work out the largest x/y dimension
+    def size
+      largest = 0
+      @map.each do |_key, hex|
+        largest = hex.x if hex.x > largest
+        largest = hex.y if hex.y > largest
+      end
+      largest
+    end
 
-    # iterate settlements and assign shortcuts to each
-    @map.each { | key, hex |
+    # shortcut to settlements in the map hash based on unique
+    # short strings
+    def load_settlements
+      @settlements = {}
 
-      if ['town', 'city'].include? hex.terrain
+      # iterate settlements and assign shortcuts to each
+      @map.each do |key, hex|
+        next unless %w[town city].include? hex.terrain
 
         if hex.shortcut
           code = hex.shortcut
           shortcut_help = hex.shortcut_help
 
-        elsif hex.name.include? " "
+        elsif hex.name.include? ' '
           parts = hex.name.downcase.split
-          code = parts.collect { | part | part[0, 1] }.join
-          shortcut_help = parts.collect { | part | part[0, 1].upcase + part[1, 99].downcase }.join(' ')
+          code = parts.collect { |part| part[0, 1] }.join
+          shortcut_help = parts.collect { |part| part[0, 1].upcase + part[1, 99].downcase }.join(' ')
 
           if @settlements.include? code.to_sym
-            code = parts[0][0,1] + parts[1][0,2]
-            shortcut_help = parts[0][0,1].upcase + parts[0][1, 99].downcase + " " + parts[1][0,2].upcase + parts[1][2, 99].downcase
+            code = parts[0][0, 1] + parts[1][0, 2]
+            shortcut_help = parts[0][0,
+                                     1].upcase + parts[0][1,
+                                                          99].downcase + ' ' + parts[1][0,
+                                                                                        2].upcase + parts[1][2,
+                                                                                                             99].downcase
           end
 
           if @settlements.include? code.to_sym
-            code = parts[0][0,2] + parts[1][0,1]
-            shortcut_help = parts[0][0,2].upcase + parts[0][2, 99].downcase + " " + parts[1][0,1].upcase + parts[1][1, 99].downcase
+            code = parts[0][0, 2] + parts[1][0, 1]
+            shortcut_help = parts[0][0,
+                                     2].upcase + parts[0][2,
+                                                          99].downcase + ' ' + parts[1][0,
+                                                                                        1].upcase + parts[1][1,
+                                                                                                             99].downcase
           end
 
           if @settlements.include? code.to_sym
-            code = parts.collect { | part | part[0, 2] }.join
-            shortcut_help = parts.collect { | part | part[0, 2].upcase + part[2, 99].downcase }.join(' ')
+            code = parts.collect { |part| part[0, 2] }.join
+            shortcut_help = parts.collect { |part| part[0, 2].upcase + part[2, 99].downcase }.join(' ')
           end
 
           if @settlements.include? code.to_sym
-            code = parts[0][0,2] + parts[1][0,3]
-            shortcut_help = parts[0][0,2].upcase + parts[0][2, 99].downcase + " " + parts[1][0,3].upcase + parts[1][3, 99].downcase
+            code = parts[0][0, 2] + parts[1][0, 3]
+            shortcut_help = parts[0][0,
+                                     2].upcase + parts[0][2,
+                                                          99].downcase + ' ' + parts[1][0,
+                                                                                        3].upcase + parts[1][3,
+                                                                                                             99].downcase
           end
         else
 
           code = hex.name[0, 3].downcase
-          shortcut_help =  hex.name[0, 3].upcase +  hex.name[3, 99].downcase
+          shortcut_help = hex.name[0, 3].upcase + hex.name[3, 99].downcase
 
           if @settlements.include? code.to_sym
             code = hex.name[0, 4].downcase
-            shortcut_help =  hex.name[0, 4].upcase +  hex.name[4, 99].downcase
+            shortcut_help = hex.name[0, 4].upcase + hex.name[4, 99].downcase
           end
 
           if @settlements.include? code.to_sym
             code = hex.name[0, 5].downcase
-            shortcut_help =  hex.name[0, 5].upcase +  hex.name[5, 99].downcase
+            shortcut_help = hex.name[0, 5].upcase + hex.name[5, 99].downcase
           end
 
           if @settlements.include? code.to_sym
             code = hex.name.downcase
-            shortcut_help =  hex.name.upcase
+            shortcut_help = hex.name.upcase
           end
         end
 
         hex.shortcut = code.to_sym
         hex.shortcut_help = shortcut_help.to_sym
         @settlements[code.to_sym] = key
-
       end
-    }
+    end
 
-  end
+    # find a settlement with a short version of the name
+    def find_settlement(name_fragment)
+      coord = @settlements[name_fragment]
+      return unless coord
 
-  # find a settlement with a short version of the name
-  def find_settlement(name_fragment)
-    coord = @settlements[name_fragment]
-    if coord
       @map[coord]
-    else
+    end
+
+    def each_flag
+      flags = []
+      @kingdoms.each do |_key, kingdom|
+        flags.push kingdom.flag if !block_given? or yield kingdom.flag
+      end
+      return nil if flags.length == 0
+
+      flags
+    end
+
+    def each_player
+      players = []
+      @kingdoms.each do |_key, kingdom|
+        players.push players if !block_given? or yield kingdom.player, kingdom
+      end
+
+      return nil if players.length == 0
+
+      players
+    end
+
+    def kingdom_by_name(name)
+      @kingdoms.values.find { |kingdom| kingdom.name == name }
+    end
+
+    def kingdom_by_player(name)
+      @kingdoms[name]
+    end
+
+    def kingdom_by_capital(coord)
+      @kingdoms.values.find { |kingdom| kingdom.x == coord[:x] and kingdom.y == coord[:y] }
+    end
+
+    def rural
+      %w[lowland mountain forest desert]
+    end
+
+    def urban
+      %w[town city]
+    end
+
+    # get all of the specified terrain from the map
+    # and return array - if block then only include
+    # items where block returns true
+    def each_area(terrain = nil)
+      matched = []
+      terrain = [terrain] if !terrain.nil? and !terrain.is_a? Array
+
+      @map.each do |_key, value|
+        next unless terrain.nil? or terrain.include? value.terrain
+
+        matched.push value if !block_given? or yield value
+      end
+      matched
+    end
+
+    def areas(coords = nil)
+      return @map if coords.nil?
+
+      @map.select { |_key, area| coords.include? area.coord }
+    end
+
+    def each_rural(&block)
+      each_area rural, &block
+    end
+
+    def each_urban(&block)
+      each_area urban, &block
+    end
+
+    def each_trade_node
+      matched = []
+
+      @map.each do |_key, value|
+        next unless value.trade_node and value.trade_node.is_node
+
+        matched.push value if !block_given? or yield value
+      end
+      matched
+    end
+
+    ##################################
+    # get the kingom object for specified user
+    ##################################
+    def kingdom_for_user(user_id)
+      @kingdoms.each do |_key, kingdom|
+        return kingdom if kingdom.player == user_id
+      end
       nil
     end
-  end
 
-  def each_flag
-    flags = Array.new
-    @kingdoms.each { | key, kingdom |
-      if !block_given? or yield kingdom.flag
-        flags.push kingdom.flag
+    ##################################
+    # check the kingdom/capital names unique
+    ##################################
+    def kingdom_names_unique(name, capital)
+      @kingdoms.each do |_key, kingdom|
+        return false if kingdom.name.downcase.gsub!(/\s+/, '') == name.downcase.gsub!(/\s+/, '') or
+                        kingdom.capital.downcase.gsub!(/\s+/, '') == capital.downcase.gsub!(/\s+/, '')
       end
-    }
-    return nil if flags.length == 0
-    flags
-  end
+      true
+    end
 
-  def each_player
-    players = Array.new
-    @kingdoms.each { | key, kingdom |
-      if !block_given? or yield kingdom.player, kingdom
-        players.push players
+    ##################################
+    # clears old data and increments
+    # turn
+    ##################################
+    def new_turn(randomseed)
+      # clear old data
+      puts 'clearing old data'
+      @messages = {}
+      @errors = {}
+
+      # reset information
+      each_area do |area|
+        area.new_turn
       end
-    }
-    
-    return nil if players.length == 0
-    players
-  end
 
-  def kingdom_by_name(name)
-    @kingdoms.values.find { | kingdom | kingdom.name == name }
-  end
+      # reset ships
+      # self.each_ship { | ship |
+      # 	ship.new_turn
+      # }
 
-  def kingdom_by_player(name)    
-    @kingdoms[name]
-  end
+      # increment turn no
+      @turn = @turn.next
+      puts "moving to turn #{@turn}"
 
-  def kingdom_by_capital(coord)
-    @kingdoms.values.find { | kingdom | kingdom.x == coord[:x] and kingdom.y == coord[:y] }
-  end
-
-  def rural
-    ['lowland', 'mountain', 'forest', 'desert']
-  end
-
-  def urban
-    ['town', 'city']
-  end
-
-  # get all of the specified terrain from the map
-  # and return array - if block then only include
-  # items where block returns true
-  def each_area(terrain=nil)
-    matched = []
-    terrain = [terrain] if !terrain.nil? and !terrain.kind_of? Array
-
-    @map.each { | key, value |
-      if terrain.nil? or terrain.include? value.terrain        
-        if !block_given? or yield value
-          matched.push value
-        end
+      # ensure we can repeat rand calls by logging
+      # and allowing the reuse of a seed
+      if [nil, ''].include?(randomseed)
+        randomseed = rand(1_000_000)
+        puts "random seed generated: #{randomseed}"
+        @randomseed = randomseed
+      else
+        puts "random seed set to: #{randomseed}"
+        @randomseed = randomseed
       end
-    }
-    matched
-  end
+      srand(@randomseed)
+    end
 
-  def areas(coords=nil)
-    return @map if coords.nil?
-    @map.select { | key, area | coords.include? area.coord}
-  end
-
-  def each_rural(&block)
-    self.each_area self.rural, &block
-  end
-
-  def each_urban(&block)
-    self.each_area self.urban, &block
-  end
-
-  def each_trade_node
-    matched = Array.new
-
-    @map.each { | key, value |
-      if value.trade_node and value.trade_node.is_node
-        if !block_given? or yield value
-          matched.push value
-        end
+    ##################################
+    # converts the map to an array suitible for rendering in rails as json
+    ##################################
+    def map_array
+      maparray = []
+      @map.each do |_key, area|
+        maparray.push area
       end
-    }
-    matched
-  end
-
-  ##################################
-  # get the kingom object for specified user
-  ##################################
-  def kingdom_for_user(user_id)
-    @kingdoms.each { | key, kingdom |
-      return kingdom if kingdom.player == user_id
-    }
-    return nil
-  end
-
-  ##################################
-  # check the kingdom/capital names unique
-  ##################################
-  def kingdom_names_unique(name, capital)
-    @kingdoms.each { | key, kingdom |
-      return false if kingdom.name.downcase.gsub!(/\s+/, "") == name.downcase.gsub!(/\s+/, "") or
-                      kingdom.capital.downcase.gsub!(/\s+/, "") == capital.downcase.gsub!(/\s+/, "")
-    }
-    return true
-  end
-
-
-
-  ##################################
-  # clears old data and increments
-  # turn
-  ##################################
-  def new_turn(randomseed)
-
-    # clear old data
-    puts "clearing old data"
-    @messages = Array.new
-
-  	# reset information
-  	self.each_area { | area |
-      area.new_turn
-    }
-
-    # reset ships
-  	# self.each_ship { | ship |
-  	# 	ship.new_turn
-  	# }
-
-  	 # increment turn no
-    @turn = @turn.next
-    puts "moving to turn #{@turn}"
-
-    # ensure we can repeat rand calls by logging
-    # and allowing the reuse of a seed
-    if randomseed == nil or randomseed == ''
-  		randomseed = rand(1000000)
-  		puts "random seed generated: #{randomseed}"
-  		@randomseed = randomseed
-	 	else
-			puts "random seed set to: #{randomseed}"
-			@randomseed = randomseed
-	 	end
-	 	srand(@randomseed)
-
-  end
-
-  ##################################
-  # converts the map to an array suitible for rendering in rails as json
-  ##################################
-  def map_array()
-
-    maparray = Array.new
-    @map.each { | key, area |
-      maparray.push area
-    }
-    maparray
-  end
-  
+      maparray
+    end
 
     def save(gamefile)
       # save the gamestate
@@ -316,14 +319,9 @@ class GameState
       #   file.print JSON.pretty_generate(self)
       # end
 
-      File.open(gamefile, 'w') do | file |
+      File.open(gamefile, 'w') do |file|
         file.print YAML.dump(self)
       end
-
-
-
     end
-
-end
-
+  end
 end

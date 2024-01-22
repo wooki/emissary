@@ -3,113 +3,105 @@ require_relative '../models/constants'
 require_relative '../models/report'
 
 module Emissary
+  class ReportGenerator
+    def initialize(reportsdir)
+      @reportsdir = reportsdir
+      @levels = {}
+    end
 
-class ReportGenerator
-  
-  def initialize(reportsdir) 
-    @reportsdir = reportsdir
-    @levels = Hash.new
-  end
+    def add_area(area, level, report)
+      return unless !@levels.has_key?(area.coord_sym) or @levels[area.coord_sym] < level
 
-  def add_area(area, level, report)
-    if !@levels.has_key?(area.coord_sym) or @levels[area.coord_sym] < level
       report.map[area.coord_sym] = area.report(level)
       @levels[area.coord_sym] = level
     end
 
-  end
+    # create a report for specific user
+    def run(game, player)
+      # create a new gamestate for the report data
+      report = Emissary::Report.new
+      report.turn = game.turn
 
-  # create a report for specific user
-  def run(game, player)
+      # add the kingdoms (only ones met? or all?)
+      report.kingdoms = game.kingdoms
 
-    # create a new gamestate for the report data
-    report = Emissary::Report.new
-    report.turn = game.turn
+      # add the players kingdom separately
+      report.my_kingdom = game.kingdom_by_player player
 
-    # add the kingdoms (only ones met? or all?)
-    report.kingdoms = game.kingdoms
+      # add messages and errors
+      report.messages = game.messages[player]
+      report.errors = game.errors[player]
 
-    # add the players kingdom separately
-    report.my_kingdom = game.kingdom_by_player player
+      # check which trade node the players capital is in
+      capital = game.map[report.my_kingdom.capital_coord_sym]
 
-    # check which trade node the players capital is in
-    capital = game.map[report.my_kingdom.capital_coord_sym]
-    
-    # build array of urban areas from which all map info is discovered
-    known_urbans = Hash.new
-    known_urbans[capital.coord_sym] = INFO_LEVELS[:OWNED]
-    
-    known_trade_nodes = Array.new
-    known_trade_nodes.push capital.trade.coord_sym
-    
-    # iterate the urban areas adding if owned, or in the same trade node    
-    game.each_urban { | urban |
-      if urban.owner == player 
+      # build array of urban areas from which all map info is discovered
+      known_urbans = {}
+      known_urbans[capital.coord_sym] = INFO_LEVELS[:OWNED]
 
-        known_urbans[urban.coord_sym] = INFO_LEVELS[:OWNED]        
-        known_trade_nodes.push urban.trade.coord_sym if urban.trade        
+      known_trade_nodes = []
+      known_trade_nodes.push capital.trade.coord_sym
 
-      elsif urban.trade.coord_sym == capital.trade.coord_sym        
+      # iterate the urban areas adding if owned, or in the same trade node
+      game.each_urban do |urban|
+        if urban.owner == player
 
-        known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
-      
-      elsif capital.neighbours.any? { | coord | urban.x == coord[:x] and urban.y == coord[:y] }
-        
-        known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
+          known_urbans[urban.coord_sym] = INFO_LEVELS[:OWNED]
+          known_trade_nodes.push urban.trade.coord_sym if urban.trade
 
-      end                
+        elsif urban.trade.coord_sym == capital.trade.coord_sym
 
-      false
-    }            
+          known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
 
-    # add all ocean for known trade nodes
-    known_trade_nodes.uniq!
+        elsif capital.neighbours.any? { |coord| urban.x == coord[:x] and urban.y == coord[:y] }
 
+          known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
 
-    # add all areas that are in provinces this player knows about
-    game.each_area { | area |
+        end
 
-      if known_urbans.has_key? area.coord_sym
-        
-        add_area(area, known_urbans[area.coord_sym], report)
-
-      elsif area.province and known_urbans.has_key? area.province.coord_sym
-
-        add_area(area, known_urbans[area.province.coord_sym], report)        
-
-        # # add adjacent
-        # adjacent_coords = MapUtils::adjacent(area.coord, game.size)
-        # adjacent = game.areas adjacent_coords
-        # adjacent.each { | adj |
-        #   report.map[adj.coord_sym] = adj.report(99)
-        # }
-      elsif ["ocean"].include?(area.terrain)  and area.trade and known_trade_nodes.include? area.trade.coord_sym
-
-        add_area(area, INFO_LEVELS[:PUBLIC], report)        
-
-      elsif area.terrain == "ocean" and known_trade_nodes.include? area.coord_sym
-
-        add_area(area, INFO_LEVELS[:PUBLIC], report)        
-
+        false
       end
 
-      false # return false to stop iterator from building return hash
-    }
-    
+      # add all ocean for known trade nodes
+      known_trade_nodes.uniq!
 
-    # rename closest settlement as in-game relationship "feilty" or something
+      # add all areas that are in provinces this player knows about
+      game.each_area do |area|
+        if known_urbans.has_key? area.coord_sym
 
-    # save the player turn
-    puts "saving to #{@reportsdir}"
-    File.open("#{@reportsdir}report.#{player}.#{report.turn}.json", 'w') do | file |
-      # file.print map.to_json
-      file.print JSON.pretty_generate(report)
-   end
+          add_area(area, known_urbans[area.coord_sym], report)
 
+        elsif area.province and known_urbans.has_key? area.province.coord_sym
+
+          add_area(area, known_urbans[area.province.coord_sym], report)
+
+          # # add adjacent
+          # adjacent_coords = MapUtils::adjacent(area.coord, game.size)
+          # adjacent = game.areas adjacent_coords
+          # adjacent.each { | adj |
+          #   report.map[adj.coord_sym] = adj.report(99)
+          # }
+        elsif ['ocean'].include?(area.terrain) and area.trade and known_trade_nodes.include? area.trade.coord_sym
+
+          add_area(area, INFO_LEVELS[:PUBLIC], report)
+
+        elsif area.terrain == 'ocean' and known_trade_nodes.include? area.coord_sym
+
+          add_area(area, INFO_LEVELS[:PUBLIC], report)
+
+        end
+
+        false # return false to stop iterator from building return hash
+      end
+
+      # rename closest settlement as in-game relationship "feilty" or something
+
+      # save the player turn
+      puts "saving to #{@reportsdir}"
+      File.open("#{@reportsdir}report.#{player}.#{report.turn}.json", 'w') do |file|
+        # file.print map.to_json
+        file.print JSON.pretty_generate(report)
+      end
+    end
   end
-
-
 end
-
-end
-

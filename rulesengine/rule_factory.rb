@@ -1,61 +1,52 @@
-require_relative '../rules/production'
-require_relative '../rules/import'
+require_relative '../rules/set_trade_policy'
 
 module Emissary
-
   # dynamically creates rules and populates their
   # properties from the "raw" version being passed
   # in
   # only for parsing input from players - no need to do this for internal
   class RuleFactory
-
     # map orders to rules
     def initialize
-
       @rules = {
-        "production" => Production,
-        "import" => Import
+        'trade_policy' => SetTradePolicy
       }
-
     end
 
     def CreateRule(orderName, parameters, player, gameState)
-
-      parameters = Array.new if parameters == nil
+      parameters = [] if parameters.nil?
 
       # look-up the Rule object from the orderName
       ruleClass = @rules[orderName.downcase]
 
       # check if ruleName is invalid
-      if ! ruleClass then
-        gameState.OrderError(player, 'No rule could be found for order: ' + orderName)
+      unless ruleClass
+        gameState.order_error(player, 'No rule could be found for order: ' + orderName)
         return
       end
 
       # create an instance
       begin
         newRule = ruleClass.new(player)
-      rescue
-        puts 'rule class not found for: ' + ruleClass + ": " + $!
+      rescue StandardError
+        puts 'rule class not found for: ' + ruleClass + ': ' + $!
         return
       end
 
       # try and set each parameter
       begin
-        parameters.each { | value | begin
+        parameters.each do |value|
           newRule.send(value[0].downcase + '=', value[1])
-        end }
-      rescue
+        end
+      rescue StandardError
         puts $!
         puts parameters.inspect
-        gameState.OrderError(player, 'Invalid parameters for ' + orderName + ': ' + parameters.to_s)
+        gameState.order_error(player, 'Invalid parameters for ' + orderName + ': ' + parameters.to_s)
         return
       end
 
       # return the rule
-      return newRule
+      newRule
     end
-
   end
-
 end
