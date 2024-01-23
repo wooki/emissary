@@ -27,7 +27,7 @@
     },
     "cd ./scripts && bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k \"The Jimpire\"": {
       "name": "Add Jimpire",
-      "command": "cd ./scripts && bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k \"The Jimpire\""
+      "command": "cd ./scripts && bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k \"The Jimpire\" && bundle exec ruby add_kingdom.rb -g game.yaml -p alex -c XXX -k \"Alexland\" && bundle exec ruby add_kingdom.rb -g game.yaml -p steve -c XXX -k \"Steveworld\"  && bundle exec ruby add_kingdom.rb -g game.yaml -p jeff -c XXX -k \"Jeffdom\" && bundle exec ruby add_kingdom.rb -g game.yaml -p stu -c XXX -k \"The Stuniverse\""
     },
     "cd ./scripts && bundle exec ruby turn.rb -g game.yaml -o ../orders/ -r ../reports/ -s 123456": {
       "name": "Run Turn",
