@@ -680,13 +680,13 @@ module Emissary
          # iterate all non settlements setting province and trade node
          @map.each { | key, hex |
             if !['city', 'town'].include? hex[:terrain]
+
                province = getHex(hex[:province][:x], hex[:province][:y])
                hex[:province][:name] = province[:name]
 
                if hex[:trade] && !hex[:trade][:is_node]
                   
-                  node = getTradeNode hex[:trade]                  
-                  hex[:trade][:name] = node[:name]
+                  hex[:trade] = province[:trade]                      
 
                elsif hex[:trade]
                   
@@ -699,8 +699,8 @@ module Emissary
                   end
                end
             end
-         }         
-   
+         }       
+         
          # remove some side-effect keys e.g. :z and :required_distance
          @map.each { | key, hex |
             hex.delete(:z)

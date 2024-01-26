@@ -143,13 +143,7 @@ module Emissary
       # save game file
       # puts "## skipping save in dev ##"
       @state.save gamefile
-
-      # produce reports
-      puts 'producing player reports'
-      reports = ReportGenerator.new reportsdir
-      @state.each_player do |player, _kingdom|
-        reports.run @state, player
-      end
+      
     end
   end
 end

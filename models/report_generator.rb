@@ -5,8 +5,7 @@ require_relative '../models/report'
 module Emissary
   class ReportGenerator
     def initialize(reportsdir)
-      @reportsdir = reportsdir
-      @levels = {}
+      @reportsdir = reportsdir      
     end
 
     def add_area(area, level, report)
@@ -18,6 +17,10 @@ module Emissary
 
     # create a report for specific user
     def run(game, player)
+
+      # reset levels
+      @levels = {}
+
       # create a new gamestate for the report data
       report = Emissary::Report.new
       report.turn = game.turn
@@ -92,12 +95,10 @@ module Emissary
         end
 
         false # return false to stop iterator from building return hash
-      end
-
-      # rename closest settlement as in-game relationship "feilty" or something
+      end      
 
       # save the player turn
-      puts "saving to #{@reportsdir}"
+      puts "saving to #{@reportsdir}report.#{player}.#{report.turn}.json"
       File.open("#{@reportsdir}report.#{player}.#{report.turn}.json", 'w') do |file|
         # file.print map.to_json
         file.print JSON.pretty_generate(report)

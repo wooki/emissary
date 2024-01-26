@@ -105,7 +105,7 @@ class Settlement < Area
     details[:borders] = @borders
 
     # add details dependent on level
-    details[:trade] = @trade if level >= INFO_LEVELS[:TRADE]
+    details[:trade] = @trade #if level >= INFO_LEVELS[:TRADE]
     details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH]
     details[:unrest] = @unrest.round(2) if level >= INFO_LEVELS[:UNREST]
     details[:tax] = @tax.round() if level >= INFO_LEVELS[:PRODUCTION]
