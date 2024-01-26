@@ -9,11 +9,11 @@ class NameGenererator
     attr_accessor :region, :data
 
     @@rules = {
-      persian: { desert: 31..100 },
-      andalusian: { desert: 10..31 },
+      persian: { desert: 21..100 },
+      andalusian: { desert: 2..21 },
       scandinavian: { lowland: 0..10, mountain: 4..100, ocean: 50..100, peak: 0..20 },
       welsh: { lowland: 0..15, forest: 3..60, mountain: 3..60, peak: 0..1, town: 0..3 },
-      italian: { ocean: 82..100 },
+      italian: { ocean: 75..100 },
       # germanic: { lowland: 4..50, forest: 2..100, ocean: 0..85 }, # syllables not working well
       fantasy: {} # Fallback generator
     }
