@@ -46,7 +46,7 @@ module Emissary
          @trade_node_sample_size = 15
          @trade_node_land_multiplier = 3
    
-         @population_nop_settlement = 0.1
+         @population_nop_settlement = 0.5
          @population = {
             'city' => 30000,
             'town' => 12000,
@@ -59,19 +59,19 @@ module Emissary
             'city' => 0,
             'town' => 0,
             'lowland' => 0.002,
-            'forest' => 0.001,
-            'mountain' => 0.0007,
+            'forest' => 0.002,
+            'mountain' => 0.0003,
             'desert' => 0.0002
          }
          @goods = {
             'city' => 0,
             'town' => 0,
-            'lowland' => 0.001,
-            'forest' => 0.003,
-            'mountain' => 0.002,
+            'lowland' => 0.0005,
+            'forest' => 0.002,
+            'mountain' => 0.003,
             'desert' => 0.0015
          }
-         @population_settlement_boost = [4.0, 3.0, 2.0, 1.0, 1.0, 0.75, 0.5, 0.25, 0.2, 0.15];
+         @population_settlement_boost = [1.0, 1.0, 1.6, 1.2, 1.0, 1.0, 0.75, 0.75];
    
          # store the map as we build it
          @map = Hash.new
@@ -514,12 +514,16 @@ module Emissary
             base_population = @population[hex[:terrain]]
             base_food = @food[hex[:terrain]]
             base_goods = @goods[hex[:terrain]]
-   
+
+            # adjust base food/goods
+            base_food = base_food + ((base_food.to_f / 100.0) * rand() * rand(-10..10).to_f).round(5) if base_food
+            base_goods = base_goods + ((base_goods.to_f / 100.0) * rand() * rand(-10..10).to_f).round(5) if base_goods  
+            
             # if !base_population.nil?
    
                # always adjusted a bit for randomness
                base_population = 0 if base_population.nil?
-               base_population = base_population + ((base_population.to_f / 100.0) * rand() * rand(-15..15).to_f).round.to_i
+               base_population = base_population + ((base_population.to_f / 100.0) * rand() * rand(-20..20).to_f).round.to_i
    
                if ['city', 'town'].include? hex[:terrain]
    
@@ -594,9 +598,10 @@ module Emissary
                   base_population = (base_population.to_f * adjustment).round.to_i
                   hex[:population] = base_population
    
-                  # extra food in lowland adjacent to desert and water
-                  if hex[:terrain] == 'lowland' and adj['desert'] > 0 and adj['ocean'] > 0
-                     base_food = base_food + (adj['desert'].to_f * 0.0003)
+                  # extra food in coastal desert
+                  if hex[:terrain] == 'desert' and adj['ocean'] > 0
+                     base_food = base_food + 0.0005
+                     base_goods = base_goods + 0.001
                   end
    
                   hex[:food] = base_food

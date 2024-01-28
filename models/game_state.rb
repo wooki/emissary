@@ -41,6 +41,10 @@ module Emissary
       @map["#{x},#{y}".to_sym]
     end
 
+    def getCoord(coord)
+      @map["#{coord}".to_sym]
+    end
+
     # log information to hex, for filter and reporting to players
     # "PRODUCTION", @area, "Food and Goods sent to #{@settlement[:name]}", {food: food, goods: goods}
     def info(type, area, message, data = {})
@@ -61,12 +65,12 @@ module Emissary
 
     def order_error(player, message)
       @errors[player] = [] unless @errors.include?(player)
-      @errors[player].push Message.new(player, message, 'host')
+      @errors[player].push Message.new(message, 'host')
     end
 
     def player_message(player, message, from)
       @messages[player] = [] unless @messages.include?(player)
-      @messages[player].push Message.new(player, message, from)
+      @messages[player].push Message.new(message, from)
     end
 
     # work out the largest x/y dimension

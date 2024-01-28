@@ -5,11 +5,12 @@ module Emissary
 class Area
 
   attr_accessor :x, :y, :terrain, :population,
-    :food, :goods, :province, :trade_node, :info, :trade
+    :food, :goods, :province, :trade_node, :info, :trade, :messages
 
   def initialize
     super()
     @info = Array.new
+    @messages = Array.new
   end
 
   def new_turn
@@ -30,6 +31,10 @@ class Area
     {x: @x, y: @y}
   end
 
+  def message(msg, from)    
+    @messages.push Message.new(message, from)
+  end
+
   def report(level)
     
     details = {x: @x, y: @y, terrain: @terrain }
@@ -38,6 +43,8 @@ class Area
     details[:trade_node] = @trade_node if @trade_node
 
     details[:population] = @population if level >= INFO_LEVELS[:POPULATION]
+
+    details[:messages] = @messages if level >= INFO_LEVELS[:MESSAGES]
     
     if level >= INFO_LEVELS[:PRODUCTION]
       details[:food] = @food

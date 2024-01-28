@@ -38,8 +38,8 @@ module Emissary
         parameters.each do |value|
           newRule.send(value[0].downcase + '=', value[1])
         end
-      rescue StandardError
-        puts $!
+      rescue StandardError => se
+        puts se.message
         puts parameters.inspect
         gameState.order_error(player, 'Invalid parameters for ' + orderName + ': ' + parameters.to_s)
         return

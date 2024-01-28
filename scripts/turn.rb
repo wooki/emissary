@@ -7,8 +7,8 @@ class Turn
   attr_accessor :state
 
   # load game state and run turn
-  def initialize(gamefile, ordersdir, reportsdir, seed)
-    t = Emissary::Turn.new(gamefile, ordersdir, reportsdir, seed)
+  def initialize(gamefile, ordersdir, reportsdir, seed, dryrun=false)
+    t = Emissary::Turn.new(gamefile, ordersdir, reportsdir, seed, dryrun)
   end
 end
 
@@ -32,8 +32,15 @@ OptionParser.new do |opts|
   opts.on('-sSEED', '--seed=SEED', 'random seed for repeatable order run') do |n|
     options[:seed] = n.to_i
   end
+
+  opts.on('-d', '--dryrun', 'run turn but do not sabe changes (for testing)') do |n|
+    options[:dryrun] = n
+  end
 end.parse!
 
-ng = Turn.new options[:gamefile], options[:ordersdir], options[:reportsdir], options[:seed]
+ng = Turn.new options[:gamefile], options[:ordersdir], options[:reportsdir], options[:seed], options[:dryrun]
+
 
 # bundle exec ruby turn.rb -g game.yaml -o ../orders/ -r ../reports/ -s 123456
+
+# bundle exec ruby turn.rb -g game.yaml -o ../orders/ -r ../reports/ -s 123456 --dryrun

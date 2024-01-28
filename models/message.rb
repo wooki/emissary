@@ -2,15 +2,16 @@ require 'json'
 
 module Emissary
   class Message
-    attr_accessor :player, :message, :from
+    attr_accessor :message, :from
 
-    def initialize
+    def initialize(message, from)
       super()
+      @message = message
+      @from = from
     end
 
-    def as_json(_options = {})
+    def as_json(options = {})
       {
-        player: @player,
         from: @from,
         message: @message
       }
