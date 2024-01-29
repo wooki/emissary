@@ -4,29 +4,27 @@ require_relative '../models/game_state'
 require_relative '../models/kingdom'
 
 class AddKingdom
-
   attr_accessor :state
 
   # load game state, save game state
   def initialize(gamefile, player, kingdom, capital, flag)
-
     @state = Emissary::GameState.load(gamefile)
 
     # check we have a unique player, kingdom
     by_name = @state.kingdom_by_name kingdom
     if by_name
-      puts "Duplicate kingdom name"
+      puts 'Duplicate kingdom name'
       return
     end
 
     by_player = @state.kingdom_by_player player
     if by_player
-      puts "Duplicate player id"
+      puts 'Duplicate player id'
       return
     end
 
     # flag must be five different digits
-    unless five_different_digits? flag
+    unless last_three_different_digits? flag
       flag = generate_unique_digits_string
       puts "Flag was invalid, generating a random flag (#{flag})"
     end
@@ -47,14 +45,13 @@ class AddKingdom
 
       by_capital = @state.kingdom_by_capital hex
       if by_capital
-        puts "Duplicate capital"
+        puts 'Duplicate capital'
         return
       end
 
-
     else
-      puts "Capital not found, selecting random"
-      urbans = @state.each_urban.select { | urban | !urban.owner }
+      puts 'Capital not found, selecting random'
+      urbans = @state.each_urban.select { |urban| !urban.owner }
       hex = urbans.sample
     end
 
@@ -64,7 +61,7 @@ class AddKingdom
     k.player = player
     k.capital = hex.name
     k.flag = flag
-    k.capital_coord = {:x => hex.x, :y => hex.y}
+    k.capital_coord = { x: hex.x, y: hex.y }
     @state.kingdoms[player] = k
 
     # set ownership
@@ -74,16 +71,18 @@ class AddKingdom
     @state.save gamefile
   end
 
-  def five_different_digits?(input_string)
+  def last_three_different_digits?(input_string)
     # Check if the input string is exactly five characters long
     return false unless !input_string.nil? and input_string.length == 5
 
     # Check if all characters are digits
     return false unless input_string.match?(/\A\d{4}\z/)
 
+    # check only last three
+    digits = input_string[0, 3].chars.map(&:to_i)
+
     # Check if all digits are unique
-    digits = input_string.chars.map(&:to_i)
-    digits.uniq.length == 5
+    digits.uniq.length == 3
   end
 
   def generate_unique_digits_string
@@ -97,7 +96,7 @@ class AddKingdom
     unique_digits = shuffled_digits[0, 3]
     unique_digits.unshift all_digits.sample
     unique_digits.unshift all_digits.sample
-    
+
     # Convert the array to a string
     unique_digits.join
   end
@@ -105,39 +104,40 @@ class AddKingdom
   def compare_flags(string1, string2)
     # Check if the input strings are of the same length
     return 0 unless string1.length == string2.length
+    return 0 unless string1.length == 5
 
     # Initialize a counter for matching digits in the same position
-    count_same_position = 0
+    count_same_position = 0.0
 
-    # Iterate over the characters in the strings and compare them
-    string1.chars.each_with_index do |char, index|
-      count_same_position += 1 if char == string2[index]
-    end
+    # count some positions more or less than 1, so we get a score
+    count_same_position += 0.6 if string1[0] == string2[0]
+    count_same_position += 0.3 if string1[1] == string2[1]
+    count_same_position += 1.4 if string1[2] == string2[2]
+    count_same_position += 1.4 if string1[3] == string2[3]
+    count_same_position += 0.3 if string1[4] == string2[4]
 
     count_same_position
   end
-
 end
 
-
 # parse command line options
-options = Hash.new
-OptionParser.new do | opts |
-   opts.banner = "Usage: add_kingdom.rb [options]"
+options = {}
+OptionParser.new do |opts|
+  opts.banner = 'Usage: add_kingdom.rb [options]'
 
-  opts.on("-gGAME", "--gamefile=GAME", "File to read/write game to") do |n|
-     options[:gamefile] = n
+  opts.on('-gGAME', '--gamefile=GAME', 'File to read/write game to') do |n|
+    options[:gamefile] = n
   end
 
-  opts.on("-pPLAYER", "--player=PLAYER", "Player id for the kingdom (anything unique)") do |n|
+  opts.on('-pPLAYER', '--player=PLAYER', 'Player id for the kingdom (anything unique)') do |n|
     options[:player] = n.to_sym
   end
 
-  opts.on("-kKINGDOM", "--kingdom=KINGDOM", "Kingdom name") do |n|
+  opts.on('-kKINGDOM', '--kingdom=KINGDOM', 'Kingdom name') do |n|
     options[:kingdom] = n
   end
 
-  opts.on("-cCAPITAL", "--capital=CAPITAL", "Capital city by short name") do |n|
+  opts.on('-cCAPITAL', '--capital=CAPITAL', 'Capital city by short name') do |n|
     options[:capital] = n.to_sym
   end
 
@@ -147,6 +147,5 @@ OptionParser.new do | opts |
 end.parse!
 
 ng = AddKingdom.new options[:gamefile], options[:player], options[:kingdom], options[:capital], options[:flag]
-
 
 # bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k "The Jimpire" -f "1234"
