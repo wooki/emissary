@@ -5,11 +5,12 @@ module Emissary
 class Area
 
   attr_accessor :x, :y, :terrain, :population,
-    :food, :goods, :province, :trade_node, :info, :trade, :messages
+    :food, :goods, :province, :trade_node, :info, :trade, :messages, :agents
 
   def initialize
     super()
     @info = Array.new
+    @agents = Array.new
     @messages = Array.new
   end
 
@@ -45,6 +46,10 @@ class Area
     details[:population] = @population if level >= INFO_LEVELS[:POPULATION]
 
     details[:messages] = @messages if level >= INFO_LEVELS[:MESSAGES]
+
+    details[:agents] = @agents.map { | agent | 
+        agent.report(level)
+    }.compact
     
     if level >= INFO_LEVELS[:PRODUCTION]
       details[:food] = @food

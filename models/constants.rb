@@ -37,6 +37,7 @@ module Emissary
 
         # spies will gain levels here as the expand their network
         # spy level should probably just equal this level
+        
 
         # what levels does each access have
         PUBLIC: 1,
