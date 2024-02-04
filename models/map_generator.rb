@@ -96,7 +96,7 @@ module Emissary
          @forests = @forests * areafactor
          @extra_lowland = @extra_lowland * areafactor
          @trade_node_min_size = @trade_node_min_size * areafactor
-         @trade_node_sample_size = 20 - (@trade_node_sample_size * areafactor).round
+         @trade_node_sample_size = (20 * areafactor) - (@trade_node_sample_size * areafactor).round
          @trade_node_sample_size = 1 if @trade_node_sample_size < 1
    
          # adjust for a more land-based map
