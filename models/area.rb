@@ -10,7 +10,7 @@ class Area
   def initialize
     super()
     @info = Array.new
-    @agents = Array.new
+    @agents = Hash.new
     @messages = Array.new
   end
 
@@ -32,11 +32,19 @@ class Area
     {x: @x, y: @y}
   end
 
+  def add_agent(a)
+    @agents[a.id] = a
+  end
+
+  def remove_agent(a)
+    @agents.delete a.id
+  end
+
   def message(msg, from)    
     @messages.push Message.new(message, from)
   end
 
-  def report(level)
+  def report(level, player)
     
     details = {x: @x, y: @y, terrain: @terrain }
 
@@ -64,7 +72,7 @@ class Area
 
     if @info and @info.length > 0
       details[:info] = @info.select do | info_item | 
-      info_item[:level] <= level
+        (!player.nil? and info_item[:player] == player) or info_item[:level] <= level
       end
     end
 

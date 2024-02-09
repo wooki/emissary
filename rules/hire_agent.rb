@@ -3,10 +3,10 @@ require_relative '../rulesengine/turn_sequence'
 
 module Emissary
   class HireAgent < Rule
-    attr_accessor :coord, :bid
+    attr_accessor :coord
 
     def initialize(player)
-      super(player, TS_SET_TRADE_POLICY)
+      super(player, TS_SET_HIRE)
     end
 
     # executes this rule against the gamestate
@@ -18,27 +18,31 @@ module Emissary
         return
       end
 
-      owned = (hex.owner == player)        
+      owned = (hex.owner == @player)        
 
-      # quality of agent is based on population in hex and how much your'e bidding
-      # best agent is 9 but that requires a large sum to be spent in a large town
-      big_population = 30000
-      big_bid = 20
-      
-      
-      # if owned and unrest is high then agent is worse
-      # if owned and unrest is low then agent is better
-      # if not owned and unrest is high then agent is better
-      
-      # randomly assign "pips" to their three but rule is 
-      # that no stat can ever be more than 2 more than another
-      # so once you have 3,1,1 you can't have 4,1,1 you must have 3,2,1
+      # cost is based on wealth
+      wealth = 1.0
+      wealth = wealth + (1.0 * hex.wealth) unless hex.wealth.nil?
+      cost = wealth * 12.0 # buy for 12 turns
 
-      if changes.length > 0
-        msg = "Trade policy was set to #{changes.join(' and ')}."
+      # get the players capital
+      kingdom = game.kingdom_by_player(@player)
+      capital = game.getCapital(@player)
+      if capital.nil? or capital.store.nil?
+        game.order_error(@player, "Hire agent failed because the players capital could not be found.");
+        reutrn 
       end
 
-      game.info "TRADE", hex, msg, nil          
+      if capital.store.pay(cost) 
+
+        agent = Agent.new game.random_id
+        agent.message("Ready for orders.", "Agent")
+        hex.add_agent agent
+
+        game.info "HIRE", hex, "Agent hired by #{kingdom.name} for 12 turns.", {cost: cost}
+      else
+        game.info "HIRE", hex, "#{kingdom.name} failed to hire an agent.", nil
+      end
             
     end
   end

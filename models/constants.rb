@@ -33,6 +33,7 @@ module Emissary
         STORE: 6,
         WEALTH: 4,
         POLICY: 7,
+        HIRE: 6,
         MESSAGES: 8,
 
         # spies will gain levels here as the expand their network

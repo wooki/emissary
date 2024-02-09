@@ -1,4 +1,5 @@
 require_relative '../rules/set_trade_policy'
+require_relative '../rules/hire_agent'
 
 module Emissary
   # dynamically creates rules and populates their
@@ -9,7 +10,8 @@ module Emissary
     # map orders to rules
     def initialize
       @rules = {
-        'trade_policy' => SetTradePolicy
+        'trade_policy' => SetTradePolicy,
+        'hire_agent' => HireAgent
       }
     end
 

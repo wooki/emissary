@@ -4,6 +4,7 @@ module Emissary
   #
 
   TS_SET_TRADE_POLICY = 5
+  TS_SET_HIRE = 8 # hire agents
 
   TS_PRODUCTION = 10 # raw materials collected
   TS_IMPORT = 20 # urbans buy food and goods required

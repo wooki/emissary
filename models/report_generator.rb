@@ -8,10 +8,10 @@ module Emissary
       @reportsdir = reportsdir      
     end
 
-    def add_area(area, level, report)
+    def add_area(area, level, report, player)
       return unless !@levels.has_key?(area.coord_sym) or @levels[area.coord_sym] < level
 
-      report.map[area.coord_sym] = area.report(level)
+      report.map[area.coord_sym] = area.report(level, player)
       @levels[area.coord_sym] = level
     end
 
@@ -72,11 +72,11 @@ module Emissary
       game.each_area do |area|
         if known_urbans.has_key? area.coord_sym
 
-          add_area(area, known_urbans[area.coord_sym], report)
+          add_area(area, known_urbans[area.coord_sym], report, player)
 
         elsif area.province and known_urbans.has_key? area.province.coord_sym
 
-          add_area(area, known_urbans[area.province.coord_sym], report)
+          add_area(area, known_urbans[area.province.coord_sym], report, player)
 
           # # add adjacent
           # adjacent_coords = MapUtils::adjacent(area.coord, game.size)
@@ -86,11 +86,11 @@ module Emissary
           # }
         elsif ['ocean'].include?(area.terrain) and area.trade and known_trade_nodes.include? area.trade.coord_sym
 
-          add_area(area, INFO_LEVELS[:PUBLIC], report)
+          add_area(area, INFO_LEVELS[:PUBLIC], report, player)
 
         elsif area.terrain == 'ocean' and known_trade_nodes.include? area.coord_sym
 
-          add_area(area, INFO_LEVELS[:PUBLIC], report)
+          add_area(area, INFO_LEVELS[:PUBLIC], report, player)
 
         end
 

@@ -11,6 +11,15 @@ class Store
     @gold = 0
   end
 
+  def pay(cost)
+    if @gold > cost
+      @gold = @gold - cost
+      true
+    else
+      false
+    end
+  end
+
   def trade_food(food, cost)
     @food = @food + food
     @gold = @gold - cost

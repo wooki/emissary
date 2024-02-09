@@ -1,6 +1,7 @@
 module Emissary
   require 'json'
   require 'yaml'
+  require 'random/formatter'
   require_relative './area'
   require_relative './settlement'
   require_relative './trade_node'
@@ -26,6 +27,8 @@ module Emissary
 
       @messages = {}
       @errors = {}
+
+      @rnd = Random.new
     end
 
     def self.load(gamefile)
@@ -37,6 +40,16 @@ module Emissary
       state
     end
 
+    def random_id
+      prng = Random.new 1 # always use the same number sequence
+      @rnd.alphanumeric(16)
+    end
+
+    def getCapital(player)
+      kingdom = self.kingdom_by_player(name)
+      getHex(kingdom.capital_coord.x, kingdom.capital_coord.y)
+    end    
+
     def getHex(x, y)
       @map["#{x},#{y}".to_sym]
     end
@@ -47,7 +60,8 @@ module Emissary
 
     # log information to hex, for filter and reporting to players
     # "PRODUCTION", @area, "Food and Goods sent to #{@settlement[:name]}", {food: food, goods: goods}
-    def info(type, area, message, data = {})
+    def info(type, area, message, data = {}, player = nil)
+      
       # info level determined by looking up type
       level = INFO_LEVELS[type.to_sym]
 
@@ -59,7 +73,8 @@ module Emissary
                        level:,
                        type:,
                        message:,
-                       data:
+                       data:,
+                       player:
                      })
     end
 
