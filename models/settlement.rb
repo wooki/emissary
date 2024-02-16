@@ -1,6 +1,7 @@
 require_relative './area'
 require_relative './store'
 require_relative './constants'
+require_relative '../rules/behaviour/hiring'
 
 module Emissary
 
@@ -94,8 +95,12 @@ class Settlement < Area
     @unrest = 0 if @unrest < 0
   end
 
-  def report(level)
-    details = super(level)
+  def hire_cost(game)
+    Hiring.agent_hire_cost(3, self, game)
+  end 
+
+  def report(level, player, game)
+    details = super(level, player, game)
 
     details.delete(:food)
     details.delete(:goods)
@@ -105,6 +110,7 @@ class Settlement < Area
     details[:borders] = @borders
 
     # add details dependent on level
+    details[:hire_cost] = hire_cost(game) if level >= INFO_LEVELS[:WEALTH]
     details[:trade] = @trade #if level >= INFO_LEVELS[:TRADE]
     details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH]
     details[:unrest] = @unrest.round(2) if level >= INFO_LEVELS[:UNREST]

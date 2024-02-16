@@ -21,6 +21,9 @@ module Emissary
     UNREST_PRODUCTION_FACTOR = 5.0 # unrest mutiplied by this is % of production reduction
     TAX_RATIO = 10.0 # 1 industry creates 10 gold at tax rate 100%
     TAX_WEALTH_REDUCTION = 0.1 # for each utilised industry reduce wealth by this amount at 100% tax
+    AGENT_COST_PER_MONTH = 0.5
+    AGENT_COST_PER_LEVEL = 0.33
+    AGENT_COST_PER_DISTANCE = 0.1
 
     INFO_LEVELS = {
         # level required to gain this info

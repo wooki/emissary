@@ -8,10 +8,10 @@ module Emissary
       @reportsdir = reportsdir      
     end
 
-    def add_area(area, level, report, player)
+    def add_area(area, level, report, player, game)
       return unless !@levels.has_key?(area.coord_sym) or @levels[area.coord_sym] < level
 
-      report.map[area.coord_sym] = area.report(level, player)
+      report.map[area.coord_sym] = area.report(level, player, game)
       @levels[area.coord_sym] = level
     end
 
@@ -43,9 +43,9 @@ module Emissary
       known_urbans[capital.coord_sym] = INFO_LEVELS[:OWNED]
 
       known_trade_nodes = []
-      known_trade_nodes.push capital.trade.coord_sym
 
-      # iterate the urban areas adding if owned, or in the same trade node
+      # iterate the urban areas adding if owned, or in the same trade node,
+      # adjacent to capital or you have an agent
       game.each_urban do |urban|
         if urban.owner == player
 
@@ -64,38 +64,29 @@ module Emissary
 
         false
       end
-
-      # add all ocean for known trade nodes
       known_trade_nodes.uniq!
 
       # add all areas that are in provinces this player knows about
       game.each_area do |area|
         if known_urbans.has_key? area.coord_sym
 
-          add_area(area, known_urbans[area.coord_sym], report, player)
+          add_area(area, known_urbans[area.coord_sym], report, player, game)
 
         elsif area.province and known_urbans.has_key? area.province.coord_sym
 
-          add_area(area, known_urbans[area.province.coord_sym], report, player)
-
-          # # add adjacent
-          # adjacent_coords = MapUtils::adjacent(area.coord, game.size)
-          # adjacent = game.areas adjacent_coords
-          # adjacent.each { | adj |
-          #   report.map[adj.coord_sym] = adj.report(99)
-          # }
-        elsif ['ocean'].include?(area.terrain) and area.trade and known_trade_nodes.include? area.trade.coord_sym
-
-          add_area(area, INFO_LEVELS[:PUBLIC], report, player)
-
-        elsif area.terrain == 'ocean' and known_trade_nodes.include? area.coord_sym
-
-          add_area(area, INFO_LEVELS[:PUBLIC], report, player)
+          add_area(area, known_urbans[area.province.coord_sym], report, player, game)              
 
         end
 
         false # return false to stop iterator from building return hash
-      end      
+      end
+      
+      # TODO: agents report on area and surroundings
+
+      # TODO: add areas (not provinces) that your scouts can reach
+
+      # TODO: add EXPLORED trade nodes only ocean and coastline
+      
 
       # save the player turn
       puts "saving to #{@reportsdir}report.#{player}.#{report.turn}.json"

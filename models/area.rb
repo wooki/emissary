@@ -1,4 +1,5 @@
 require_relative './constants'
+require_relative '../rules/behaviour/hiring'
 
 module Emissary
 
@@ -44,16 +45,21 @@ class Area
     @messages.push Message.new(message, from)
   end
 
-  def report(level, player)
+  def hire_cost(game)
+    Hiring.agent_hire_cost(3, self, game)
+  end
+
+  def report(level, player, game)
     
     details = {x: @x, y: @y, terrain: @terrain }
 
+    details[:has_population] = !["ocean", "peak"].include?(@terrain)
     details[:province] = @province if @province
     details[:trade_node] = @trade_node if @trade_node
 
     details[:population] = @population if level >= INFO_LEVELS[:POPULATION]
-
     details[:messages] = @messages if level >= INFO_LEVELS[:MESSAGES]
+    details[:hire_cost] = hire_cost(game) if level >= INFO_LEVELS[:WEALTH]
 
     details[:agents] = @agents.map { | agent | 
         agent.report(level)

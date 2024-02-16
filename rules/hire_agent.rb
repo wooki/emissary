@@ -18,12 +18,7 @@ module Emissary
         return
       end
 
-      owned = (hex.owner == @player)        
-
-      # cost is based on wealth
-      wealth = 1.0
-      wealth = wealth + (1.0 * hex.wealth) unless hex.wealth.nil?
-      cost = wealth * 12.0 # buy for 12 turns
+      cost = hex.hire_cost(game)
 
       # get the players capital
       kingdom = game.kingdom_by_player(@player)
