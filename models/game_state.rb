@@ -46,8 +46,8 @@ module Emissary
     end
 
     def getCapital(player)
-      kingdom = self.kingdom_by_player(name)
-      getHex(kingdom.capital_coord.x, kingdom.capital_coord.y)
+      kingdom = self.kingdom_by_player(player)
+      getHex(kingdom.capital_coord[:x], kingdom.capital_coord[:y])
     end    
 
     def getHex(x, y)

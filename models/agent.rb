@@ -28,12 +28,14 @@ class Agent
   end
 
   def message(msg, from)    
-    @messages.push Message.new(message, from)
+    @messages.push Message.new(msg, from)
   end
 
   def report(level)
     
-    if level > ((10 + @skill) - (@range + @depth)) and level < INFO_LEVELS[:OWNED] return nil
+    if level > ((10 + @skill) - (@range + @depth)) and level < INFO_LEVELS[:OWNED] 
+      return nil
+    end
 
     details = {id: @id, x: @x, y: @y}
 

@@ -1,16 +1,19 @@
 require_relative '../rulesengine/rule'
 require_relative '../rulesengine/turn_sequence'
+require_relative '../models/agent'
 
 module Emissary
   class HireAgent < Rule
-    attr_accessor :coord
+    attr_accessor :coord, :data
 
     def initialize(player)
-      super(player, TS_SET_HIRE)
+      super(player, TS_SET_HIRE)      
     end
 
     # executes this rule against the gamestate
     def execute(game)
+
+      puts "HireAgent"
 
       hex = game.getCoord(@coord)
       if !hex
@@ -25,7 +28,7 @@ module Emissary
       capital = game.getCapital(@player)
       if capital.nil? or capital.store.nil?
         game.order_error(@player, "Hire agent failed because the players capital could not be found.");
-        reutrn 
+        return 
       end
 
       if capital.store.pay(cost) 

@@ -15,7 +15,7 @@ module Emissary
       super()
       @filename = filename
       @player = player
-      @gameState = gameState
+      @gameState = gameState      
     end
 
     ##################################
@@ -30,7 +30,7 @@ module Emissary
       gameState.each_player do |player|
         # work out the filename
         filename = "#{folder}turn.#{player}.#{(gameState.turn-1)}.json"
-        next unless File.exist?(filename)
+        next unless File.exist?(filename)        
 
         # create a parser for that factions file
         yield OrderParser.new(filename, player, gameState)

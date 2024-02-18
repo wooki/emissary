@@ -1,0 +1,2 @@
+bundle exec ruby ./scripts/turn.rb -g ./scripts/game.yaml -o ./orders/ -r ./reports/ -s 123456 --dryrun
+bundle exec ruby ./scripts/report.rb -g ./scripts/game.yaml -r ./reports/ 
