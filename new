@@ -1,0 +1,17 @@
+# bundle exec ruby ./scripts/new_map.rb -f ./scripts/map.json -F json -S 100 -h 6 | xargs -I % sh -c 'bundle exec ruby ./scripts/new_map.rb -f ./scripts/map.svg -S 100 -h 6 --seed=%'
+
+# bundle exec ruby ./scripts/new_map.rb -f ./scripts/map.json -F json -S 200 -h 6  --seed=16957309571841508262296210548945966668
+# bundle exec ruby ./scripts/new_map.rb -f ./scripts/map.svg -S 200 -h 6 --seed=16957309571841508262296210548945966668
+
+bundle exec ruby ./scripts/new_game.rb -g ./scripts/game.yaml -m ./scripts/map.json
+# bundle exec ruby ./scripts/draw_map.rb -g ./scripts/game.yaml -m ./scripts/world.svg -h 6
+
+bundle exec ruby ./scripts/add_kingdom.rb -g ./scripts/game.yaml -p jim -c XXX -k "The Jimpire"
+bundle exec ruby ./scripts/add_kingdom.rb -g ./scripts/game.yaml -p steve -c XXX -k "Steveland"
+bundle exec ruby ./scripts/add_kingdom.rb -g ./scripts/game.yaml -p jeff -c XXX -k "Jeffdom"
+bundle exec ruby ./scripts/add_kingdom.rb -g ./scripts/game.yaml -p alex -c XXX -k "Alexworld"
+bundle exec ruby ./scripts/add_kingdom.rb -g ./scripts/game.yaml -p stu -c XXX -k "The Stuniverse"
+
+# bundle exec ruby ./scripts/turn.rb -g ./scripts/game.yaml -o ./orders/ -r ./reports/ -s 123456 --dryrun
+bundle exec ruby ./scripts/turn.rb -g ./scripts/game.yaml -o ./orders/ -r ./reports/ -s 123456 
+bundle exec ruby ./scripts/report.rb -g ./scripts/game.yaml -r ./reports/ 

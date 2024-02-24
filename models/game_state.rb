@@ -10,6 +10,7 @@ module Emissary
   require_relative './kingdom'
   require_relative './constants'
   require_relative './message'
+  require_relative './agent'
 
   class GameState
     attr_accessor :kingdoms, :map, :settlements, :turn, :messages, :errors

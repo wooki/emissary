@@ -82,6 +82,7 @@ module Emissary
       end
       
       # TODO: agents report on area and surroundings
+      
 
       # TODO: add areas (not provinces) that your scouts can reach
 

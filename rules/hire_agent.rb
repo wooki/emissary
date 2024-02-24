@@ -12,9 +12,7 @@ module Emissary
 
     # executes this rule against the gamestate
     def execute(game)
-
-      puts "HireAgent"
-
+      
       hex = game.getCoord(@coord)
       if !hex
         game.order_error(@player, "Hire agent failed because the province could not be found.");
@@ -37,7 +35,7 @@ module Emissary
         agent.message("Ready for orders.", "Agent")
         hex.add_agent agent
 
-        game.info "HIRE", hex, "Agent hired by #{kingdom.name} for 12 turns.", {cost: cost}
+        game.info "HIRE", hex, "Agent hired by #{kingdom.name} for 12 turns.", {gold: 0 - cost}
       else
         game.info "HIRE", hex, "#{kingdom.name} failed to hire an agent.", nil
       end

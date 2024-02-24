@@ -61,7 +61,7 @@ class Area
     details[:messages] = @messages if level >= INFO_LEVELS[:MESSAGES]
     details[:hire_cost] = hire_cost(game) if level >= INFO_LEVELS[:WEALTH]
 
-    details[:agents] = @agents.map { | agent | 
+    details[:agents] = @agents.transform_values { | agent | 
         agent.report(level)
     }.compact
     
