@@ -44,7 +44,8 @@ module Emissary
         
 
         # what levels does each access have
+        KNOWN: 0,
         PUBLIC: 1,
-        OWNED: 9
+        FULL: 9
     }
 end

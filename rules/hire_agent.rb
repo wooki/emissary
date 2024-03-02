@@ -33,6 +33,7 @@ module Emissary
 
         agent = Agent.new game.random_id
         agent.message("Ready for orders.", "Agent")
+        agent.owner = @player
         hex.add_agent agent
 
         game.info "HIRE", hex, "Agent hired by #{kingdom.name} for 12 turns.", {gold: 0 - cost}

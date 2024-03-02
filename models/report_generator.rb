@@ -10,7 +10,7 @@ module Emissary
 
     def add_area(area, level, report, player, game)
       return unless !@levels.has_key?(area.coord_sym) or @levels[area.coord_sym] < level
-
+      
       report.map[area.coord_sym] = area.report(level, player, game)
       @levels[area.coord_sym] = level
     end
@@ -40,7 +40,7 @@ module Emissary
 
       # build array of urban areas from which all map info is discovered
       known_urbans = {}
-      known_urbans[capital.coord_sym] = INFO_LEVELS[:OWNED]
+      known_urbans[capital.coord_sym] = INFO_LEVELS[:PUBLIC]
 
       known_trade_nodes = []
 
@@ -49,7 +49,7 @@ module Emissary
       game.each_urban do |urban|
         if urban.owner == player
 
-          known_urbans[urban.coord_sym] = INFO_LEVELS[:OWNED]
+          known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
           known_trade_nodes.push urban.trade.coord_sym if urban.trade
 
         elsif urban.trade.coord_sym == capital.trade.coord_sym
@@ -80,9 +80,27 @@ module Emissary
 
         false # return false to stop iterator from building return hash
       end
+
+      # TODO: RETHINK ALL OF THE ABOVE, DON'T REVEAL AS MUCH OF THE MAP
+      # Make whole trade node level 0 (known) which can be drawn but is not
+      # proving anything except terrain.      
+      # then everything else is added based on agents and owned areas
       
-      # TODO: agents report on area and surroundings
-      
+      # agents report on area and surroundings
+      agents = game.each_agent do | agent_key, agent, area |
+        if agent.owner == player          
+          add_area(area, agent.depth, report, player, game)
+
+          # TODO: also add entire proivince at KNOWN level IF the area is a settlement
+
+          # TODO: also get all areas within range, with decreasing depth
+          
+
+        end
+      end
+
+      # KNOWN AREAS MUST BE TRACKED (this is how explored will work, so they are)
+      # always reported on even in later turns
 
       # TODO: add areas (not provinces) that your scouts can reach
 

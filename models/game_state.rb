@@ -264,6 +264,19 @@ module Emissary
       matched
     end
 
+    def each_agent
+      matched = []
+
+      @map.each do |_key, area|
+        
+        area.agents.each do | _agent_key, agent |
+          matched.push agent if !block_given? or yield _agent_key, agent, area
+        end
+
+      end
+      matched
+    end
+
     ##################################
     # get the kingom object for specified user
     ##################################

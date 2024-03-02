@@ -49,7 +49,7 @@ class Area
     Hiring.agent_hire_cost(3, self, game)
   end
 
-  def report(level, player, game)
+  def report(level, player, game, is_owner=false)
     
     details = {x: @x, y: @y, terrain: @terrain }
 
@@ -57,28 +57,28 @@ class Area
     details[:province] = @province if @province
     details[:trade_node] = @trade_node if @trade_node
 
-    details[:population] = @population if level >= INFO_LEVELS[:POPULATION]
-    details[:messages] = @messages if level >= INFO_LEVELS[:MESSAGES]
-    details[:hire_cost] = hire_cost(game) if level >= INFO_LEVELS[:WEALTH]
+    details[:population] = @population if level >= INFO_LEVELS[:POPULATION] or is_owner
+    details[:messages] = @messages if level >= INFO_LEVELS[:MESSAGES] or is_owner
+    details[:hire_cost] = hire_cost(game) if level >= INFO_LEVELS[:WEALTH] or is_owner
 
     details[:agents] = @agents.transform_values { | agent | 
-        agent.report(level)
+        agent.report(level, player)
     }.compact
     
-    if level >= INFO_LEVELS[:PRODUCTION]
+    if level >= INFO_LEVELS[:PRODUCTION] or is_owner
       details[:food] = @food
       details[:goods] = @goods
     end
 
     if @trade_node and @trade_node.is_node
-      if level >= INFO_LEVELS[:TRADE]
+      if level >= INFO_LEVELS[:TRADE] or is_owner
         details[:trade_node] = @trade_node
       end
     end
 
     if @info and @info.length > 0
       details[:info] = @info.select do | info_item | 
-        (!player.nil? and info_item[:player] == player) or info_item[:level] <= level
+        (!player.nil? and info_item[:player] == player) or info_item[:level] <= level or is_owner
       end
     end
 

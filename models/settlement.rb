@@ -100,24 +100,31 @@ class Settlement < Area
   end 
 
   def report(level, player, game)
-    details = super(level, player, game)
+
+    #set level to full if reporting to owner
+    is_owner = player == @owner        
+
+    details = super(level, player, game, is_owner)
 
     details.delete(:food)
     details.delete(:goods)
 
-    details[:owner] = @owner
+    details[:owner] = @owner if level >= INFO_LEVELS[:PUBLIC] or is_owner
     details[:name] = @name
-    details[:borders] = @borders
+    details[:borders] = @borders if level >= INFO_LEVELS[:PUBLIC] or is_owner
 
+    details[:report_level] = level
+    details[:report_level] = INFO_LEVELS[:FULL] if is_owner
+    
     # add details dependent on level
-    details[:hire_cost] = hire_cost(game) if level >= INFO_LEVELS[:WEALTH]
+    details[:hire_cost] = hire_cost(game) if level >= INFO_LEVELS[:WEALTH] or is_owner
     details[:trade] = @trade #if level >= INFO_LEVELS[:TRADE]
-    details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH]
-    details[:unrest] = @unrest.round(2) if level >= INFO_LEVELS[:UNREST]
-    details[:tax] = @tax.round() if level >= INFO_LEVELS[:PRODUCTION]
-    details[:trade_policy] = @trade_policy if level >= INFO_LEVELS[:POLICY]
+    details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH] or is_owner
+    details[:unrest] = @unrest.round(2) if level >= INFO_LEVELS[:UNREST] or is_owner
+    details[:tax] = @tax.round() if level >= INFO_LEVELS[:PRODUCTION] or is_owner
+    details[:trade_policy] = @trade_policy if level >= INFO_LEVELS[:POLICY] or is_owner
 
-    if level >= INFO_LEVELS[:STORE]
+    if level >= INFO_LEVELS[:STORE] or is_owner
       details[:store] = @store
     end
 
