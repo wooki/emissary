@@ -253,6 +253,27 @@ module Emissary
       each_area urban, &block
     end
 
+    def each_province_by_region(region, &block)
+      matched = []
+      self.each_urban do |urban|
+        if urban.trade.coord_sym == region.coord_sym
+          matched.push urban if !block_given? or yield urban
+        end
+      end
+      matched
+    end
+
+    def each_area_in_province(province, &block)
+      matched = []
+      self.each_area do |area|
+        if area.coord_sym == province.coord_sym or 
+          (!area.province.nil? and area.province.coord_sym == province.coord_sym)
+          matched.push area if !block_given? or yield area
+        end
+      end
+      matched
+    end
+
     def each_trade_node
       matched = []
 
@@ -263,6 +284,7 @@ module Emissary
       end
       matched
     end
+    alias each_region each_trade_node    
 
     def each_agent
       matched = []

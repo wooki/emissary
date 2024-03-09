@@ -54,13 +54,16 @@ class Area
     details = {x: @x, y: @y, terrain: @terrain }
 
     details[:has_population] = !["ocean", "peak"].include?(@terrain)
-    details[:province] = @province if @province
-    details[:trade_node] = @trade_node if @trade_node
+    details[:province] = @province if @province and level >= INFO_LEVELS[:KNOWN] or is_owner
+    details[:trade_node] = @trade_node if @trade_node and level >= INFO_LEVELS[:KNOWN] or is_owner
 
     details[:population] = @population if level >= INFO_LEVELS[:POPULATION] or is_owner
     details[:messages] = @messages if level >= INFO_LEVELS[:MESSAGES] or is_owner
     details[:hire_cost] = hire_cost(game) if level >= INFO_LEVELS[:WEALTH] or is_owner
 
+    details[:report_level] = level
+    details[:report_level] = INFO_LEVELS[:FULL] if is_owner
+    
     details[:agents] = @agents.transform_values { | agent | 
         agent.report(level, player)
     }.compact

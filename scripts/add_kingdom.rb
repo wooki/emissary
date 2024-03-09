@@ -66,6 +66,16 @@ class AddKingdom
 
     # set ownership
     hex.owner = player
+    
+    # add every hex in their region as explored
+    @state.each_province_by_region(hex.trade) { | province |
+      @state.each_area_in_province(province) { | area |
+        k.explored.push area.coord_sym
+      }
+    }
+      
+
+    # add every adjacent province
 
     # save the gamestate
     @state.save gamefile

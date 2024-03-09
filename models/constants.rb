@@ -44,6 +44,7 @@ module Emissary
         
 
         # what levels does each access have
+        EXPLORED: -1,
         KNOWN: 0,
         PUBLIC: 1,
         FULL: 9

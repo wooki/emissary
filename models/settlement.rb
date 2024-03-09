@@ -109,9 +109,9 @@ class Settlement < Area
     details.delete(:food)
     details.delete(:goods)
 
-    details[:owner] = @owner if level >= INFO_LEVELS[:PUBLIC] or is_owner
+    details[:owner] = @owner if level >= INFO_LEVELS[:KNOWN] or is_owner
     details[:name] = @name
-    details[:borders] = @borders if level >= INFO_LEVELS[:PUBLIC] or is_owner
+    details[:borders] = @borders if level >= INFO_LEVELS[:KNOWN] or is_owner
 
     details[:report_level] = level
     details[:report_level] = INFO_LEVELS[:FULL] if is_owner

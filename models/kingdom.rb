@@ -1,6 +1,6 @@
 module Emissary
   class Kingdom
-    attr_accessor :player, :name, :capital, :capital_coord, :flag
+    attr_accessor :player, :name, :capital, :capital_coord, :flag, :explored
 
     ##################################
     # set-up initial state
@@ -13,6 +13,7 @@ module Emissary
       @capital = nil
       @flag = nil
       @capital_coord = { x: nil, y: nil }
+      @explored = Array.new
     end
 
     def x

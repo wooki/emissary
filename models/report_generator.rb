@@ -29,7 +29,7 @@ module Emissary
       report.kingdoms = game.kingdoms
 
       # add the players kingdom separately
-      report.my_kingdom = game.kingdom_by_player player
+      report.my_kingdom = game.kingdom_by_player player      
 
       # add messages and errors
       report.messages = game.messages[player]
@@ -38,54 +38,29 @@ module Emissary
       # check which trade node the players capital is in
       capital = game.map[report.my_kingdom.capital_coord_sym]
 
-      # build array of urban areas from which all map info is discovered
-      known_urbans = {}
-      known_urbans[capital.coord_sym] = INFO_LEVELS[:PUBLIC]
-
-      known_trade_nodes = []
-
-      # iterate the urban areas adding if owned, or in the same trade node,
-      # adjacent to capital or you have an agent
-      game.each_urban do |urban|
-        if urban.owner == player
-
-          known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
-          known_trade_nodes.push urban.trade.coord_sym if urban.trade
-
-        elsif urban.trade.coord_sym == capital.trade.coord_sym
-
-          known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
-
-        elsif capital.neighbours.any? { |coord| urban.x == coord[:x] and urban.y == coord[:y] }
-
-          known_urbans[urban.coord_sym] = INFO_LEVELS[:PUBLIC]
-
-        end
-
-        false
-      end
-      known_trade_nodes.uniq!
-
       # add all areas that are in provinces this player knows about
       game.each_area do |area|
-        if known_urbans.has_key? area.coord_sym
-
-          add_area(area, known_urbans[area.coord_sym], report, player, game)
-
-        elsif area.province and known_urbans.has_key? area.province.coord_sym
-
-          add_area(area, known_urbans[area.province.coord_sym], report, player, game)              
-
+        
+        if report.my_kingdom.explored.include? area.coord_sym
+          add_area(area, INFO_LEVELS[:KNOWN], report, player, game)
         end
 
         false # return false to stop iterator from building return hash
       end
 
-      # TODO: RETHINK ALL OF THE ABOVE, DON'T REVEAL AS MUCH OF THE MAP
-      # Make whole trade node level 0 (known) which can be drawn but is not
-      # proving anything except terrain.      
-      # then everything else is added based on agents and owned areas
-      
+      # add amy owned provinces
+      game.each_urban do |urban|
+        if urban.owner == player
+          add_area(urban, INFO_LEVELS[:PUBLIC], report, player, game)
+
+          game.each_area_in_province(urban) { | area |
+            add_area(area, INFO_LEVELS[:PUBLIC], report, player, game)
+          }
+        end
+
+        false
+      end
+
       # agents report on area and surroundings
       agents = game.each_agent do | agent_key, agent, area |
         if agent.owner == player          
