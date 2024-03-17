@@ -261,6 +261,29 @@ class MapUtils
       nil
    end
 
+   def self.get_hexes_in_range(state, start, size, max_distance, exclude_ocean=true)
+
+      results = []
+      
+      terrain_check = lambda do |coord, path, is_start|
+        map_area = state.getHex(coord[:x], coord[:y])
+        return false if exclude_ocean && map_area.terrain == 'ocean' 
+        path.length <= max_distance
+      end
+    
+      found_hex = lambda do |coord, path|
+        results << {
+          hex: coord,
+          distance: path.length
+        }
+        false # keep searching
+      end
+    
+      breadth_search(start, size, terrain_check, found_hex)
+    
+      results
+    end
+
    def calculate_heuristic(hex_a, hex_b, terrain_weights)
       dx = (hex_a[:x] - hex_b[:x]).abs
       dy = (hex_a[:y] - hex_b[:y]).abs

@@ -48,7 +48,7 @@ module Emissary
         false # return false to stop iterator from building return hash
       end
 
-      # add amy owned provinces
+      # add any owned provinces
       game.each_urban do |urban|
         if urban.owner == player
           add_area(urban, INFO_LEVELS[:PUBLIC], report, player, game)
@@ -64,13 +64,19 @@ module Emissary
       # agents report on area and surroundings
       agents = game.each_agent do | agent_key, agent, area |
         if agent.owner == player          
-          add_area(area, agent.depth, report, player, game)
+          #add_area(area, agent.depth, report, player, game)
 
           # TODO: also add entire proivince at KNOWN level IF the area is a settlement
+          agent_report = game.agent_report(area, 6)
+          agent_report.each do | agent_area_report |
+            puts agent_area_report.inspect
+            hex = game.getHexFromCoord agent_area_report[:hex]
+            puts hex
+            add_area(hex, 6 - agent_area_report[:distance], report, player, game)
+          end
 
           # TODO: also get all areas within range, with decreasing depth
           
-
         end
       end
 

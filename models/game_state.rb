@@ -11,6 +11,7 @@ module Emissary
   require_relative './constants'
   require_relative './message'
   require_relative './agent'
+  require_relative './map_utils'
 
   class GameState
     attr_accessor :kingdoms, :map, :settlements, :turn, :messages, :errors
@@ -53,6 +54,10 @@ module Emissary
 
     def getHex(x, y)
       @map["#{x},#{y}".to_sym]
+    end
+
+    def getHexFromCoord(coord)
+      @map["#{coord[:x]},#{coord[:y]}".to_sym]
     end
 
     def getCoord(coord)
@@ -297,6 +302,11 @@ module Emissary
 
       end
       matched
+    end
+
+    def agent_report(start, max_distance)
+
+      MapUtils::get_hexes_in_range(self, start.coord, size, max_distance, exclude_ocean=true)
     end
 
     ##################################
