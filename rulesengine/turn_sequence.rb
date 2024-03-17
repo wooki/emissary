@@ -14,6 +14,7 @@ module Emissary
   TS_TRADE = 300
   TS_UPKEEP = 360
 
+  TS_LEVEL_AGENT = 499
   TS_HIRE_AGENT = 500
 
   # TS_MESSAGE = 20

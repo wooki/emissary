@@ -261,28 +261,57 @@ class MapUtils
       nil
    end
 
-   def self.get_hexes_in_range(state, start, size, max_distance, exclude_ocean=true)
+   def self.score_path(state, path, terrain_weights)
 
+      total_score = 0
+      
+      path.each do |coord|
+
+      map_area = state.getHex(coord[:x], coord[:y])
+
+        terrain = map_area.terrain.to_sym        
+        
+        terrain_weight = terrain_weights[terrain]        
+        terrain_weight = 1 if terrain_weight.nil?
+        
+        total_score += terrain_weight 
+      end
+    
+      total_score
+    
+    end
+
+   def self.get_hexes_in_range(state, start, size, max_distance, exclude_ocean=true, terrain_weights=nil)
+   
+      default_terrain_weights = {lowland: 1.0, forest: 1.0, mountain: 1.0, town: 1.0, city: 1.0, desert: 1.0, peak: 1.0, ocean: 1.0}
+      terrain_weights = default_terrain_weights.merge(terrain_weights || {})
+      
       results = []
       
       terrain_check = lambda do |coord, path, is_start|
-        map_area = state.getHex(coord[:x], coord[:y])
-        return false if exclude_ocean && map_area.terrain == 'ocean' 
-        path.length <= max_distance
+         map_area = state.getHex(coord[:x], coord[:y])
+         path.length <= max_distance
       end
-    
+
       found_hex = lambda do |coord, path|
-        results << {
-          hex: coord,
-          distance: path.length
-        }
-        false # keep searching
+         if coord[:terrain] != 'ocean'
+            score = score_path(state, path, terrain_weights) 
+            if score <= max_distance
+               results << {
+                  hex: coord,
+                  distance: path.length,
+                  score: score
+               }
+            end
+         end
+         false # keep searching
       end
-    
-      breadth_search(start, size, terrain_check, found_hex)
-    
-      results
-    end
+
+  breadth_search(start, size, terrain_check, found_hex)
+
+  results
+end
+
 
    def calculate_heuristic(hex_a, hex_b, terrain_weights)
       dx = (hex_a[:x] - hex_b[:x]).abs

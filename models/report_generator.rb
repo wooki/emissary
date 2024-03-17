@@ -64,24 +64,15 @@ module Emissary
       # agents report on area and surroundings
       agents = game.each_agent do | agent_key, agent, area |
         if agent.owner == player          
-          #add_area(area, agent.depth, report, player, game)
-
-          # TODO: also add entire proivince at KNOWN level IF the area is a settlement
-          agent_report = game.agent_report(area, 6)
+          
+          agent_report = game.agent_report(area, agent.range)
           agent_report.each do | agent_area_report |
-            puts agent_area_report.inspect
             hex = game.getHexFromCoord agent_area_report[:hex]
-            puts hex
-            add_area(hex, 6 - agent_area_report[:distance], report, player, game)
-          end
-
-          # TODO: also get all areas within range, with decreasing depth
+            add_area(hex, agent.depth - agent_area_report[:score], report, player, game)
+          end          
           
         end
       end
-
-      # KNOWN AREAS MUST BE TRACKED (this is how explored will work, so they are)
-      # always reported on even in later turns
 
       # TODO: add areas (not provinces) that your scouts can reach
 

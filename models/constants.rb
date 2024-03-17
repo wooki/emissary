@@ -24,6 +24,7 @@ module Emissary
     AGENT_COST_PER_MONTH = 0.5
     AGENT_COST_PER_LEVEL = 0.33
     AGENT_COST_PER_DISTANCE = 0.1
+    AGENT_REPORT_TERRAIN_WEIGHTS = {lowland: 1.0, forest: 2.0, mountain: 1.5, town: 0.5, city: 0.5, desert: 2.0, peak: 3.0, ocean: 2.0}
 
     INFO_LEVELS = {
         # level required to gain this info

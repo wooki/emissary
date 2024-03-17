@@ -305,8 +305,7 @@ module Emissary
     end
 
     def agent_report(start, max_distance)
-
-      MapUtils::get_hexes_in_range(self, start.coord, size, max_distance, exclude_ocean=true)
+      MapUtils::get_hexes_in_range(self, start.coord, size, max_distance, exclude_ocean=true, terrain_weights=AGENT_REPORT_TERRAIN_WEIGHTS)
     end
 
     ##################################

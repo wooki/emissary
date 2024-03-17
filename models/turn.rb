@@ -5,6 +5,7 @@ require_relative '../rules/export'
 require_relative '../rules/industry'
 require_relative '../rules/upkeep'
 require_relative '../rules/trade_prices'
+require_relative '../rules/level_agent'
 require_relative './report_generator'
 require_relative './order_parser'
 require_relative './map_utils'
@@ -52,12 +53,18 @@ module Emissary
           queue.AddRule(Import.new(area))
           queue.AddRule(Export.new(area))
           queue.AddRule(Industry.new(area))
-          queue.AddRule(Upkeep.new(area))
+          queue.AddRule(Upkeep.new(area))          
         end
 
         # TradePrices
         @state.each_trade_node.each do |area|
           queue.AddRule(TradePrices.new(area.trade_node))
+        end
+
+        # agents
+        # Import, Export, Industry, Upkeep
+        @state.each_agent do | agent_key, agent, area |
+          queue.AddRule(LevelAgent.new(agent))          
         end
 
         # loyalty
