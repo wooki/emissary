@@ -6,6 +6,7 @@ require_relative '../rules/industry'
 require_relative '../rules/upkeep'
 require_relative '../rules/trade_prices'
 require_relative '../rules/level_agent'
+require_relative '../rules/pay_agent'
 require_relative './report_generator'
 require_relative './order_parser'
 require_relative './map_utils'
@@ -64,7 +65,8 @@ module Emissary
         # agents
         # Import, Export, Industry, Upkeep
         @state.each_agent do | agent_key, agent, area |
-          queue.AddRule(LevelAgent.new(agent))          
+          queue.AddRule(LevelAgent.new(agent))
+          queue.AddRule(PayAgent.new(agent))
         end
 
         # loyalty

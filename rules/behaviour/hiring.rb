@@ -20,7 +20,7 @@ module Emissary
             end
 
             cost = cost * AGENT_COST_PER_MONTH * 12.0 # buy for 12 turns
-            cost = cost * AGENT_COST_PER_LEVEL * level
+            cost = cost * AGENT_COST_PER_LEVEL * Math.sqrt(level)
 
             cost.round.to_i
           end

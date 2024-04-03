@@ -308,6 +308,24 @@ module Emissary
       MapUtils::get_hexes_in_range(self, start.coord, size, max_distance, exclude_ocean=true, terrain_weights=AGENT_REPORT_TERRAIN_WEIGHTS)
     end
 
+    def find_agent(agent_id)
+      each_agent do |agent_key, agent, area|
+        if agent.id == agent_key
+          yield agent, area
+        end
+      end      
+    end
+
+    def retire(agent)
+
+      # for now remove agent but in future maybe keep them
+      # and allow others to hire them
+      find_agent(agent.id) do | agent, area |
+        area.remove_agent(agent)
+      end
+      
+    end
+
     ##################################
     # get the kingom object for specified user
     ##################################

@@ -1,4 +1,5 @@
 require_relative '../rules/set_trade_policy'
+require_relative '../rules/set_pay_agent'
 require_relative '../rules/hire_agent'
 
 module Emissary
@@ -11,6 +12,7 @@ module Emissary
     def initialize
       @rules = {
         'trade_policy' => SetTradePolicy,
+        'pay_agent' => SetPayAgent,
         'hire_agent' => HireAgent
       }
     end
@@ -30,8 +32,9 @@ module Emissary
       # create an instance
       begin
         newRule = ruleClass.new(player)
-      rescue StandardError
-        puts 'rule class not found for: ' + ruleClass + ': ' + $!
+      rescue StandardError => e
+        puts 'rule class not found for: ' + ruleClass.to_s
+        puts e.message
         return
       end
 

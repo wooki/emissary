@@ -4,7 +4,7 @@ module Emissary
 
 class Agent
 
-  attr_accessor :id, :x, :y, :owner, :range, :depth, :skill, :messages
+  attr_accessor :id, :x, :y, :owner, :range, :depth, :skill, :messages, :next_payment, :will_pay
 
   def initialize(id)
     super()
@@ -13,6 +13,8 @@ class Agent
     @range = 1
     @depth = 1
     @skill = 1
+    @next_payment = 0
+    @will_pay = 0
   end  
 
   def new_turn
@@ -31,6 +33,10 @@ class Agent
     @messages.push Message.new(msg, from)
   end
 
+  def level 
+    @range + @depth + @skill
+  end
+
   def report(level, player)
     
     is_owner = player == @owner
@@ -45,6 +51,8 @@ class Agent
     details[:range] = @range if level >= INFO_LEVELS[:FULL] or is_owner
     details[:depth] = @depth if level >= INFO_LEVELS[:FULL] or is_owner
     details[:skill] = @skill if level >= INFO_LEVELS[:FULL] or is_owner
+    details[:next_payment] = @next_payment if level >= INFO_LEVELS[:FULL] or is_owner
+    details[:will_pay] = @will_pay if level >= INFO_LEVELS[:FULL] or is_owner
     
     details[:messages] = @messages if level >= INFO_LEVELS[:MESSAGES] or is_owner
 

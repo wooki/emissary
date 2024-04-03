@@ -6,7 +6,7 @@ module Emissary
     attr_accessor :coord, :data
 
     def initialize(player)
-      super(player, TS_SET_TRADE_POLICY)
+      super(player, TS_SET_ORDER)
     end
 
     # executes this rule against the gamestate
