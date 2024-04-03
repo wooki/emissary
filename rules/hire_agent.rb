@@ -39,6 +39,9 @@ module Emissary
         hex.add_agent agent
 
         game.info "HIRE", hex, "Agent hired by #{kingdom.name} for 12 turns.", {gold: 0 - cost}
+        if hex != capital
+          game.info "HIRE", capital, "Agent hired in #{hex.province_name} for 12 turns.", {gold: 0 - cost}
+        end
       else
         game.info "HIRE", hex, "#{kingdom.name} failed to hire an agent.", nil
       end

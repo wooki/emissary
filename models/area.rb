@@ -52,6 +52,10 @@ class Area
     Hiring.agent_hire_cost(3, self, game)
   end
 
+  def province_name
+    @province 
+  end
+
   def report(level, player, game, is_owner=false)
     
     details = {x: @x, y: @y, terrain: @terrain }
@@ -68,7 +72,7 @@ class Area
     details[:report_level] = INFO_LEVELS[:FULL] if is_owner
     
     details[:agents] = @agents.transform_values { | agent | 
-        agent.report(level, player)
+        agent.report(level, player, self, game)
     }.compact
     
     if level >= INFO_LEVELS[:PRODUCTION] or is_owner

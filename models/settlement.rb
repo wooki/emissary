@@ -95,6 +95,10 @@ class Settlement < Area
     @unrest = 0 if @unrest < 0
   end
 
+  def province_name
+    @name 
+  end
+
   def hire_cost(game)
     Hiring.agent_hire_cost(3, self, game)
   end 

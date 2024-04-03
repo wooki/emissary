@@ -1,4 +1,5 @@
 require_relative './constants'
+require_relative '../rules/behaviour/hiring'
 
 module Emissary
 
@@ -34,10 +35,14 @@ class Agent
   end
 
   def level 
-    @range + @depth + @skill
+    Math.sqrt(@range + @depth + @skill)
   end
 
-  def report(level, player)
+  def cost(area, game)
+    Hiring.agent_hire_cost(self.level, area, game)
+  end
+
+  def report(level, player, area, game)
     
     is_owner = player == @owner
 
@@ -51,8 +56,10 @@ class Agent
     details[:range] = @range if level >= INFO_LEVELS[:FULL] or is_owner
     details[:depth] = @depth if level >= INFO_LEVELS[:FULL] or is_owner
     details[:skill] = @skill if level >= INFO_LEVELS[:FULL] or is_owner
+    details[:level] = @level if level >= INFO_LEVELS[:FULL] or is_owner
     details[:next_payment] = @next_payment if level >= INFO_LEVELS[:FULL] or is_owner
     details[:will_pay] = @will_pay if level >= INFO_LEVELS[:FULL] or is_owner
+    details[:cost] = self.cost(area, game) if level >= INFO_LEVELS[:FULL] or is_owner
     
     details[:messages] = @messages if level >= INFO_LEVELS[:MESSAGES] or is_owner
 

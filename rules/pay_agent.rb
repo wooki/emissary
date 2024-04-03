@@ -1,7 +1,6 @@
 require_relative '../rulesengine/rule'
 require_relative '../rulesengine/turn_sequence'
 require_relative '../models/agent'
-require_relative '../rules/behaviour/hiring'
 
 module Emissary
   class PayAgent < Rule
@@ -29,7 +28,7 @@ module Emissary
 
             game.find_agent(@agent.id) do | agent, area |
             
-              cost = Hiring.agent_hire_cost(@agent.level, area, game)
+              cost = @agent.cost(area, game)
 
               if capital.store.pay(cost) 
 
