@@ -46,7 +46,7 @@ class Agent
     
     is_owner = player == @owner
 
-    if !is_owner and level > ((10 + @skill) - (@range + @depth)) and level < INFO_LEVELS[:FULL] 
+    if !is_owner and level < ((10 + @skill) - (@range + @depth)) and level < INFO_LEVELS[:FULL] 
       return nil
     end
 
