@@ -40,12 +40,6 @@ module Emissary
                         goods = goods * production_rate
                     end
 
-                    # maybe split into another rule but for now just send to closest
-                    distance.times { | i |
-                        food = food * PRODUCTION_FOOD_TRAVEL_LOSS
-                        goods = goods * PRODUCTION_GOODS_TRAVEL_LOSS
-                    }
-
                     food = food.floor.to_i
                     goods = goods.floor.to_i
                 

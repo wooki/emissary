@@ -41,4 +41,4 @@ end.parse!
 
 ng = Reporter.new options[:gamefile], options[:reportsdir], options[:player]
 
-# bundle exec ruby report.rb -g game.yaml -r ../reports/ -p stu
+# bundle exec ruby report.rb -g game.yaml -r ../reports/ -p jim

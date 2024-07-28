@@ -5,8 +5,6 @@ module Emissary
     START_GOLD_MAX = 50
 
     # used in turn sequence rules and behaviours
-    PRODUCTION_FOOD_TRAVEL_LOSS = 0.95 # rate at which food is reduced per area between the production area and the settlement (represents cost of taransit)
-    PRODUCTION_GOODS_TRAVEL_LOSS = 0.95 # rate at which goods are reduced per area between the production area and the settlement (represents cost of taransit)
     FOOD_CONSUMPTION = 0.001 # food consumption per population rounded to integer
     INDUSTRY_RATE = 0.001 # industry per population, rounded down to integer
     TRADE_RATE = 0.10 # fixed rate of trading
