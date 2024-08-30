@@ -55,9 +55,17 @@ module Emissary
         return
       end
 
+      # get the data
+      player = data["player"]
+      turn = data["turn"]
+      orders = data["orders"]
+
+      # TODO: confiorm the turn number and player are valid
+      
       # all the sub elements are orders
-      data.each do |order|
+      orders.each do |order|
         
+        pp order
         # get the order name
         orderName = order["order"]
 
