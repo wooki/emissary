@@ -26,3 +26,5 @@ These are extra areas of specific gameplay functionality that I want to add to t
 * Rivers and Deep Desert
 * Castles
 * Combat - overhaul of whole system
+* AI for independent nations
+* Named leaders and hereditary titles
