@@ -53,7 +53,7 @@ class Area
   end
 
   def province_name
-    @province 
+    "#{@terrain} in #{@province.name}" 
   end
 
   def report(level, player, game, is_owner=false)

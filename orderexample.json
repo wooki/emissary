@@ -1,17 +1,27 @@
 {
-  "player": "jim",
-  "turn": 2,
-  "orders": [
-    {
-      "order": "set_trade_policy",
-      "area": "43,48",
-      "food": "none",
-      "goods": "reserve"
-    },
-    {
-      "order": "set_tax",
-      "area": "43,48",
-      "tax": 0.1
-    }
-  ]
+	"player": "jim",
+	"turn": 1,
+	"orders": [
+		{
+			"coord": "72,86",
+			"order": "hire_agent",
+			"hire": "hire"
+		},
+		{
+			"coord": "86,85",
+			"order": "hire_agent",
+			"hire": "hire"
+		},
+		{
+			"coord": "84,94",
+			"order": "hire_agent",
+			"hire": "hire"
+		},
+		{
+			"coord": "84,94",
+			"order": "set_trade_policy",
+			"food": "stockpile",
+			"goods": "reserve"
+		}
+	]
 }

@@ -4,7 +4,7 @@ require_relative '../models/agent'
 
 module Emissary
   class HireAgent < Rule
-    attr_accessor :coord, :data
+    attr_accessor :coord, :hire
 
     def initialize(player)
       super(player, TS_SET_ORDER)      
