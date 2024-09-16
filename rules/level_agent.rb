@@ -29,7 +29,7 @@ module Emissary
           @agent.message("Has made friends in high places", "Agent")
         elsif level_skill == :skill
           @agent.skill += 1
-          @agent.message("Has hired some useful operators", "Agent")
+          @agent.message("Has hired some blunt instruments", "Agent")
         end
       end
             
