@@ -2,7 +2,7 @@ require 'json'
 require 'optparse'
 require_relative '../models/game_state'
 require_relative '../models/map_utils'
-require_relative '../models/map_generator'
+require 'emissary-maps'
 
 # parse command line options
 options = {
@@ -37,7 +37,7 @@ end.parse!
 
 seeded = nil
 seeded = options[:seed]
-mg = Emissary::MapGenerator.new seeded
+mg = Emissary::Maps.new seeded
 
 map = mg.generate options[:size]
 
