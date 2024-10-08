@@ -12,8 +12,6 @@ The following apt packages are required:
 
 # Structural
 
-* Extract map generator
-* Extract name generator
 * Extract flag generator
 * Write CLI as a single command
 
@@ -21,6 +19,7 @@ The following apt packages are required:
 
 These are extra areas of specific gameplay functionality that I want to add to the game.
 
+* Seasons and weather (esp. for battle effects)
 * Armies - recruit, move, join, disband
 * Combat
 * Recruitment - different terrain provide % of different troops and base is militia

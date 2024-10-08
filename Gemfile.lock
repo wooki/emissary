@@ -1,3 +1,21 @@
+GIT
+  remote: https://github.com/wooki/emissary-battles.git
+  revision: d7df0db7652a21bf825e5cf18a873ffee33ff2a7
+  specs:
+    emissary-battles (1.0.0)
+
+GIT
+  remote: https://github.com/wooki/emissary-maps.git
+  revision: 870318e9f82d6ded2f909d1a73578bca8c022f0e
+  specs:
+    emissary-maps (0.1.0)
+
+GIT
+  remote: https://github.com/wooki/emissary-names.git
+  revision: 54f2ce3515e43a734e0b23201ded5ba48ef50192
+  specs:
+    emissary-names (0.1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -7,6 +25,9 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  emissary-battles!
+  emissary-maps!
+  emissary-names!
   titleize
 
 BUNDLED WITH

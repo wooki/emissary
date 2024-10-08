@@ -1,3 +1,4 @@
+require 'emissary-maps'
 require_relative '../rulesengine/rule_queue'
 require_relative '../rules/production'
 require_relative '../rules/import'
@@ -9,7 +10,6 @@ require_relative '../rules/level_agent'
 require_relative '../rules/pay_agent'
 require_relative './report_generator'
 require_relative './order_parser'
-require_relative './map_utils'
 
 module Emissary
   # runs a turn

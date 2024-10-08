@@ -158,4 +158,4 @@ end.parse!
 
 ng = AddKingdom.new options[:gamefile], options[:player], options[:kingdom], options[:capital], options[:flag]
 
-# bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k "The Jimpire" -f "1234"
+# bundle exec ruby add_kingdom.rb -g game.yaml -p jim -c XXX -k "The Jimpire" -f "54321"

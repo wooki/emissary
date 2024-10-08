@@ -2,6 +2,7 @@ module Emissary
   require 'json'
   require 'yaml'
   require 'random/formatter'
+  require 'emissary-maps'
   require_relative './area'
   require_relative './settlement'
   require_relative './trade_node'
@@ -10,8 +11,7 @@ module Emissary
   require_relative './kingdom'
   require_relative './constants'
   require_relative './message'
-  require_relative './agent'
-  require_relative './map_utils'
+  require_relative './agent'  
 
   class GameState
     attr_accessor :kingdoms, :map, :settlements, :turn, :messages, :errors

@@ -1,7 +1,7 @@
 require 'json'
 require 'optparse'
 require_relative '../models/game_state'
-require_relative '../models/map_utils'
+require 'emissary-maps'
 
 class DrawMap
 
