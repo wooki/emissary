@@ -91,6 +91,9 @@ class AddKingdom
     # check only last three
     digits = input_string[0, 3].chars.map(&:to_i)
 
+    # also check for some bad contrast colours
+    return false if [4,5,6,7].include?(digits[0]) && [4,5,6,7].include?(digits[1])    
+    
     # Check if all digits are unique
     digits.uniq.length == 3
   end
@@ -105,7 +108,7 @@ class AddKingdom
     # Take the first five digits from the shuffled array
     unique_digits = shuffled_digits[0, 3]
     unique_digits.unshift all_digits.sample
-    unique_digits.unshift all_digits.sample
+    unique_digits.unshift all_digits.sample % 3 # force 0-2
 
     # Convert the array to a string
     unique_digits.join
