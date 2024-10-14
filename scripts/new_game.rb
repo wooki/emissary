@@ -9,10 +9,15 @@ require_relative '../models/constants'
 
 class NewGame
 
-  attr_accessor :state
+  attr_accessor :state, :seed
 
   # load map.json and create game state, save game state
-  def initialize(gamefile, mapfile)
+  def initialize(gamefile, mapfile, seed = nil)
+
+    # Set the random seed if provided
+    @seed = seed
+    @seed = Random.new_seed if !@seed
+    @random = srand @seed
 
     # create an empty gamestate
     @state = Emissary::GameState.new
@@ -109,6 +114,10 @@ class NewGame
         end
       end
 
+      # assign a random int for use when drawing the map
+      # so it can allow for some variation that is predictable
+      a.seed = rand(1..10)      
+
       @state.map[key] = a
     }
 
@@ -130,8 +139,12 @@ OptionParser.new do | opts |
    opts.on("-mFILE", "--map=FILE", "Map file to read") do |n|
      options[:mapfile] = n
    end
+
+   opts.on("-s SEED", "--seed=SEED", "Random seed for game generation") do |s|
+    options[:seed] = s.to_i
+  end
 end.parse!
 
-ng = NewGame.new options[:gamefile], options[:mapfile]
+ng = NewGame.new options[:gamefile], options[:mapfile], options[:seed]
 
 # bundle exec ruby new_game.rb -g game.yaml -m map.json
