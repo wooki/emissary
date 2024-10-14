@@ -19,6 +19,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    perlin_noise (0.2.0)
     titleize (1.4.1)
 
 PLATFORMS
@@ -28,6 +29,7 @@ DEPENDENCIES
   emissary-battles!
   emissary-maps!
   emissary-names!
+  perlin_noise (~> 0.2.0)
   titleize
 
 BUNDLED WITH

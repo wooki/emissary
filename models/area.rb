@@ -6,7 +6,7 @@ module Emissary
 class Area
 
   attr_accessor :x, :y, :terrain, :population,
-    :food, :goods, :province, :trade_node, :info, :trade, :messages, :agents
+    :food, :goods, :province, :trade_node, :info, :trade, :messages, :agents, :seed
 
   def initialize
     super()
@@ -59,6 +59,8 @@ class Area
   def report(level, player, game, is_owner=false)
     
     details = {x: @x, y: @y, terrain: @terrain }
+
+    details[:seed] = @seed
 
     details[:has_population] = !["ocean", "peak"].include?(@terrain)
     details[:province] = @province if @province and level >= INFO_LEVELS[:KNOWN] or is_owner
