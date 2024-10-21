@@ -33,7 +33,7 @@ OptionParser.new do |opts|
     options[:seed] = n.to_i
   end
 
-  opts.on('-d', '--dryrun', 'run turn but do not sabe changes (for testing)') do |n|
+  opts.on('-d', '--dryrun', 'run turn but do not save changes (for testing)') do |n|
     options[:dryrun] = n
   end
 end.parse!
