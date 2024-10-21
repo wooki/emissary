@@ -6,20 +6,19 @@ GIT
 
 GIT
   remote: https://github.com/wooki/emissary-maps.git
-  revision: 870318e9f82d6ded2f909d1a73578bca8c022f0e
+  revision: 830a70d13dd8e918d48f9b051270d98300f9b5e8
   specs:
-    emissary-maps (0.1.0)
+    emissary-maps (0.1.1)
 
 GIT
   remote: https://github.com/wooki/emissary-names.git
-  revision: 54f2ce3515e43a734e0b23201ded5ba48ef50192
+  revision: 19cc4b8e83cc8c008a3e6f675c2ba19db76d0dd9
   specs:
-    emissary-names (0.1.0)
+    emissary-names (0.1.1)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    perlin_noise (0.2.0)
     titleize (1.4.1)
 
 PLATFORMS
@@ -29,7 +28,6 @@ DEPENDENCIES
   emissary-battles!
   emissary-maps!
   emissary-names!
-  perlin_noise (~> 0.2.0)
   titleize
 
 BUNDLED WITH
