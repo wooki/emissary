@@ -1,6 +1,7 @@
 require 'json'
 require 'optparse'
 require_relative '../models/game_state'
+require_relative '../models/settlement'
 require 'emissary-maps'
 
 class DrawMap
@@ -31,6 +32,17 @@ class DrawMap
 
   # output as svg
    def to_svg(state, size, io, hexsize=10)
+
+      terrain_colors = {
+         peak: 'dimgray',
+         ocean: '#3D59AB', 
+         mountain: 'slategray',
+         lowland: '#65b240',
+         forest: '#316e44',
+         desert: 'goldenrod',
+         town: 'Sienna',
+         city: 'Sienna'
+      }
 
       hex_b = 2*Math.sin( 60*(Math::PI/180) )*hexsize
       xoffset = (hex_b/2).round + Emissary::MapUtils::hex_pos(0, (size/2).round, hexsize, 0, 0)[:x].abs
@@ -69,29 +81,14 @@ class DrawMap
       @state.map.each { | key, hex |
 
          terrain = hex.terrain
-         if terrain == "peak"
-            # terrain = "silver"
-            terrain_color = "dimgray"
-         elsif terrain == "ocean"
+
+         terrain_color = terrain_colors[terrain.to_sym]
+         if terrain == "ocean"
             if is_trade_node? @state.map, hex
                # terrain_color = hex.tradenode
                # terrain_color = "blueviolet"
                terrain_color = trade_node_colors[key]
-            else
-               terrain_color = "#3D59AB"
             end
-         elsif terrain == "mountain"
-            terrain_color = "slategray"
-         elsif terrain == "lowland"
-            terrain_color = "limegreen"
-         elsif terrain == "forest"
-            terrain_color = "forestgreen"
-         elsif terrain == "desert"
-            terrain_color = "goldenrod"
-         elsif terrain == "town"
-            terrain_color = "black"
-         elsif terrain == "city"
-            terrain_color = "red"
          end
 
          pos = Emissary::MapUtils::hex_pos(hex.x, hex.y, hexsize, xoffset, yoffset)
@@ -102,33 +99,87 @@ class DrawMap
          hex_points.each { | hex_point |
             io.print "#{hex_point[:x].round(2)},#{hex_point[:y].round(2)} "
          }
-         # io.print "\" fill=\"#{terrain_color}\" stroke=\"#{terrain_color}\" />"
-         # io.print "\" fill=\"#{terrain_color}\" stroke=\"black\" stroke-width=\"0.5\" />"
+         
          stroke = "black"
          stroke_width= 0.1
-         if terrain == "ocean" and !(is_trade_node?(@state.map, hex) and hex.trade)            
-            stroke = trade_node_colors["#{hex.trade.x},#{hex.trade.y}"]
-            stroke_width = 1.0
-            # terrain_color = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}".to_sym]
+         # stroke = "transparent"
+         # stroke_width= 0
+         
+         # show the ocean in trade node colors
+         # if !is_trade_node?(@state.map, hex) and hex.trade
+         #    terrain_color = trade_node_colors["#{hex.trade.x},#{hex.trade.y}".to_sym]
+         # end
 
-         elsif terrain != "peak" and !is_trade_node?(@state.map, hex) and hex.trade
-            # stroke = trade_node_colors["#{hex.trade_node.x},#{hex.trade_node.y}"]
-            # stroke_width = 2.0
-            terrain_color = trade_node_colors["#{hex.trade.x},#{hex.trade.y}".to_sym]
-         end
          io.print "\" fill=\"#{terrain_color}\" stroke=\"#{stroke}\" stroke-width=\"#{stroke_width}\" />"
 
          x = pos[:x].to_f - (hexsize.to_f/2).to_f
          y = pos[:y].to_f - (hexsize.to_f/2).to_f
+         text_color = 'black';
          if terrain == "town"
+            text_color = 'white';
             io.print "<use href=\"#town\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"white\" style=\"opacity:1.0\" />"
          elsif terrain == "city"
+            text_color = 'white';
             io.print "<use href=\"#city\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"white\" style=\"opacity:1.0\" />"
          elsif terrain == "ocean" and is_trade_node? @state.map, hex
-            io.print "<use href=\"#trade\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"black\" style=\"opacity:0.8\" />"
+            io.print "<use href=\"#trade\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"white\" style=\"opacity:0.8\" />"
          end
+         
+         if terrain == "town"  or terrain == "city"
+            io.print "<text font-size=\"2px\" x=\"#{hex_points[0][:x]}\" y=\"#{(hex_points[2][:y] + hex_points[3][:y]) / 2}\" width=\"#{hex_points[0][:x] - hex_points[2][:x]}\" fill=\"#{text_color}\" text-anchor=\"middle\">#{hex.x},#{hex.y}</text>"
+         end
+      }
+      
+      # iterate again and add all borders AFTER hexs
+      @state.map.each { | key, hex |
+         if hex.is_a?(Emissary::Settlement)
+            if hex.borders    
+               
+               border_lines = Array.new
+               hex.borders.each { |border|
+                  border_area = @state.getHexFromCoord(border)
+                  border_center = Emissary::MapUtils::hex_pos(border[:x], border[:y], hexsize, xoffset, yoffset)
+                  border_points = Emissary::MapUtils::hex_points(border_center[:x], border_center[:y], hexsize)
+                  border_area_province = border_area&.province&.name
+                  border_area_province = border_area.name if border_area.is_a?(Emissary::Settlement)
+                 
 
-         # io.print "<text font-size=\"8px\" x=\"#{x}\" y=\"#{pos[:y]}\" fill=\"white\">#{hex.x},#{hex.y}</text>"
+                  adjacent_coords = Emissary::MapUtils.adjacent(border, @state.map.size)                  
+                  adjacent_coords.each { |adjacent_coord|
+                     adjacent_hex = @state.getHexFromCoord(adjacent_coord)
+                     if adjacent_hex 
+                        adjacent_hex_province = adjacent_hex&.province&.name
+                        adjacent_hex_province = adjacent_hex.name if adjacent_hex.is_a?(Emissary::Settlement)
+                        
+                        if adjacent_hex and adjacent_hex_province != border_area_province
+
+                           adjacent_center = Emissary::MapUtils::hex_pos(adjacent_hex.x, adjacent_hex.y, hexsize, xoffset, yoffset)
+                           adjacent_points = Emissary::MapUtils::hex_points(adjacent_center[:x], adjacent_center[:y], hexsize)                        
+                           common_points = adjacent_points.select { |point|
+                              border_points.any? { |border_point| 
+                                 (point[:x] - border_point[:x]).abs < 0.1 && 
+                                 (point[:y] - border_point[:y]).abs < 0.1 
+                              }
+                           }
+                           border_lines.push(common_points) if common_points.length == 2                                                   
+                        end
+                     end
+                  }
+               }
+
+               border_lines.each do |border_points|
+                  io.print "<line x1=\"#{border_points[0][:x].round(2)}\" y1=\"#{border_points[0][:y].round(2)}\" "
+                  io.print "x2=\"#{border_points[1][:x].round(2)}\" y2=\"#{border_points[1][:y].round(2)}\" "
+                  io.print "stroke=\"#000000CC\" stroke-width=\"1\" stroke-dasharray=\"2,3\" />"
+               end
+            end
+                                                  
+            if hex.coast            
+               # puts "Hex at #{hex.x},#{hex.y} has coast: #{hex.coast}"
+            end
+         end
+         
+
       }
 
       # town and city labels
