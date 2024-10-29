@@ -68,7 +68,7 @@ module Emissary
           agent_report = game.agent_report(area, agent.range)
           agent_report.each do | agent_area_report |
             hex = game.getHexFromCoord agent_area_report
-            add_area(hex, agent.depth - (agent_area_report[:score]-1), report, player, game)
+            add_area(hex, agent.depth - agent_area_report[:score], report, player, game)
           end          
           
         end

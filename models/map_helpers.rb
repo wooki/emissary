@@ -37,11 +37,10 @@ module Emissary
                 hex_key = "#{coord[:x]},#{coord[:y]}"
                 if !hexes.has_key?(hex_key)
 
-                    # Calculate total path cost including current hex
+                    # Calculate total path cost excluding current hex
                     path_cost = path.reduce(0) { |sum, hex| 
                         sum + (terrain_weights[state.getHexFromCoord(hex).terrain] || 1)
                     }
-                    current_cost = terrain_weights[terrain] || 1
                     
                     hexes.store(hex_key, {
                         x: coord[:x], 
