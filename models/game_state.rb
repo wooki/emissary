@@ -2,7 +2,7 @@ module Emissary
   require 'json'
   require 'yaml'
   require 'random/formatter'
-  require 'emissary-maps'
+  require_relative './map_helpers'
   require_relative './area'
   require_relative './settlement'
   require_relative './trade_node'
@@ -305,7 +305,7 @@ module Emissary
     end
 
     def agent_report(start, max_distance)
-      MapUtils::get_hexes_in_range(self, start.coord, size, max_distance, exclude_ocean=true, terrain_weights=AGENT_REPORT_TERRAIN_WEIGHTS)
+      MapHelpers.get_hexes_in_range(self, start.coord, size, max_distance, exclude_ocean=true, terrain_weights=AGENT_REPORT_TERRAIN_WEIGHTS)
     end
 
     def find_agent(agent_id)

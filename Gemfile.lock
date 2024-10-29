@@ -6,9 +6,9 @@ GIT
 
 GIT
   remote: https://github.com/wooki/emissary-maps.git
-  revision: 830a70d13dd8e918d48f9b051270d98300f9b5e8
+  revision: 70b086443c5db529d5d4c774e600e6d3943d8bc0
   specs:
-    emissary-maps (0.1.1)
+    emissary-maps (0.1.2)
 
 GIT
   remote: https://github.com/wooki/emissary-names.git
