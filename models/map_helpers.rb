@@ -45,7 +45,7 @@ module Emissary
                     hexes.store(hex_key, {
                         x: coord[:x], 
                         y: coord[:y], 
-                        score: (path_cost + current_cost)
+                        score: path_cost
                     })
                 end
                 # Never "found" - continue searching until max_distance reached
