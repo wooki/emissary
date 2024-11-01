@@ -1,5 +1,5 @@
 require_relative '../rules/set_trade_policy'
-require_relative '../rules/set_pay_agent'
+require_relative '../rules/retire_agent'
 require_relative '../rules/hire_agent'
 
 module Emissary
@@ -12,7 +12,7 @@ module Emissary
     def initialize
       @rules = {
         'trade_policy' => SetTradePolicy,
-        'pay_agent' => SetPayAgent,
+        'retire_agent' => RetireAgent,
         'hire_agent' => HireAgent
       }
     end

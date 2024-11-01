@@ -125,9 +125,9 @@ class DrawMap
             io.print "<use href=\"#trade\" x=\"#{x.round(2)}\"  y=\"#{y.round(2)}\" fill=\"white\" style=\"opacity:0.8\" />"
          end
          
-         if terrain == "town"  or terrain == "city"
+         # if terrain == "town"  or terrain == "city"
             io.print "<text font-size=\"2px\" x=\"#{hex_points[0][:x]}\" y=\"#{(hex_points[2][:y] + hex_points[3][:y]) / 2}\" width=\"#{hex_points[0][:x] - hex_points[2][:x]}\" fill=\"#{text_color}\" text-anchor=\"middle\">#{hex.x},#{hex.y}</text>"
-         end
+         # end
       }
       
       # iterate again and add all borders AFTER hexs

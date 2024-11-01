@@ -35,7 +35,6 @@ module Emissary
         agent.message("Ready for orders.", "Agent")
         agent.owner = @player
         agent.next_payment = game.turn + 12
-        agent.will_pay = true
         hex.add_agent agent
 
         game.info "HIRE", hex, "Agent hired by #{kingdom.name} for 12 turns.", {gold: 0 - cost}

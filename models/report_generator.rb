@@ -56,6 +56,16 @@ module Emissary
           game.each_area_in_province(urban) { | area |
             add_area(area, INFO_LEVELS[:PUBLIC], report, player, game)
           }
+
+          # add any adjacent provinces
+          urban.neighbours.each do | coord |
+            neighbour = game.getHexFromCoord(coord)
+            add_area(neighbour, INFO_LEVELS[:KNOWN], report, player, game)
+
+            game.each_area_in_province(neighbour) { | area |
+              add_area(area, INFO_LEVELS[:KNOWN], report, player, game)
+            }
+          end
         end
 
         false

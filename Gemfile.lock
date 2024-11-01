@@ -6,9 +6,9 @@ GIT
 
 GIT
   remote: https://github.com/wooki/emissary-maps.git
-  revision: 70b086443c5db529d5d4c774e600e6d3943d8bc0
+  revision: 2592337fedabb03032c745d1f3c87590c07fdf8c
   specs:
-    emissary-maps (0.1.2)
+    emissary-maps (0.1.4)
 
 GIT
   remote: https://github.com/wooki/emissary-names.git
@@ -19,12 +19,14 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    algorithms (1.0.1)
     titleize (1.4.1)
 
 PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  algorithms
   emissary-battles!
   emissary-maps!
   emissary-names!

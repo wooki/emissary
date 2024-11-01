@@ -9,3 +9,4 @@ gem 'emissary-battles', git: 'https://github.com/wooki/emissary-battles.git'
 gem 'emissary-maps', git: 'https://github.com/wooki/emissary-maps.git'
 
 gem 'titleize'
+gem "algorithms"
