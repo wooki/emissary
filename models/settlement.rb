@@ -8,14 +8,13 @@ module Emissary
 class Settlement < Area
 
   attr_accessor :shortcut, :shortcut_help, :owner, :store, :neighbours,
-                :wealth, :unrest, :borders, :tax, :trade_policy, :coast
+                :wealth, :borders, :tax, :trade_policy, :coast
 
   def initialize
     super()
     @store = Store.new
     @neighbours = Array.new
     @wealth = 0
-    @unrest = 0
     @tax = 0.0
 
     # policy can be 
@@ -89,12 +88,6 @@ class Settlement < Area
     @wealth = 0 if @wealth < 0
   end
 
-  def add_unrest(val)
-    @unrest = 0 if !@unrest
-    @unrest = @unrest + val
-    @unrest = 0 if @unrest < 0
-  end
-
   def province_name
     @name 
   end
@@ -125,7 +118,6 @@ class Settlement < Area
     details[:hire_cost] = hire_cost(game) if level >= INFO_LEVELS[:WEALTH] or is_owner
     details[:trade] = @trade #if level >= INFO_LEVELS[:TRADE]
     details[:wealth] = @wealth.round(2) if level >= INFO_LEVELS[:WEALTH] or is_owner
-    details[:unrest] = @unrest.round(2) if level >= INFO_LEVELS[:UNREST] or is_owner
     details[:tax] = @tax.round() if level >= INFO_LEVELS[:PRODUCTION] or is_owner
     details[:trade_policy] = @trade_policy if level >= INFO_LEVELS[:POLICY] or is_owner
 

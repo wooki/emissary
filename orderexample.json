@@ -19,7 +19,7 @@
 		},
 		{
 			"coord": "84,94",
-			"order": "set_trade_policy",
+			"order": "trade_policy",
 			"food": "stockpile",
 			"goods": "reserve"
 		}

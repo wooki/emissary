@@ -56,9 +56,8 @@ module Emissary
                     # increase wealth and add message
                     increase = (total_exported.to_f * WEALTH_EXPORT_RATE).round(4)
                     if increase > 0
-
                         urban.add_wealth(increase)
-                        gameState.info "WEALTH", urban, "Wealth increased by #{increase} due to export of goods and food", {wealth: increase}
+                        gameState.info "WEALTH", urban, "Wealth increased by #{increase.round(2)} due to export of goods and food", {wealth: increase.round(2)}
                     end
                 end
 

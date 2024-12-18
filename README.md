@@ -29,6 +29,7 @@ These are extra areas of specific gameplay functionality that I want to add to t
 * Religion - includes playable religion
 * Ships - trade, piracy, transport, seaborn landings
 * Economics - overhaul of whole system and add playable trading companies, Farms
+* Espionage - recruit agents from pool, fired agents become availible again. Choice to fire/assassinate a agent you dont want. Failed assassassination will cause them to work against you. Could have players playing as spymasters as well as kings, traders and religous leaders.
 * Rivers and Deep Desert
 * Castles
 * Combat - overhaul of whole system

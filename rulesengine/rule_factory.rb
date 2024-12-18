@@ -12,7 +12,7 @@ module Emissary
     def initialize
       @rules = {
         'trade_policy' => SetTradePolicy,
-        'retire_agent' => RetireAgent,
+        'retire' => RetireAgent,
         'hire_agent' => HireAgent
       }
     end

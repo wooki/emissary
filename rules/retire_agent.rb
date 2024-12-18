@@ -4,7 +4,7 @@ require_relative '../models/agent'
 
 module Emissary
   class RetireAgent < Rule
-    attr_accessor :coord, :agent, :data
+    attr_accessor :coord, :agentid, :retire
 
     def initialize(player)
       super(player, TS_SET_ORDER)      
@@ -19,7 +19,7 @@ module Emissary
         return
       end
 
-      agent = hex.agents[@agent]
+      agent = hex.agents[@agentid]
       if !hex
         game.order_error(@player, "Retire agent agent failed because the agent could not be found.");
         return
@@ -30,8 +30,13 @@ module Emissary
         return
       end
 
-      game.retire(@agent)      
-      game.info "HIRE", area, "#{kingdom.name} has retired an agent.", nil
+      # get the players capital
+      kingdom = game.kingdom_by_player(@player)
+            
+      if @retire
+        game.retire(agent)    
+        game.info "HIRE", hex, "#{kingdom.name} has retired an agent.", nil
+      end
 
     end
   end

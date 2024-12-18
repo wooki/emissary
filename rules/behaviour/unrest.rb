@@ -41,10 +41,10 @@ module Emissary
             if urban
 
                 # decrease unrest and add message
-                decrease = UNREST_MET_UPKEEP_RATE
-                urban.add_unrest(0 - decrease)
-                gameState.info "UNREST", urban, "Unrest decreased by #{decrease} following normal food supply", {unrest: 0 - decrease}
-
+                decrease = urban.add_unrest(0 - UNREST_MET_UPKEEP_RATE)
+                if decrease != 0
+                    gameState.info "UNREST", urban, "Unrest decreased by #{decrease} following normal food supply", {unrest: decrease}
+                end
             end
         end
 
@@ -61,6 +61,23 @@ module Emissary
                     gameState.info "UNREST", urban, "Unrest increased by #{increase} following food shortage", {unrest: increase}
 
                 end
+            end
+        end
+
+        # is reduced every turn in rural areas
+        def self.ruralDecrease(hex, gameState)
+
+            if hex && hex.unrest > 0
+
+                return unless hex.population && hex.population > 0
+                return if hex.terrain == "town" || hex.terrain == "city"
+    
+                # decrease unrest and add message
+                decrease = urban.add_unrest(0 - UNREST_RECOVERY_RURAL)
+                if decrease != 0
+                    gameState.info "UNREST", hex, "Unrest decreased due to peaceful tranquility of the countryside", {unrest: decrease}
+                end
+            
             end
         end
 

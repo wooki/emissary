@@ -5,6 +5,7 @@ module Emissary
 
   TS_SET_ORDER = 5
   
+  TS_RURAL = 6 # rural only
   TS_PRODUCTION = 10 # raw materials collected
   TS_IMPORT = 20 # urbans buy food and goods required
   TS_INDUSTRY = 100 # urbans generate goods from goods

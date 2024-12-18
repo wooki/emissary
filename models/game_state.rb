@@ -310,7 +310,7 @@ module Emissary
 
     def find_agent(agent_id)
       each_agent do |agent_key, agent, area|
-        if agent.id == agent_key
+        if agent_id == agent_key
           yield agent, area
         end
       end      

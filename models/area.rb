@@ -6,13 +6,15 @@ module Emissary
 class Area
 
   attr_accessor :x, :y, :terrain, :population,
-    :food, :goods, :province, :trade_node, :info, :trade, :messages, :agents, :seed
+    :food, :goods, :province, :trade_node, :info, :trade, :messages, :agents, :seed,
+    :manpower, :unrest
 
   def initialize
     super()
     @info = Array.new
     @agents = Hash.new
     @messages = Array.new
+    @unrest = 0
   end
 
   def new_turn
@@ -56,6 +58,14 @@ class Area
     "#{@terrain} in #{@province.name}" 
   end
 
+  def add_unrest(val)
+    @unrest = 0 if !@unrest
+    old_unrest = @unrest
+    @unrest = @unrest + val
+    @unrest = 0 if @unrest < 0
+    @unrest - old_unrest
+  end
+  
   def report(level, player, game, is_owner=false)
     
     details = {x: @x, y: @y, terrain: @terrain }
@@ -93,6 +103,9 @@ class Area
         (!player.nil? and info_item[:player] == player) or info_item[:level] <= level or is_owner
       end
     end
+
+    details[:unrest] = @unrest.round(2) if level >= INFO_LEVELS[:UNREST] or is_owner
+    details[:manpower] = @manpower.round(2) if level >= INFO_LEVELS[:MANPOWER]
 
     details
   end  

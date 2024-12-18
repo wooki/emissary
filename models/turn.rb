@@ -8,6 +8,7 @@ require_relative '../rules/upkeep'
 require_relative '../rules/trade_prices'
 require_relative '../rules/level_agent'
 require_relative '../rules/pay_agent'
+require_relative '../rules/unrest_recovery_rural'
 require_relative './report_generator'
 require_relative './order_parser'
 
@@ -44,8 +45,8 @@ module Emissary
 
         # Production
         @state.each_rural.each do |area|
+          queue.AddRule(UnrestRecoveryRural.new(area))
           queue.AddRule(Production.new(area))
-
           queue.AddRule(TradePrices.new(area)) if area.trade_node and area.trade_node.is_node
         end
 

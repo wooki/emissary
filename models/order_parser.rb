@@ -65,7 +65,9 @@ module Emissary
       # all the sub elements are orders
       orders.each do |order|
         
+        # DEBUG: print out the order
         pp order
+        
         # get the order name
         orderName = order["order"]
 

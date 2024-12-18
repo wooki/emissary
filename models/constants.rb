@@ -24,6 +24,14 @@ module Emissary
     AGENT_COST_PER_DISTANCE = 0.1
     AGENT_REPORT_TERRAIN_WEIGHTS = {lowland: 1.0, forest: 2.0, mountain: 1.5, town: 0.5, city: 0.5, desert: 2.0, peak: 3.0, ocean: 2.0}
 
+    MANPOWER_PER_POPULATION = 0.3 # max proportion of population that can be recruited
+    MANPOWER_RECOVERY_RATE = 0.001 # recovery rate of manpower per turn
+    UNREST_RECRUITMENT_RATE = 0.0002 # rate at which 1% of low manpower is added to unrest
+    UNREST_RECOVERY_RURAL = 0.001 # base decrease in unrest in rural areas is just fixed so happens over time
+
+    POPULATION_GROWTH_RATE = 0.020 # population growth rate per turn. setttlement wealth increases this, but rurals are decreased by the wealth of their settlement    
+    
+
     INFO_LEVELS = {
         # level required to gain this info
         PRODUCTION: 2,
@@ -34,6 +42,7 @@ module Emissary
         UNREST: 3,
         STORE: 6,
         WEALTH: 4,
+        MANPOWER: 5,
         POLICY: 7,
         HIRE: 6,
         MESSAGES: 8,

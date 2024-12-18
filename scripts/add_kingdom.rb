@@ -108,7 +108,7 @@ class AddKingdom
     # Take the first five digits from the shuffled array
     unique_digits = shuffled_digits[0, 3]
     unique_digits.unshift all_digits.sample
-    unique_digits.unshift all_digits.sample % 3 # force 0-2
+    unique_digits.unshift all_digits.sample
 
     # Convert the array to a string
     unique_digits.join
