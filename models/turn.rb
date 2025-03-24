@@ -59,14 +59,14 @@ module Emissary
         end
 
         # TradePrices
-        @state.each_trade_node.each do |area|
-          queue.AddRule(TradePrices.new(area.trade_node))
-        end
+        # @state.each_trade_node.each do |area|
+        #   queue.AddRule(TradePrices.new(area.trade_node))
+        # end
 
         # agents
         # Import, Export, Industry, Upkeep
         @state.each_agent do | agent_key, agent, area |
-          queue.AddRule(LevelAgent.new(agent))
+          queue.AddRule(LevelAgent.new(agent, area))
           queue.AddRule(PayAgent.new(agent))
         end
 

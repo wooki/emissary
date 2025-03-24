@@ -48,7 +48,7 @@ module Emissary
                         @trade.trade_node.buy_later(:food, buy_food)
                         trades.push Trade.new(@urban, @trade.trade_node, :food, false, @urban.import_message(:food), buy_food, nil, true)
 
-                        # we will payonly in the trade so deliver immeditely
+                        # we will payonly in the trade but deliver immeditely
                         @urban.store.food = @urban.store.food + buy_food
                     end
 
@@ -60,7 +60,7 @@ module Emissary
                         @trade.trade_node.buy_later(:goods, buy_goods)
                         trades.push Trade.new(@urban, @trade.trade_node, :goods, false, @urban.import_message(:goods), buy_goods, nil, true)
 
-                        # we will payonly in the trade so deliver immeditely
+                        # we will payonly in the trade but deliver immeditely
                         @urban.store.goods = @urban.store.goods + buy_goods
                     end
 

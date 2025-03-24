@@ -13,7 +13,7 @@ module Emissary
             # cost is based on wealth of province    
             if area.kind_of? Settlement
                 cost = 1.0 + (1.0 * area.wealth)                
-            else
+            else              
                 cost_factor = 1.0 - (AGENT_COST_PER_DISTANCE * area.province.distance)
                 urban = game.getHex(area.province.x, area.province.y)    
                 cost = [0.25, cost_factor].max + (1.0 * urban.wealth)                

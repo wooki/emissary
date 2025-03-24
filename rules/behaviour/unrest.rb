@@ -48,7 +48,7 @@ module Emissary
             end
         end
 
-        # is reduced when food upkeep is not met
+        # is increased when food upkeep is not met
         def self.failedUpkeep(urban, unrest, gameState)
 
             if urban

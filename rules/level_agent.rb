@@ -4,16 +4,30 @@ require_relative '../models/agent'
 
 module Emissary
   class LevelAgent < Rule
-    attr_accessor :agent
+    attr_accessor :agent, :area
 
-    def initialize(agent)    
+    def initialize(agent, area)    
       super(nil, TS_LEVEL_AGENT, true)      
       @agent = agent
+      @area = area
     end
 
-    def execute(game)
+    def execute(game)                  
       
-      # aray of possible improvements
+      # level-up is random and depends on terrain
+      chance = 0.5
+      if @area.terrain == 'town'
+        chance = 0.75
+      elsif @area.terrain == 'city'
+        chance = 0.9
+      end
+
+      if rand < chance
+        @agent.message("Bided his time", "Agent")
+        return
+      end
+
+      # array of possible improvements
       level_up = []
       level_up.push :range if @agent.range < 10 and @agent.range < [@agent.depth + 2, @agent.skill + 2].min
       level_up.push :depth if @agent.depth < 10 and @agent.depth < [@agent.range + 2, @agent.skill + 2].min
