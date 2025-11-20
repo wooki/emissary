@@ -201,7 +201,7 @@ module Emissary
     def each_player
       players = []
       @kingdoms.each do |_key, kingdom|
-        players.push players if !block_given? or yield kingdom.player, kingdom
+        players.push kingdom.player if !block_given? or yield kingdom.player, kingdom
       end
 
       return nil if players.length == 0
@@ -341,8 +341,8 @@ module Emissary
     ##################################
     def kingdom_names_unique(name, capital)
       @kingdoms.each do |_key, kingdom|
-        return false if kingdom.name.downcase.gsub!(/\s+/, '') == name.downcase.gsub!(/\s+/, '') or
-                        kingdom.capital.downcase.gsub!(/\s+/, '') == capital.downcase.gsub!(/\s+/, '')
+        return false if kingdom.name.downcase.gsub(/\s+/, '') == name.downcase.gsub(/\s+/, '') or
+                        kingdom.capital.downcase.gsub(/\s+/, '') == capital.downcase.gsub(/\s+/, '')
       end
       true
     end

@@ -47,7 +47,7 @@ class Area
   end
 
   def message(msg, from)    
-    @messages.push Message.new(message, from)
+    @messages.push Message.new(msg, from)
   end
 
   def hire_cost(game)

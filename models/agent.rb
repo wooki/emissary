@@ -55,7 +55,7 @@ class Agent
     details[:range] = @range if level >= INFO_LEVELS[:FULL] or is_owner
     details[:depth] = @depth if level >= INFO_LEVELS[:FULL] or is_owner
     details[:skill] = @skill if level >= INFO_LEVELS[:FULL] or is_owner
-    details[:level] = @level if level >= INFO_LEVELS[:FULL] or is_owner
+    details[:level] = level if level >= INFO_LEVELS[:FULL] or is_owner
     details[:next_payment] = @next_payment if level >= INFO_LEVELS[:FULL] or is_owner
     details[:cost] = self.cost(area, game) if level >= INFO_LEVELS[:FULL] or is_owner
     
